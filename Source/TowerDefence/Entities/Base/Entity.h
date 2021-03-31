@@ -2,7 +2,6 @@
 #include "Buff.h"
 #include "GameFramework/Character.h"
 #include "Interface/EntityAppearanceInterface.h"
-#include "UObject/ObjectMacros.h"
 
 
 #include "Entity.generated.h"
@@ -30,13 +29,13 @@ struct FEntityHitAttack
     // 攻击率，每一段攻击对应总攻击的百分比
     float AttackRate;
     // 攻击时间
-    float HitTime;
+    float AttackTime;
     // 硬直
     float Stiff;
     // 攻击的时候buff
     FBuff Buff;
     // 发出的子弹
-    TSoftObjectPtr<ABullet> Bullet;
+    TSubclassOf<ABullet> BulletClass;
 };
 
 // 基础参数
@@ -55,8 +54,7 @@ struct FEntity
         
     // 部署时间
     UPROPERTY()
-    int32 DeployTime = 1.f;
-    
+    float DeployTime = 1.f;
    
     // 基础攻击值
     UPROPERTY()
@@ -86,6 +84,15 @@ struct FEntity
     TArray<FEntityHitAttack> Attacks;
 };
 
+// 攻击的时候的视觉特效
+USTRUCT(BlueprintType)
+struct FHitAttackVisualEffect
+{
+    GENERATED_BODY()
+    int32 EntityID;
+    TArray<TSoftObjectPtr<UAnimationAsset>> Anims;
+};
+
 
 UCLASS(Blueprintable)
 class AEntity: public ACharacter,public
@@ -99,16 +106,26 @@ public:
     
     
     // 初始化实体
-    void InitEntity(const FEntity& Params, FTransform TargetTransform,
+    void InitEntity(const FEntity& Params, const FHitAttackVisualEffect& InAttackVisualEffect, FTransform TargetTransform,
         const TArray<FBuff>& BasePermanentBuffs);
     void Tick(float DeltaSeconds) override;
+    virtual void BeginPlay() override;
+    virtual void OnAttack() override;
 private:
     FEntity BaseEntityParams;
     TArray<AEntity*> CurrentAttackedEntities;
-    
-     void CalculateAttackEntities();
+    FHitAttackVisualEffect HitAttackVisualEffect;
 
     
-    // 连招相关
+    void CalculateAttackEntities();
+    void Attack(float DeltaSeconds);    
+    // 连招
+    // 当前连招使用哪个id
+    int32 CurrentHitIdx = 0;
+    // 该招式的剩余时间
+    float LeftHitTime;
+
     
+    bool IsDeath = false;
+    float LeftDeathTime = 1.f;
 };

@@ -2,7 +2,8 @@
 
 #include "Kismet/GameplayStatics.h"
 
-void AEntity::InitEntity(const FEntity& Params, FTransform TargetTransform, const TArray<FBuff>& BasePermanentBuffs)
+void AEntity::InitEntity(const FEntity& Params, const FHitAttackVisualEffect& InAttackVisualEffect, FTransform TargetTransform,
+        const TArray<FBuff>& BasePermanentBuffs)
 {
 
      // 初始化Mesh
@@ -10,11 +11,10 @@ void AEntity::InitEntity(const FEntity& Params, FTransform TargetTransform, cons
      check(MeshComp);
      MeshComp->SetSkeletalMesh(Params.SkeletalMesh.LoadSynchronous());
      // 对初始值进行初始化
-
-     
      SetActorTransform(TargetTransform);
-
-     
+    // 初始化攻击时视觉特效
+    HitAttackVisualEffect = InAttackVisualEffect;
+    
      BaseEntityParams = Params;
   for(const FBuff& Item: BasePermanentBuffs)
   {
@@ -58,24 +58,76 @@ void AEntity::InitEntity(const FEntity& Params, FTransform TargetTransform, cons
 void AEntity::Tick(float DeltaSeconds)
 {
      // 首先看是否是在部署
-     if(BaseEntityParams.DeployTime>0)
+     if(BaseEntityParams.DeployTime>=0)
      {
          BaseEntityParams.DeployTime -=DeltaSeconds;
-         OnDeploy();
          return;
      }
      // 攻击
+    if(!IsDeath)
+    {
+        Attack(DeltaSeconds);
+    }
+    else
+    {
+        if(LeftDeathTime>=0)
+        {
+            LeftDeathTime -= DeltaSeconds;
+            
+        }
+        else
+        {
+            Destroy();
+        }
+    }
      
+}
+
+void AEntity::BeginPlay()
+{
+    Super::BeginPlay();
+    OnDeploy();
+    if(BaseEntityParams.Attacks.Num()>=0)
+    {
+        CurrentHitIdx = 0;
+        LeftHitTime = BaseEntityParams.Attacks[CurrentHitIdx].Stiff;
+    }
+    
 }
 
 void AEntity::CalculateAttackEntities()
 {
+    TArray<AActor*> FoundActors;
+
     switch (BaseEntityParams.EntityType)
     {
+        // 范围攻击，查找攻击范围所有的目标
         case EEntityType::RangeAttack:
-            break; 
-        case EEntityType::Assist:
+            CurrentAttackedEntities.Empty();
+            UGameplayStatics::GetAllActorsOfClass(GetWorld(), TargetAttackEntityClass, FoundActors);
+            for(AActor* Actor: FoundActors)
+            {
+                float Dist = FVector::DistSquaredXY(Actor->GetActorLocation(), GetActorLocation());
+                if(Dist <= BaseEntityParams.AttackRadius)
+                {
+                    CurrentAttackedEntities.Add(Cast<AEntity>(Actor));
+                }
+            }
             break;
+        // 辅助，对己方发动
+        case EEntityType::Assist:
+            CurrentAttackedEntities.Empty();
+            UGameplayStatics::GetAllActorsOfClass(GetWorld(), StaticClass(), FoundActors);
+        for(AActor* Actor: FoundActors)
+        {
+            float Dist = FVector::DistSquaredXY(Actor->GetActorLocation(), GetActorLocation());
+            if(Dist <= BaseEntityParams.AttackRadius)
+            {
+                CurrentAttackedEntities.Add(Cast<AEntity>(Actor));
+            }
+        }
+            break;
+        // 单个攻击，对敌方有效
         case EEntityType::SingleAttack:
             if(CurrentAttackedEntities.Num() > 0)
             {
@@ -84,7 +136,7 @@ void AEntity::CalculateAttackEntities()
                 if(Distance> BaseEntityParams.AttackRadius)
                 {
                     CurrentAttackedEntities.Empty();
-                    TArray<AActor*> FoundActors;
+                   
                     UGameplayStatics::GetAllActorsOfClass(GetWorld(), TargetAttackEntityClass, FoundActors);
                     // get the nearest actor
                     AActor* NearestActor = nullptr;
@@ -113,4 +165,34 @@ void AEntity::CalculateAttackEntities()
             }
             break;
     }
+}
+
+void AEntity::Attack(float DeltaSeconds)
+{
+    const FEntityHitAttack* CurrentAttack;
+    if(BaseEntityParams.Attacks.Num()<=0)
+        return;
+    // 切换招式
+    if(LeftHitTime <= 0)
+    {
+        CurrentHitIdx = (CurrentHitIdx+1)%BaseEntityParams.Attacks.Num();
+        CurrentAttack = &BaseEntityParams.Attacks[CurrentHitIdx];
+        LeftHitTime = CurrentAttack->Stiff;
+        OnAttack();
+    }
+    LeftHitTime -= LeftHitTime-DeltaSeconds;
+    
+    
+}
+
+void AEntity::OnAttack()
+{
+    // 计算可以攻击的目标对象组
+    CalculateAttackEntities();
+    const FEntityHitAttack& CurrentAttack = BaseEntityParams.Attacks[CurrentHitIdx];
+    for(AEntity* AttackEntity: CurrentAttackedEntities)
+    {
+        
+    }
+    // 播放动画
 }
