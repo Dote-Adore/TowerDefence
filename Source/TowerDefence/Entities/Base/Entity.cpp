@@ -2,7 +2,7 @@
 
 #include "Kismet/GameplayStatics.h"
 
-void AEntity::InitEntity(const FEntity& Params, const FHitAttackVisualEffect& InAttackVisualEffect, FTransform TargetTransform,
+void AEntity::InitEntity(const FEntityParams& Params, const FHitAttackVisualEffect& InAttackVisualEffect, FTransform TargetTransform,
         const TArray<FBuff>& BasePermanentBuffs)
 {
 
@@ -18,7 +18,7 @@ void AEntity::InitEntity(const FEntity& Params, const FHitAttackVisualEffect& In
      BaseEntityParams = Params;
   for(const FBuff& Item: BasePermanentBuffs)
   {
-      for(const FBuffAtom& BuffParam:Item)
+      for(const FBuffAtom& BuffParam:Item.EffectParams)
       {
          FProperty* TargetProerty = BaseEntityParams.StaticStruct()->FindPropertyByName(BuffParam.TargetPropertyName);
           if(TargetProerty)
@@ -28,10 +28,10 @@ void AEntity::InitEntity(const FEntity& Params, const FHitAttackVisualEffect& In
               {
                   switch(Item.BuffType)
                   {
-                      case FBuff::Addition:
+                      case EBuffType::Addition:
                           *TargetValue += BuffParam.TargetValue;
                       break;
-                      case FBuff::Magnification:
+                      case EBuffType::Magnification:
                           *TargetValue*=BuffParam.TargetValue;
                       break;
                   }
@@ -42,10 +42,10 @@ void AEntity::InitEntity(const FEntity& Params, const FHitAttackVisualEffect& In
               {
                   switch(Item.BuffType)
                   {
-                  case FBuff::Addition:
+                  case EBuffType::Addition:
                       *TargetValue += BuffParam.TargetValue;
                       break;
-                  case FBuff::Magnification:
+                  case EBuffType::Magnification:
                       *TargetValue *= BuffParam.TargetValue;
                       break;
                   }
@@ -86,7 +86,7 @@ void AEntity::Tick(float DeltaSeconds)
 void AEntity::BeginPlay()
 {
     Super::BeginPlay();
-    OnDeploy();
+    // OnDeploy();
     if(BaseEntityParams.Attacks.Num()>=0)
     {
         CurrentHitIdx = 0;

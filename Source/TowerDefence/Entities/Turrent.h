@@ -6,7 +6,7 @@ class ATurrent: public AActor
 {
     GENERATED_BODY()
 public:
-    void InitEntities(FEntity TurrentParams);
+    void InitEntities(FEntityParams TurrentParams);
     void AddBuffs(const TArray<FBuff>& Buffs);
     virtual void Tick(float DeltaSeconds) override;
 
@@ -14,9 +14,9 @@ private:
     void CalculateBuffs(float DeltaSeconds);
     
     // 基础的参数
-    FEntity BaseTurrent;
+    FEntityParams BaseTurrent;
     // 当前加了buff后的参数
-    FEntity CurrentTurrent;
+    FEntityParams CurrentTurrent;
     // 通过id快速找buff
     TMap<int32, FBuff> CurrentBuffs;
 };

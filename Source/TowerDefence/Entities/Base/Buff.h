@@ -10,40 +10,39 @@ struct FBuffAtom
 {
     GENERATED_BODY()
     // 目标更改的属性名
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     FName TargetPropertyName;
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     // 目标属性值
     float TargetValue;
 };
 
+UENUM()
+enum class EBuffType
+{
+    // 倍率buff
+    Magnification,
+    // 加法buff
+    Addition,
+    // 持续性地加法buff
+    ContinuouslyAddition
+};
 USTRUCT(BlueprintType)
 struct FBuff
 {
-
-    UENUM()
-    enum EBuffType
-    {
-        // 倍率buff
-        Magnification,
-        // 加法buff
-        Addition,
-        // 持续性地加法buff
-        ContinuouslyAddition
-    };
     
     GENERATED_BODY()
 
     
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     EBuffType BuffType;
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     int32 BuffID;
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     FName DisplayName;
     // 持续时间
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     float duration;
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     TArray<FBuffAtom> EffectParams;
 };

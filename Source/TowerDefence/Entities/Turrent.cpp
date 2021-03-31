@@ -1,6 +1,6 @@
 ﻿#include "Turrent.h"
 
-void ATurrent::InitEntities(FEntity TurrentParams)
+void ATurrent::InitEntities(FEntityParams TurrentParams)
 {
     this->BaseTurrent = TurrentParams;
 }

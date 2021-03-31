@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "Buff.h"
+#include "Engine/DataTable.h"
 #include "GameFramework/Character.h"
-#include "Interface/EntityAppearanceInterface.h"
 
 
 #include "Entity.generated.h"
@@ -9,7 +9,7 @@
 
 class ABullet;
 class UAnimationAsset;
-UENUM(BlueprintType)
+UENUM()
 enum class EEntityType
 {
     // 一对一攻击
@@ -25,62 +25,66 @@ USTRUCT(BlueprintType)
 struct FEntityHitAttack
 {
     GENERATED_BODY()
+    UPROPERTY(EditAnywhere)
     float Radius;
     // 攻击率，每一段攻击对应总攻击的百分比
+    UPROPERTY(EditAnywhere)
     float AttackRate;
     // 攻击时间
+    UPROPERTY(EditAnywhere)
     float AttackTime;
     // 硬直
+    UPROPERTY(EditAnywhere)
     float Stiff;
     // 攻击的时候buff
+    UPROPERTY(EditAnywhere)
     FBuff Buff;
     // 发出的子弹
+    UPROPERTY(EditAnywhere)
     TSubclassOf<ABullet> BulletClass;
 };
 
 // 基础参数
 USTRUCT(BlueprintType)
-struct FEntity
+struct FEntityParams:public FTableRowBase
 {
     GENERATED_BODY()
-    UPROPERTY()
-    int32 ID;
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     FName DisplayName;
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     TSoftObjectPtr<USkeletalMesh> SkeletalMesh;
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     EEntityType EntityType;
         
     // 部署时间
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     float DeployTime = 1.f;
    
     // 基础攻击值
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     int32 Attack;
     // 生命值
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     int32 HP;
     // 防御值
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     int32 Defence;
     // 攻击速率
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     float AttackSpeedRate = 1.f;
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     float AttackRadius;
     
     // 暴击率
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     float CritRate;
     // 暴击伤害(百分比)
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     float CritDamageRate;
 
 
     // 列表的作用是用来连招用
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     TArray<FEntityHitAttack> Attacks;
 };
 
@@ -95,24 +99,25 @@ struct FHitAttackVisualEffect
 
 
 UCLASS(Blueprintable)
-class AEntity: public ACharacter,public
-IEntityAppearanceInterface
+class AEntity: public ACharacter
+// ,public IEntityAppearanceInterface
 {
     GENERATED_BODY()
 public:
     // 目标攻击的Entity类型;
-    UPROPERTY()
+    UPROPERTY(EditDefaultsOnly)
     TSubclassOf<AEntity> TargetAttackEntityClass;
     
     
     // 初始化实体
-    void InitEntity(const FEntity& Params, const FHitAttackVisualEffect& InAttackVisualEffect, FTransform TargetTransform,
+    void InitEntity(const FEntityParams& Params, const FHitAttackVisualEffect& InAttackVisualEffect, FTransform TargetTransform,
         const TArray<FBuff>& BasePermanentBuffs);
     void Tick(float DeltaSeconds) override;
+    const FEntityParams& GetBaseEntityParams() const { return BaseEntityParams;};
     virtual void BeginPlay() override;
-    virtual void OnAttack() override;
+    virtual void OnAttack();
 private:
-    FEntity BaseEntityParams;
+    FEntityParams BaseEntityParams;
     TArray<AEntity*> CurrentAttackedEntities;
     FHitAttackVisualEffect HitAttackVisualEffect;
 
