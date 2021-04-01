@@ -14,7 +14,6 @@ public:
 
 
 protected:
-    UParticleSystemComponent* ParticleSystemComp;
     UStaticMeshComponent* StaticMeshComponent;
 };
 
@@ -38,4 +37,5 @@ public:
     // 飞行速度
     UPROPERTY(EditDefaultsOnly)
     float Speed;
+    virtual void File(AEntity* ParentEntity, AEntity* TargetAttackEntity, const FEntityHitAttack& CurrentAttack) override;
 };

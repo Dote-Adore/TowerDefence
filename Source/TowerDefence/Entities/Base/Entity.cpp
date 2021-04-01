@@ -2,7 +2,7 @@
 
 #include "Kismet/GameplayStatics.h"
 
-void AEntity::InitEntity(const FEntityParams& Params, const FHitAttackVisualEffect& InAttackVisualEffect, FTransform TargetTransform,
+void AEntity::InitEntity(const FEntityParams& Params, const FEntityAnimation& Anims, FTransform TargetTransform,
         const TArray<FBuff>& BasePermanentBuffs)
 {
 
@@ -13,7 +13,7 @@ void AEntity::InitEntity(const FEntityParams& Params, const FHitAttackVisualEffe
      // 对初始值进行初始化
      SetActorTransform(TargetTransform);
     // 初始化攻击时视觉特效
-    HitAttackVisualEffect = InAttackVisualEffect;
+    Animations = Anims;
     
      BaseEntityParams = Params;
   for(const FBuff& Item: BasePermanentBuffs)
@@ -53,6 +53,8 @@ void AEntity::InitEntity(const FEntityParams& Params, const FHitAttackVisualEffe
           }
       }
   }
+    
+    CurrentEntityParams = BaseEntityParams;
 }
 
 void AEntity::Tick(float DeltaSeconds)
@@ -64,11 +66,11 @@ void AEntity::Tick(float DeltaSeconds)
          return;
      }
      // 攻击
-    if(!IsDeath)
+    //if(!CurrentHP)
     {
         Attack(DeltaSeconds);
     }
-    else
+    //else
     {
         if(LeftDeathTime>=0)
         {
@@ -195,4 +197,13 @@ void AEntity::OnAttack()
         
     }
     // 播放动画
+}
+
+void AEntity::OnDamage(int32 DamageValue,  const FBuff& Buff)
+{
+}
+
+void AEntity::AddBuff(const FBuff& Buff)
+{
+    
 }

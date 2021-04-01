@@ -38,7 +38,7 @@ struct FEntityHitAttack
     float Stiff;
     // 攻击的时候buff
     UPROPERTY(EditAnywhere)
-    FBuff Buff;
+    int32 BuffID;
     // 发出的子弹
     UPROPERTY(EditAnywhere)
     TSubclassOf<ABullet> BulletClass;
@@ -90,11 +90,17 @@ struct FEntityParams:public FTableRowBase
 
 // 攻击的时候的视觉特效
 USTRUCT(BlueprintType)
-struct FHitAttackVisualEffect
+struct FEntityAnimation:public FTableRowBase
 {
     GENERATED_BODY()
+    UPROPERTY(EditAnywhere)
     int32 EntityID;
-    TArray<TSoftObjectPtr<UAnimationAsset>> Anims;
+    UPROPERTY(EditAnywhere)
+    TSoftObjectPtr<UAnimationAsset> IdleAnim;
+    UPROPERTY(EditAnywhere)
+    TSoftObjectPtr<UAnimationAsset> DeathAnim;
+    UPROPERTY(EditAnywhere)
+    TArray<TSoftObjectPtr<UAnimationAsset>> AttackAnims;
 };
 
 
@@ -110,27 +116,28 @@ public:
     
     
     // 初始化实体
-    void InitEntity(const FEntityParams& Params, const FHitAttackVisualEffect& InAttackVisualEffect, FTransform TargetTransform,
+    void InitEntity(const FEntityParams& Params, const FEntityAnimation& Anims, FTransform TargetTransform,
         const TArray<FBuff>& BasePermanentBuffs);
     void Tick(float DeltaSeconds) override;
-    const FEntityParams& GetBaseEntityParams() const { return BaseEntityParams;};
+    const FEntityParams& GetCurrentEntityParams() const { return CurrentEntityParams;};
     virtual void BeginPlay() override;
     virtual void OnAttack();
+    void OnDamage(int32 DamageValue, const FBuff& Buff);
+    void AddBuff(const FBuff& Buff);
 private:
     FEntityParams BaseEntityParams;
+    FEntityParams CurrentEntityParams;
     TArray<AEntity*> CurrentAttackedEntities;
-    FHitAttackVisualEffect HitAttackVisualEffect;
-
+    FEntityAnimation Animations;
+    TMap<int32, FBuff> CurrentBuffs;
     
     void CalculateAttackEntities();
-    void Attack(float DeltaSeconds);    
+    void Attack(float DeltaSeconds);
     // 连招
     // 当前连招使用哪个id
     int32 CurrentHitIdx = 0;
     // 该招式的剩余时间
     float LeftHitTime;
-
     
-    bool IsDeath = false;
     float LeftDeathTime = 1.f;
 };
