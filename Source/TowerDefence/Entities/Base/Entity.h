@@ -132,6 +132,7 @@ public:
     void Tick(float DeltaSeconds) override;
     FEntityParams& GetCurrentEntityParams() { return CurrentEntityParams;};
     virtual void BeginPlay() override;
+    virtual void BeginDestroy() override;
     
     virtual void OnAttack();
     virtual void OnDamage(int32 DamageValue, const FBuff& Buff);

@@ -5,6 +5,11 @@
 UBuffComponent::UBuffComponent(const FObjectInitializer& ObjectInitializer)
     :UActorComponent(ObjectInitializer)
 {
+  
+}
+
+void UBuffComponent::BeginPlay()
+{
     AActor* Owner = GetOwner();
     ParentEntity = Cast<AEntity>(Owner);
     check(ParentEntity);

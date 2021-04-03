@@ -2,7 +2,7 @@
 #include "TowerDefence/Entities/Base/Entity.h"
 #include "EntityCreator.generated.h"
 
-UCLASS()
+UCLASS(Blueprintable)
 class UEntityCreator:public UObject
 {
     GENERATED_BODY()

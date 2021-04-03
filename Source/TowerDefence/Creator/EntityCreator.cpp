@@ -25,12 +25,14 @@ void UEntityCreator::CreateEnemy(int32 EntityID, FTransform EntityTransform)
 
 void UEntityCreator::CreateEntity(int32 EntityID, FTransform EntityTransform, TSubclassOf<AEntity> Entitylass, UDataTable* EntityDatas, UDataTable* AnimDatas)
 {
-    const UGlobalConfig* GlobalConfig = GetDefault<UGlobalConfig>();
-    FEntityParams* TargetFoundParams =  EntityDatas->FindRow<FEntityParams>(GET_MEMBER_NAME_CHECKED(FEntityParams, EntityID), FString::FromInt(EntityID));
-    FEntityAnimation* TargetFoundAnims = AnimDatas->FindRow<FEntityAnimation>(GET_MEMBER_NAME_CHECKED(FEntityAnimation, EntityID), FString::FromInt(EntityID));
+    FEntityParams* TargetFoundParams =  EntityDatas->FindRow<FEntityParams>(FName(*FString::FromInt(EntityID)), "EntityID");
+    FEntityAnimation* TargetFoundAnims = AnimDatas->FindRow<FEntityAnimation>(FName(*FString::FromInt(EntityID)), "EntityID");
     check(TargetFoundParams);
     check(TargetFoundAnims);
-    AEntity* SpawnedEntity = GetWorld()->SpawnActor<AEntity>(Entitylass, EntityTransform);
+    FActorSpawnParameters SpawnParameters;
+    SpawnParameters.Name = TargetFoundParams->DisplayName;
+    SpawnParameters.bNoFail = true;
+    AEntity* SpawnedEntity = GetWorld()->SpawnActor<AEntity>(Entitylass, EntityTransform, SpawnParameters);
     SpawnedEntity->InitEntity(*TargetFoundParams, *TargetFoundAnims, EntityTransform, {});
 }
 

@@ -11,6 +11,7 @@ class UBuffComponent:public UActorComponent
     GENERATED_BODY()
 public:
     UBuffComponent(const FObjectInitializer& ObjectInitializer);
+    void BeginPlay() override;
     void AddBuff(const FBuff& Buff);
     
 private:

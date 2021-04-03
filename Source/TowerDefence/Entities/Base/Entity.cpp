@@ -27,47 +27,18 @@ void AEntity::InitEntity(const FEntityParams& Params, const FEntityAnimation& An
     // 初始化攻击时视觉特效
     Animations = Anims;
      BaseEntityParams = Params;
-  // for(const FBuff& Item: BasePermanentBuffs)
-  // {
-  //     for(const FBuffAtom& BuffParam:Item.EffectParams)
-  //     {
-  //        FProperty* TargetProerty = BaseEntityParams.StaticStruct()->FindPropertyByName(BuffParam.TargetPropertyName);
-  //         if(TargetProerty)
-  //         {
-  //            float* TargetValue = TargetProerty->ContainerPtrToValuePtr<float>(BaseEntityParams.StaticStruct());
-  //             if(TargetValue)
-  //             {
-  //                 switch(Item.BuffType)
-  //                 {
-  //                     case EBuffType::Addition:
-  //                         *TargetValue += BuffParam.TargetValue;
-  //                     break;
-  //                     case EBuffType::Magnification:
-  //                         *TargetValue*=BuffParam.TargetValue;
-  //                     break;
-  //                 }
-  //                 continue;
-  //             }
-  //             int32* TargetIntValue = TargetProerty->ContainerPtrToValuePtr<int32>(BaseEntityParams.StaticStruct());
-  //             if(TargetIntValue)
-  //             {
-  //                 switch(Item.BuffType)
-  //                 {
-  //                 case EBuffType::Addition:
-  //                     *TargetValue += BuffParam.TargetValue;
-  //                     break;
-  //                 case EBuffType::Magnification:
-  //                     *TargetValue *= BuffParam.TargetValue;
-  //                     break;
-  //                 }
-  //             }
-  //         }
-  //     }
-  // }
+     
+     
     CurrentEntityParams = BaseEntityParams;
     for(auto Buff:BasePermanentBuffs)
     {
         BuffComponent->AddBuff(Buff);
+    }
+    // OnDeploy();
+    if(BaseEntityParams.Attacks.Num()>=0)
+    {
+        CurrentHitIdx = 0;
+        LeftHitTime = BaseEntityParams.Attacks[CurrentHitIdx].Stiff;
     }
 }
 
@@ -102,13 +73,12 @@ void AEntity::Tick(float DeltaSeconds)
 void AEntity::BeginPlay()
 {
     Super::BeginPlay();
-    // OnDeploy();
-    if(BaseEntityParams.Attacks.Num()>=0)
-    {
-        CurrentHitIdx = 0;
-        LeftHitTime = BaseEntityParams.Attacks[CurrentHitIdx].Stiff;
-    }
-    
+}
+
+void AEntity::BeginDestroy()
+{
+    Super::BeginDestroy();
+    UE_LOG(LogTemp, Display ,TEXT("A Entity Destoryed"));
 }
 
 void AEntity::CalculateAttackEntities()

@@ -55,6 +55,7 @@ class UBuffEntity : public UObject
 {
     GENERATED_BODY()
 public:
+    UBuffEntity(const FObjectInitializer& ObjectInitializer);
     void Init(const FBuff& Buff, AEntity* Parent);
     virtual void ResetTimer();
     virtual void Start();

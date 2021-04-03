@@ -1,6 +1,11 @@
 ﻿#include "Buff.h"
 #include "Entity.h"
 
+UBuffEntity::UBuffEntity(const FObjectInitializer& ObjectInitializer)
+    :UObject(ObjectInitializer)
+{
+}
+
 void UBuffEntity::Init(const FBuff& Buff, AEntity* Parent)
 {
     ParentEntity =Parent;
@@ -83,8 +88,6 @@ void UBuffEntity::Start()
 
 void UBuffEntity::BeginDestroy()
 {
-    GetWorld()->GetTimerManager().ClearTimer(ContinuouslyTimerHandle);
-    GetWorld()->GetTimerManager().ClearTimer(StopTimerHandle);
     Super::BeginDestroy();
 }
 
