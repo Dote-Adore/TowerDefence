@@ -2,9 +2,12 @@
 #include "TowerDefence/Entities/Base/Buff.h"
 #include "TowerDefence/Entities/Base/Entity.h"
 
-void UBuffComponent::SetParentEntity(AEntity* Entity)
+UBuffComponent::UBuffComponent(const FObjectInitializer& ObjectInitializer)
+    :UActorComponent(ObjectInitializer)
 {
-    ParentEntity = Entity;
+    AActor* Owner = GetOwner();
+    ParentEntity = Cast<AEntity>(Owner);
+    check(ParentEntity);
 }
 
 void UBuffComponent::AddBuff(const FBuff& Buff)
@@ -19,7 +22,8 @@ void UBuffComponent::AddBuff(const FBuff& Buff)
         UBuffEntity*  NewBuff = NewObject<UBuffEntity>(this, UBuffEntity::StaticClass());
         NewBuff->Init(Buff, ParentEntity);
         NewBuff->Start();
-        // NewBuff->OnStopBuffDelegate.CreateRaw(this, &UBuffComponent::RemoveBuff);
+        // 监听buff停止的消息，然后将其remove掉
+        NewBuff->OnStopBuffDelegate.BindUObject(this, &UBuffComponent::RemoveBuff);
     }
 }
 

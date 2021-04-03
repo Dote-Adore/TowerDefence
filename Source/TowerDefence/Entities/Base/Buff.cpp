@@ -15,10 +15,12 @@ void UBuffEntity::ResetTimer()
 
 void UBuffEntity::Start()
 {
+    
     // 持续性的buff有单独一套
     if(MyBuff.BuffType == EBuffType::ContinuouslyAddition)
     {
         GetWorld()->GetTimerManager().SetTimer(ContinuouslyTimerHandle, this, &UBuffEntity::StartContinuously, ContinuouslyAdditionIntervals, true);
+        // 如果buff的时间小于等于0，则说明这个buff是永久有效的
         if(MyBuff.duration>=0)
         {
             GetWorld()->GetTimerManager().SetTimer(StopTimerHandle,this, &UBuffEntity::Stop, MyBuff.duration, false);
@@ -77,6 +79,13 @@ void UBuffEntity::Start()
     {
         GetWorld()->GetTimerManager().SetTimer(StopTimerHandle,this, &UBuffEntity::Stop, MyBuff.duration, false);
     }
+}
+
+void UBuffEntity::BeginDestroy()
+{
+    GetWorld()->GetTimerManager().ClearTimer(ContinuouslyTimerHandle);
+    GetWorld()->GetTimerManager().ClearTimer(StopTimerHandle);
+    Super::BeginDestroy();
 }
 
 

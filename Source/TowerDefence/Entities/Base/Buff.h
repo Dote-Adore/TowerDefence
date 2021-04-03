@@ -58,7 +58,7 @@ public:
     void Init(const FBuff& Buff, AEntity* Parent);
     virtual void ResetTimer();
     virtual void Start();
-
+    virtual void BeginDestroy() override;
     FOnStopBuffDelegate OnStopBuffDelegate;
 protected:
     virtual void Stop();
