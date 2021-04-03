@@ -3,30 +3,32 @@
 #include "Kismet/GameplayStatics.h"
 #include "TowerDefence/GlobalConfig.h"
 #include "TowerDefence/Components/BuffComponent.h"
-
+#include "TowerDefence/Components/AnimComponent.h"
 
 AEntity::AEntity(const FObjectInitializer& ObjectInitializer)
     :ACharacter(ObjectInitializer)
 {
+    AnimInstanceClass = UAnimInstance::StaticClass();
     BuffComponent = CreateDefaultSubobject<UBuffComponent>(TEXT("BuffComp"));
+    AnimComponent = CreateDefaultSubobject<UAnimComponent>(TEXT("AnimComp"));
 }
 
 void AEntity::InitEntity(const FEntityParams& Params, const FEntityAnimation& Anims, FTransform TargetTransform,
                          const TArray<FBuff>& BasePermanentBuffs)
 {
-
-     // 初始化Mesh
-     USkeletalMeshComponent* MeshComp = GetMesh();
-     check(MeshComp);
-     MeshComp->SetSkeletalMesh(Params.SkeletalMesh.LoadSynchronous());
+    // 初始化Mesh
+    USkeletalMeshComponent* MeshComp = GetMesh();
+    check(MeshComp);
+    MeshComp->SetSkeletalMesh(Params.SkeletalMesh.LoadSynchronous());
+    MeshComp->SetRenderCustomDepth(true);
+    // 对初始值进行初始化
     const UGlobalConfig* Config = GetDefault<UGlobalConfig>();
-    check(Config->TurrentAnimInstClass);
-    MeshComp->SetAnimInstanceClass(Config->TurrentAnimInstClass);
-     // 对初始值进行初始化
-     SetActorTransform(TargetTransform);
+    MeshComp->SetAnimInstanceClass(AnimInstanceClass);
+    
+    SetActorTransform(TargetTransform);
     // 初始化攻击时视觉特效
     Animations = Anims;
-     BaseEntityParams = Params;
+    BaseEntityParams = Params;
      
      
     CurrentEntityParams = BaseEntityParams;
@@ -40,6 +42,7 @@ void AEntity::InitEntity(const FEntityParams& Params, const FEntityAnimation& An
         CurrentHitIdx = 0;
         LeftHitTime = BaseEntityParams.Attacks[CurrentHitIdx].Stiff;
     }
+    OnEntityInitialized.ExecuteIfBound();
 }
 
 void AEntity::Tick(float DeltaSeconds)
@@ -167,7 +170,7 @@ void AEntity::CalculateAttack(float DeltaSeconds)
         LeftHitTime = CurrentAttack->Stiff;
         OnAttack();
     }
-    LeftHitTime -= LeftHitTime-DeltaSeconds;
+    LeftHitTime -= DeltaSeconds;
     
     
 }
@@ -176,23 +179,25 @@ void AEntity::OnAttack()
 {
     // 计算可以攻击的目标对象组
     CalculateAttackEntities();
+    UE_LOG(LogTemp, Display, TEXT("Find Attack Nums: %d"), CurrentAttackedEntities.Num());
     const FEntityHitAttack& CurrentAttack = BaseEntityParams.Attacks[CurrentHitIdx];
     const UGlobalConfig* Config = GetDefault<UGlobalConfig>();
     // 当前没有可攻击对象，则idle
     if(CurrentAttackedEntities.Num() == 0)
     {
-        GetMesh()->GetAnimInstance()->PlaySlotAnimationAsDynamicMontage(Animations.IdleAnim.LoadSynchronous(), Config->EntityAnimSlotName);
+      // GetMesh()->GetAnimInstance()->PlaySlotAnimationAsDynamicMontage(Animations.IdleAnim.LoadSynchronous(), Config->EntityAnimSlotName);
         CurrentHitIdx = 0;
         OnIdleDelegate.ExecuteIfBound();
     }
     for(AEntity* AttackEntity: CurrentAttackedEntities)
     {
         ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(CurrentAttack.BulletClass);
+        UE_LOG(LogTemp, Display, TEXT("Spawn Bullet"));
         Bullet->File(this, AttackEntity, CurrentAttack);
         OnAttackDelegate.ExecuteIfBound(CurrentHitIdx);
     }
     // 播放动画
-    GetMesh()->GetAnimInstance()->PlaySlotAnimationAsDynamicMontage(Animations.AttackAnims[CurrentHitIdx].LoadSynchronous(), Config->EntityAnimSlotName);
+  //  GetMesh()->GetAnimInstance()->PlaySlotAnimationAsDynamicMontage(Animations.AttackAnims[CurrentHitIdx].LoadSynchronous(), Config->EntityAnimSlotName);
 }
 
 void AEntity::OnDamage(int32 DamageValue,  const FBuff& Buff)
@@ -212,6 +217,6 @@ void AEntity::OnDamage(int32 DamageValue,  const FBuff& Buff)
 void AEntity::OnDeath()
 {
     const UGlobalConfig* Config = GetDefault<UGlobalConfig>();
-    GetMesh()->GetAnimInstance()->PlaySlotAnimationAsDynamicMontage(Animations.DeathAnim.LoadSynchronous(), Config->EntityAnimSlotName);
+//    GetMesh()->GetAnimInstance()->PlaySlotAnimationAsDynamicMontage(Animations.DeathAnim.LoadSynchronous(), Config->EntityAnimSlotName);
     OnDeathDelegate.ExecuteIfBound();
 }

@@ -20,6 +20,7 @@ void AImmediateHitBullet::File(AEntity* ParentEntity, AEntity* TargetAttackEntit
     // GetBuff
     FBuff Buff;
     TargetAttackEntity->OnDamage(AttackValue, Buff);
+    Destroy();
 }
 
 void AFilghtHitBullet::File(AEntity* ParentEntity, AEntity* TargetAttackEntity, const FEntityHitAttack& CurrentAttack)

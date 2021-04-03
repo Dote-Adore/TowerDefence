@@ -1,7 +1,12 @@
 ﻿#pragma once
+#include "Base/Entity.h"
+#include "Enemy.generated.h"
 
-class Enemy
+UCLASS()
+class AEnemy:public AEntity
 {
+    GENERATED_BODY()
 public:
+    AEnemy(const FObjectInitializer& ObjectInitializer);
     
 };

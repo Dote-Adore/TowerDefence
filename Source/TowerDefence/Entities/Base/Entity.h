@@ -108,6 +108,7 @@ struct FEntityAnimation:public FTableRowBase
 
 // 攻击消息，参数是攻击下标
 DECLARE_DELEGATE_OneParam(FOnAttackDelegate, int32)
+DECLARE_DELEGATE(FOnEntityInitialized)
 DECLARE_DELEGATE(FOnIdleDelegate)
 DECLARE_DELEGATE(FOnDeathDelegate)
 UCLASS(Blueprintable)
@@ -118,12 +119,9 @@ class AEntity: public ACharacter
 public:
     AEntity(const FObjectInitializer& ObjectInitializer);
     // 目标攻击的Entity类型;
-    UPROPERTY(EditDefaultsOnly)
-    TSubclassOf<AEntity> TargetAttackEntityClass;
-    UPROPERTY(EditDefaultsOnly)
-    float LeftDeathTime = 1.f;
     
     FOnAttackDelegate OnAttackDelegate;
+    FOnEntityInitialized OnEntityInitialized;
     FOnIdleDelegate OnIdleDelegate;
     FOnDeathDelegate OnDeathDelegate;
     // 初始化实体
@@ -131,6 +129,7 @@ public:
         const TArray<FBuff>& BasePermanentBuffs);
     void Tick(float DeltaSeconds) override;
     FEntityParams& GetCurrentEntityParams() { return CurrentEntityParams;};
+    const FEntityAnimation& GetAnimations() const {return Animations; };
     virtual void BeginPlay() override;
     virtual void BeginDestroy() override;
     
@@ -139,6 +138,15 @@ public:
     virtual void OnDeath();
 protected:
     class UBuffComponent* BuffComponent;
+    class UAnimComponent* AnimComponent;
+    UPROPERTY(EditDefaultsOnly)
+    TSubclassOf<AEntity> TargetAttackEntityClass;
+    UPROPERTY(EditDefaultsOnly)
+    TSubclassOf<UAnimInstance> AnimInstanceClass;
+    UPROPERTY(EditDefaultsOnly)
+    float LeftDeathTime = 1.f;
+
+    
 private:
     FEntityParams BaseEntityParams;
     FEntityParams CurrentEntityParams;

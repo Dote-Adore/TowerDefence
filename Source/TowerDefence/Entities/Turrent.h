@@ -5,5 +5,6 @@ UCLASS(BlueprintType)
 class ATurrent: public AEntity
 {
     GENERATED_BODY()
-    
+public:
+    ATurrent(const FObjectInitializer& ObjectInitializer );
 };
