@@ -50,6 +50,8 @@ struct FEntityParams:public FTableRowBase
 {
     GENERATED_BODY()
     UPROPERTY(EditAnywhere)
+    int32 EntityID;
+    UPROPERTY(EditAnywhere)
     FName DisplayName;
     UPROPERTY(EditAnywhere)
     TSoftObjectPtr<USkeletalMesh> SkeletalMesh;
@@ -96,48 +98,59 @@ struct FEntityAnimation:public FTableRowBase
     UPROPERTY(EditAnywhere)
     int32 EntityID;
     UPROPERTY(EditAnywhere)
-    TSoftObjectPtr<UAnimationAsset> IdleAnim;
+    TSoftObjectPtr<UAnimSequenceBase> IdleAnim;
     UPROPERTY(EditAnywhere)
-    TSoftObjectPtr<UAnimationAsset> DeathAnim;
+    TSoftObjectPtr<UAnimSequenceBase> DeathAnim;
     UPROPERTY(EditAnywhere)
-    TArray<TSoftObjectPtr<UAnimationAsset>> AttackAnims;
+    TArray<TSoftObjectPtr<UAnimSequenceBase>> AttackAnims;
 };
 
 
+// 攻击消息，参数是攻击下标
+DECLARE_DELEGATE_OneParam(FOnAttackDelegate, int32)
+DECLARE_DELEGATE(FOnIdleDelegate)
+DECLARE_DELEGATE(FOnDeathDelegate)
 UCLASS(Blueprintable)
 class AEntity: public ACharacter
 // ,public IEntityAppearanceInterface
 {
     GENERATED_BODY()
 public:
+    AEntity(const FObjectInitializer& ObjectInitializer);
     // 目标攻击的Entity类型;
     UPROPERTY(EditDefaultsOnly)
     TSubclassOf<AEntity> TargetAttackEntityClass;
+    UPROPERTY(EditDefaultsOnly)
+    float LeftDeathTime = 1.f;
     
-    
+    FOnAttackDelegate OnAttackDelegate;
+    FOnIdleDelegate OnIdleDelegate;
+    FOnDeathDelegate OnDeathDelegate;
     // 初始化实体
     void InitEntity(const FEntityParams& Params, const FEntityAnimation& Anims, FTransform TargetTransform,
         const TArray<FBuff>& BasePermanentBuffs);
     void Tick(float DeltaSeconds) override;
-    const FEntityParams& GetCurrentEntityParams() const { return CurrentEntityParams;};
+    FEntityParams& GetCurrentEntityParams() { return CurrentEntityParams;};
     virtual void BeginPlay() override;
+    
     virtual void OnAttack();
-    void OnDamage(int32 DamageValue, const FBuff& Buff);
-    void AddBuff(const FBuff& Buff);
+    virtual void OnDamage(int32 DamageValue, const FBuff& Buff);
+    virtual void OnDeath();
+protected:
+    class UBuffComponent* BuffComponent;
 private:
     FEntityParams BaseEntityParams;
     FEntityParams CurrentEntityParams;
     TArray<AEntity*> CurrentAttackedEntities;
-    FEntityAnimation Animations;
-    TMap<int32, FBuff> CurrentBuffs;
-    
+    FEntityAnimation Animations;    
     void CalculateAttackEntities();
-    void Attack(float DeltaSeconds);
+    // 计算buff到主数值中
+    void CalculateAttack(float DeltaSeconds);
     // 连招
     // 当前连招使用哪个id
     int32 CurrentHitIdx = 0;
     // 该招式的剩余时间
     float LeftHitTime;
-    
-    float LeftDeathTime = 1.f;
 };
+
+

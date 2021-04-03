@@ -1,15 +1,28 @@
 ﻿#include "Entity.h"
-
+#include "Bullet.h"
 #include "Kismet/GameplayStatics.h"
+#include "TowerDefence/GlobalConfig.h"
+#include "TowerDefence/Components/BuffComponent.h"
+
+
+AEntity::AEntity(const FObjectInitializer& ObjectInitializer)
+    :ACharacter(ObjectInitializer)
+{
+    BuffComponent = CreateDefaultSubobject<UBuffComponent>(TEXT("BuffComp"));
+    BuffComponent->SetParentEntity(this);
+}
 
 void AEntity::InitEntity(const FEntityParams& Params, const FEntityAnimation& Anims, FTransform TargetTransform,
-        const TArray<FBuff>& BasePermanentBuffs)
+                         const TArray<FBuff>& BasePermanentBuffs)
 {
 
      // 初始化Mesh
      USkeletalMeshComponent* MeshComp = GetMesh();
      check(MeshComp);
      MeshComp->SetSkeletalMesh(Params.SkeletalMesh.LoadSynchronous());
+    const UGlobalConfig* Config = GetDefault<UGlobalConfig>();
+    check(Config->TurrentAnimInstClass);
+    MeshComp->SetAnimInstanceClass(Config->TurrentAnimInstClass);
      // 对初始值进行初始化
      SetActorTransform(TargetTransform);
     // 初始化攻击时视觉特效
@@ -53,7 +66,6 @@ void AEntity::InitEntity(const FEntityParams& Params, const FEntityAnimation& An
           }
       }
   }
-    
     CurrentEntityParams = BaseEntityParams;
 }
 
@@ -66,16 +78,16 @@ void AEntity::Tick(float DeltaSeconds)
          return;
      }
      // 攻击
-    //if(!CurrentHP)
+    if(CurrentEntityParams.HP>0)
     {
-        Attack(DeltaSeconds);
+        CalculateAttack(DeltaSeconds);
+        // CalculateBuffs(DeltaSeconds);
     }
-    //else
+    else
     {
         if(LeftDeathTime>=0)
         {
             LeftDeathTime -= DeltaSeconds;
-            
         }
         else
         {
@@ -168,12 +180,13 @@ void AEntity::CalculateAttackEntities()
             break;
     }
 }
-
-void AEntity::Attack(float DeltaSeconds)
+void AEntity::CalculateAttack(float DeltaSeconds)
 {
     const FEntityHitAttack* CurrentAttack;
     if(BaseEntityParams.Attacks.Num()<=0)
+    {
         return;
+    }
     // 切换招式
     if(LeftHitTime <= 0)
     {
@@ -192,18 +205,41 @@ void AEntity::OnAttack()
     // 计算可以攻击的目标对象组
     CalculateAttackEntities();
     const FEntityHitAttack& CurrentAttack = BaseEntityParams.Attacks[CurrentHitIdx];
+    const UGlobalConfig* Config = GetDefault<UGlobalConfig>();
+    // 当前没有可攻击对象，则idle
+    if(CurrentAttackedEntities.Num() == 0)
+    {
+        GetMesh()->GetAnimInstance()->PlaySlotAnimationAsDynamicMontage(Animations.IdleAnim.LoadSynchronous(), Config->EntityAnimSlotName);
+        CurrentHitIdx = 0;
+        OnIdleDelegate.ExecuteIfBound();
+    }
     for(AEntity* AttackEntity: CurrentAttackedEntities)
     {
-        
+        ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(CurrentAttack.BulletClass);
+        Bullet->File(this, AttackEntity, CurrentAttack);
+        OnAttackDelegate.ExecuteIfBound(CurrentHitIdx);
     }
     // 播放动画
+    GetMesh()->GetAnimInstance()->PlaySlotAnimationAsDynamicMontage(Animations.AttackAnims[CurrentHitIdx].LoadSynchronous(), Config->EntityAnimSlotName);
 }
 
 void AEntity::OnDamage(int32 DamageValue,  const FBuff& Buff)
 {
+    // 如果已经没血了，就不用再收到伤害了
+    if(CurrentEntityParams.HP <= 0)
+        return;
+    // 减掉防御力
+    int32 FinalAttack = FMath::Max(0, DamageValue - CurrentEntityParams.Defence);
+    CurrentEntityParams.HP -= FinalAttack;
+    BuffComponent->AddBuff(Buff);
+    if(CurrentEntityParams.HP <=0)
+    {
+        OnDeath();
+    }
 }
-
-void AEntity::AddBuff(const FBuff& Buff)
+void AEntity::OnDeath()
 {
-    
+    const UGlobalConfig* Config = GetDefault<UGlobalConfig>();
+    GetMesh()->GetAnimInstance()->PlaySlotAnimationAsDynamicMontage(Animations.DeathAnim.LoadSynchronous(), Config->EntityAnimSlotName);
+    OnDeathDelegate.ExecuteIfBound();
 }

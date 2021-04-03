@@ -24,4 +24,5 @@ void AImmediateHitBullet::File(AEntity* ParentEntity, AEntity* TargetAttackEntit
 
 void AFilghtHitBullet::File(AEntity* ParentEntity, AEntity* TargetAttackEntity, const FEntityHitAttack& CurrentAttack)
 {
+    
 }

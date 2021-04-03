@@ -1,10 +1,10 @@
 ﻿#pragma once
 #include "CoreMinimal.h"
-
-#include "UObject/ObjectMacros.h"
+#include "Engine/DataTable.h"
 
 #include "Buff.generated.h"
 // 一个Buff原子
+class AEntity;
 USTRUCT(BlueprintType)
 struct FBuffAtom
 {
@@ -24,11 +24,11 @@ enum class EBuffType
     Magnification,
     // 加法buff
     Addition,
-    // 持续性地加法buff
+    // 持续性地加法buff,结束后将会保持状态
     ContinuouslyAddition
 };
 USTRUCT(BlueprintType)
-struct FBuff
+struct FBuff:public FTableRowBase
 {
     
     GENERATED_BODY()
@@ -45,4 +45,33 @@ struct FBuff
     float duration;
     UPROPERTY(EditAnywhere)
     TArray<FBuffAtom> EffectParams;
+};
+
+// 每个buff有自己的一套实现
+// int32 BuffID
+DECLARE_DELEGATE_OneParam(FOnStopBuffDelegate, int32)
+UCLASS()
+class UBuffEntity : public UObject
+{
+    GENERATED_BODY()
+public:
+    void Init(const FBuff& Buff, AEntity* Parent);
+    virtual void ResetTimer();
+    virtual void Start();
+
+    FOnStopBuffDelegate OnStopBuffDelegate;
+protected:
+    virtual void Stop();
+
+    // 如果类型是持续性质的影响，则这里表示其改变单次数值的间隔时间
+    UPROPERTY(EditAnywhere)
+    float ContinuouslyAdditionIntervals = 0.2;
+private:
+    void StartContinuously();
+    FBuff MyBuff;
+    AEntity* ParentEntity;
+    FTimerHandle StopTimerHandle;
+    TMap<FName, float> ChangedValueOffest;
+    // 持续性改参数的buff的定时器
+    FTimerHandle ContinuouslyTimerHandle;
 };
