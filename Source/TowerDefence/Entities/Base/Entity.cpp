@@ -10,11 +10,11 @@ AEntity::AEntity(const FObjectInitializer& ObjectInitializer)
 {
     AnimInstanceClass = UAnimInstance::StaticClass();
     BuffComponent = CreateDefaultSubobject<UBuffComponent>(TEXT("BuffComp"));
-    AnimComponent = CreateDefaultSubobject<UAnimComponent>(TEXT("AnimComp"));
+    AnimComponent = Cast<UAnimComponent>(CreateDefaultSubobject(TEXT("AnimComp"), GetAnimCompClass(), GetAnimCompClass(), true, false));
 }
 
 void AEntity::InitEntity(const FEntityParams& Params, const FEntityAnimation& Anims, FTransform TargetTransform,
-                         const TArray<FBuff>& BasePermanentBuffs)
+                         const TArray<FBuff*>& BasePermanentBuffs)
 {
     // 初始化Mesh
     USkeletalMeshComponent* MeshComp = GetMesh();
@@ -29,8 +29,10 @@ void AEntity::InitEntity(const FEntityParams& Params, const FEntityAnimation& An
     // 初始化攻击时视觉特效
     Animations = Anims;
     BaseEntityParams = Params;
-     
-     
+
+    // 当前生命值点满
+    BaseEntityParams.CurrentHP = BaseEntityParams.MaxHP;
+    
     CurrentEntityParams = BaseEntityParams;
     for(auto Buff:BasePermanentBuffs)
     {
@@ -47,17 +49,18 @@ void AEntity::InitEntity(const FEntityParams& Params, const FEntityAnimation& An
 
 void AEntity::Tick(float DeltaSeconds)
 {
-     // 首先看是否是在部署
-     if(BaseEntityParams.DeployTime>=0)
-     {
-         BaseEntityParams.DeployTime -=DeltaSeconds;
-         return;
-     }
-     // 攻击
-    if(CurrentEntityParams.HP>0)
+    // 首先看是否是在部署
+    if(BaseEntityParams.DeployTime>=0)
+    {
+        BaseEntityParams.DeployTime -=DeltaSeconds;
+        return;
+    }
+    // 这里将玩家当前的Hp限定为0~最大值
+    CurrentEntityParams.CurrentHP = FMath::Clamp(CurrentEntityParams.CurrentHP, 0, CurrentEntityParams.MaxHP);
+    // 攻击
+    if(CurrentEntityParams.CurrentHP>0)
     {
         CalculateAttack(DeltaSeconds);
-        // CalculateBuffs(DeltaSeconds);
     }
     else
     {
@@ -70,7 +73,6 @@ void AEntity::Tick(float DeltaSeconds)
             Destroy();
         }
     }
-     
 }
 
 void AEntity::BeginPlay()
@@ -84,9 +86,15 @@ void AEntity::BeginDestroy()
     UE_LOG(LogTemp, Display ,TEXT("A Entity Destoryed"));
 }
 
-TSubclassOf<UAnimComponent> AEntity::GetAnimCompClass()
+TSubclassOf<UAnimComponent> AEntity::GetAnimCompClass() const
 {
     return UAnimComponent::StaticClass();
+}
+
+
+TSubclassOf<AEntity> AEntity::GetAttackTargetClass()
+{
+    return StaticClass();
 }
 
 void AEntity::CalculateAttackEntities()
@@ -178,8 +186,6 @@ void AEntity::CalculateAttack(float DeltaSeconds)
         OnAttack();
     }
     LeftHitTime -= DeltaSeconds;
-    
-    
 }
 
 void AEntity::OnAttack()
@@ -192,32 +198,33 @@ void AEntity::OnAttack()
     // 当前没有可攻击对象，则idle
     if(CurrentAttackedEntities.Num() == 0)
     {
-      // GetMesh()->GetAnimInstance()->PlaySlotAnimationAsDynamicMontage(Animations.IdleAnim.LoadSynchronous(), Config->EntityAnimSlotName);
         CurrentHitIdx = 0;
         OnIdleDelegate.ExecuteIfBound();
+    }
+    else
+    {
+        OnAttackDelegate.ExecuteIfBound(CurrentHitIdx);
     }
     for(AEntity* AttackEntity: CurrentAttackedEntities)
     {
         ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(CurrentAttack.BulletClass);
         UE_LOG(LogTemp, Display, TEXT("Spawn Bullet"));
         Bullet->File(this, AttackEntity, CurrentAttack);
-        OnAttackDelegate.ExecuteIfBound(CurrentHitIdx);
     }
-    // 播放动画
-  //  GetMesh()->GetAnimInstance()->PlaySlotAnimationAsDynamicMontage(Animations.AttackAnims[CurrentHitIdx].LoadSynchronous(), Config->EntityAnimSlotName);
 }
 
-void AEntity::OnDamage(int32 DamageValue,  const FBuff& Buff)
+void AEntity::OnDamage(int32 DamageValue,  const FBuff* Buff)
 {
     // 如果已经没血了，就不用再收到伤害了
-    if(CurrentEntityParams.HP <= 0)
+    if(CurrentEntityParams.CurrentHP <= 0)
         return;
     // 减掉防御力
     int32 FinalAttack = FMath::Max(0, DamageValue - CurrentEntityParams.Defence);
-    CurrentEntityParams.HP -= FinalAttack;
-    BuffComponent->AddBuff(Buff);
+    CurrentEntityParams.CurrentHP -= FinalAttack;
+    if(Buff)
+        BuffComponent->AddBuff(Buff);
     OnDamageDelegate.ExecuteIfBound();
-    if(CurrentEntityParams.HP <=0)
+    if(CurrentEntityParams.CurrentHP <=0)
     {
         OnDeath();
     }
@@ -225,6 +232,5 @@ void AEntity::OnDamage(int32 DamageValue,  const FBuff& Buff)
 void AEntity::OnDeath()
 {
     const UGlobalConfig* Config = GetDefault<UGlobalConfig>();
-//    GetMesh()->GetAnimInstance()->PlaySlotAnimationAsDynamicMontage(Animations.DeathAnim.LoadSynchronous(), Config->EntityAnimSlotName);
     OnDeathDelegate.ExecuteIfBound();
 }

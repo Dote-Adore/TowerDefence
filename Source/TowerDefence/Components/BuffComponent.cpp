@@ -15,18 +15,17 @@ void UBuffComponent::BeginPlay()
     check(ParentEntity);
 }
 
-void UBuffComponent::AddBuff(const FBuff& Buff)
+void UBuffComponent::AddBuff(const FBuff* Buff)
 {
-    UBuffEntity** ExistedBuff =  CurrentBuffs.Find(Buff.BuffID);
+    UBuffEntity** ExistedBuff =  CurrentBuffs.Find(Buff->BuffID);
     if(ExistedBuff&&*ExistedBuff)
     {
         (*ExistedBuff)->ResetTimer();
     }
     else
     {
-        UBuffEntity*  NewBuff = NewObject<UBuffEntity>(this, UBuffEntity::StaticClass());
+        UBuffEntity*  NewBuff = NewObject<UBuffEntity>(this, Buff->BuffEntityClass);
         NewBuff->Init(Buff, ParentEntity);
-        NewBuff->Start();
         // 监听buff停止的消息，然后将其remove掉
         NewBuff->OnStopBuffDelegate.BindUObject(this, &UBuffComponent::RemoveBuff);
     }

@@ -63,9 +63,12 @@ struct FEntityParams:public FTableRowBase
     // 基础攻击值
     UPROPERTY(EditAnywhere)
     int32 Attack;
-    // 生命值
+    // 当前生命值
+    UPROPERTY(Transient)
+    int32 CurrentHP;
+    // 策划配表的最大生命值
     UPROPERTY(EditAnywhere)
-    int32 HP;
+    int32 MaxHP;
     // 防御值
     UPROPERTY(EditAnywhere)
     int32 Defence;
@@ -126,7 +129,7 @@ public:
     FOnDamageDelegate OnDamageDelegate;
     // 初始化实体
     void InitEntity(const FEntityParams& Params, const FEntityAnimation& Anims, FTransform TargetTransform,
-        const TArray<FBuff>& BasePermanentBuffs);
+        const TArray<FBuff*>& BasePermanentBuffs);
     void Tick(float DeltaSeconds) override;
     FEntityParams& GetCurrentEntityParams() { return CurrentEntityParams;};
     const FEntityAnimation& GetAnimations() const {return Animations; };
@@ -134,7 +137,7 @@ public:
     virtual void BeginDestroy() override;
     
     virtual void OnAttack();
-    virtual void OnDamage(int32 DamageValue, const FBuff& Buff);
+    virtual void OnDamage(int32 DamageValue, const FBuff* Buff = nullptr);
     virtual void OnDeath();
 protected:
     class UBuffComponent* BuffComponent;
@@ -146,7 +149,8 @@ protected:
     UPROPERTY(EditDefaultsOnly)
     float LeftDeathTime = 2.f;
 
-    virtual TSubclassOf<UAnimComponent> GetAnimCompClass();
+    virtual TSubclassOf<UAnimComponent> GetAnimCompClass() const;
+    virtual TSubclassOf<AEntity> GetAttackTargetClass();
     
 private:
     FEntityParams BaseEntityParams;

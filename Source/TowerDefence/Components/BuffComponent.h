@@ -12,7 +12,7 @@ class UBuffComponent:public UActorComponent
 public:
     UBuffComponent(const FObjectInitializer& ObjectInitializer);
     void BeginPlay() override;
-    void AddBuff(const FBuff& Buff);
+    void AddBuff(const FBuff* Buff);
     
 private:
     // 当前的Buff

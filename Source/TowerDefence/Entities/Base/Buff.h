@@ -5,6 +5,7 @@
 #include "Buff.generated.h"
 // 一个Buff原子
 class AEntity;
+class UBuffEntity;
 USTRUCT(BlueprintType)
 struct FBuffAtom
 {
@@ -32,12 +33,13 @@ struct FBuff:public FTableRowBase
 {
     
     GENERATED_BODY()
-
-    
-    UPROPERTY(EditAnywhere)
-    EBuffType BuffType;
     UPROPERTY(EditAnywhere)
     int32 BuffID;
+    UPROPERTY(EditAnywhere)
+    EBuffType BuffType;
+    // 所使用到的buff实体class
+    UPROPERTY(EditAnywhere)
+    TSubclassOf<UBuffEntity> BuffEntityClass;
     UPROPERTY(EditAnywhere)
     FName DisplayName;
     // 持续时间
@@ -45,31 +47,33 @@ struct FBuff:public FTableRowBase
     float duration;
     UPROPERTY(EditAnywhere)
     TArray<FBuffAtom> EffectParams;
+    FBuff();
 };
 
 // 每个buff有自己的一套实现
 // int32 BuffID
 DECLARE_DELEGATE_OneParam(FOnStopBuffDelegate, int32)
-UCLASS()
+UCLASS(BlueprintType)
 class UBuffEntity : public UObject
 {
     GENERATED_BODY()
 public:
     UBuffEntity(const FObjectInitializer& ObjectInitializer);
-    void Init(const FBuff& Buff, AEntity* Parent);
+    void Init(const FBuff* Buff, AEntity* Parent);
     virtual void ResetTimer();
-    virtual void Start();
     virtual void BeginDestroy() override;
     FOnStopBuffDelegate OnStopBuffDelegate;
 protected:
     virtual void Stop();
-
+    virtual void Start();
+    // 重新计算buff后的攻击
+    virtual void OnReCalculateOffestValue(float* CalculatedOffestValue, const FName& PropertyName);
+    virtual void StartContinuously();
     // 如果类型是持续性质的影响，则这里表示其改变单次数值的间隔时间
     UPROPERTY(EditAnywhere)
     float ContinuouslyAdditionIntervals = 0.2;
 private:
-    void StartContinuously();
-    FBuff MyBuff;
+    const FBuff* MyBuff;
     AEntity* ParentEntity;
     FTimerHandle StopTimerHandle;
     TMap<FName, float> ChangedValueOffest;

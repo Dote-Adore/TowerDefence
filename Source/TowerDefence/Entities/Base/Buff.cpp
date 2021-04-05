@@ -1,39 +1,45 @@
 ﻿#include "Buff.h"
 #include "Entity.h"
 
+FBuff::FBuff()
+{
+    BuffEntityClass = UBuffEntity::StaticClass();
+}
+
 UBuffEntity::UBuffEntity(const FObjectInitializer& ObjectInitializer)
     :UObject(ObjectInitializer)
 {
 }
 
-void UBuffEntity::Init(const FBuff& Buff, AEntity* Parent)
+void UBuffEntity::Init(const FBuff* Buff, AEntity* Parent)
 {
     ParentEntity =Parent;
-    MyBuff  = Buff;
+    MyBuff = Buff;
+    Start();
 }
 
 void UBuffEntity::ResetTimer()
 {
     GetWorld()->GetTimerManager().ClearTimer(StopTimerHandle);
-    GetWorld()->GetTimerManager().SetTimer(StopTimerHandle,this, &UBuffEntity::Stop, MyBuff.duration, false);
+    GetWorld()->GetTimerManager().SetTimer(StopTimerHandle,this, &UBuffEntity::Stop, MyBuff->duration, false);
 }
 
 void UBuffEntity::Start()
 {
-    
-    // 持续性的buff有单独一套
-    if(MyBuff.BuffType == EBuffType::ContinuouslyAddition)
+    UE_LOG(LogTemp, Display, TEXT("Start Buff, ID:%d"), )
+    // 持续性的buff有单独一套,持续性的buff在buff结束后仍然保持数值不变
+    if(MyBuff->BuffType == EBuffType::ContinuouslyAddition)
     {
         GetWorld()->GetTimerManager().SetTimer(ContinuouslyTimerHandle, this, &UBuffEntity::StartContinuously, ContinuouslyAdditionIntervals, true);
-        // 如果buff的时间小于等于0，则说明这个buff是永久有效的
-        if(MyBuff.duration>=0)
+        // 如果buff的时间小于0，则说明这个buff是永久有效的
+        if(MyBuff->duration>=0)
         {
-            GetWorld()->GetTimerManager().SetTimer(StopTimerHandle,this, &UBuffEntity::Stop, MyBuff.duration, false);
+            GetWorld()->GetTimerManager().SetTimer(StopTimerHandle,this, &UBuffEntity::Stop, MyBuff->duration, false);
         }
         return;
     }
     FEntityParams& CurrentEntityParams = ParentEntity->GetCurrentEntityParams();
-    for(const FBuffAtom& BuffParam:MyBuff.EffectParams)
+    for(const FBuffAtom& BuffParam:MyBuff->EffectParams)
     {
         const FName& TargetChangedParmName = BuffParam.TargetPropertyName;
         // 目标要改变的数值
@@ -57,19 +63,22 @@ void UBuffEntity::Start()
                 continue;
             }
         }
-        float TargetChangedValue = 0;
-        switch(MyBuff.BuffType)
+        float TargetChangedOffest = 0;
+        switch(MyBuff->BuffType)
         {
             case EBuffType::Addition:
-                ChangedValueOffest.Add(TargetChangedParmName, BuffParam.TargetValue);
-                TargetChangedValue = BeforeValue + BuffParam.TargetValue;
+                TargetChangedOffest = BuffParam.TargetValue;
+                OnReCalculateOffestValue(&TargetChangedOffest, TargetChangedParmName);
+                ChangedValueOffest.Add(TargetChangedParmName, TargetChangedOffest);
                 break;
             // 乘法的话转换成加法，这样可以避免一些多个buff叠加的计算错误
             case EBuffType::Magnification:
-                ChangedValueOffest.Add(TargetChangedParmName, BeforeValue*BuffParam.TargetValue);
-                TargetChangedValue = BeforeValue + BeforeValue*BuffParam.TargetValue;
+                TargetChangedOffest = BeforeValue*BuffParam.TargetValue;
+                OnReCalculateOffestValue(&TargetChangedOffest, TargetChangedParmName);
+                ChangedValueOffest.Add(TargetChangedParmName, TargetChangedOffest);
                 break;
         }
+        float TargetChangedValue = BeforeValue + TargetChangedOffest;
         if(TargetFloatValue)
         {
             *TargetFloatValue = TargetChangedValue;
@@ -80,10 +89,14 @@ void UBuffEntity::Start()
         }
         
     }
-    if(MyBuff.duration>=0)
+    if(MyBuff->duration>=0)
     {
-        GetWorld()->GetTimerManager().SetTimer(StopTimerHandle,this, &UBuffEntity::Stop, MyBuff.duration, false);
+        GetWorld()->GetTimerManager().SetTimer(StopTimerHandle,this, &UBuffEntity::Stop, MyBuff->duration, false);
     }
+}
+
+void UBuffEntity::OnReCalculateOffestValue(float* CalculatedOffestValue, const FName& PropertyName)
+{
 }
 
 void UBuffEntity::BeginDestroy()
@@ -94,7 +107,7 @@ void UBuffEntity::BeginDestroy()
 
 void UBuffEntity::Stop()
 {
-    if(MyBuff.BuffType == EBuffType::ContinuouslyAddition)
+    if(MyBuff->BuffType == EBuffType::ContinuouslyAddition)
     {
         GetWorld()->GetTimerManager().ClearTimer(ContinuouslyTimerHandle);
         GetWorld()->GetTimerManager().ClearTimer(StopTimerHandle);
@@ -102,7 +115,7 @@ void UBuffEntity::Stop()
     }
     GetWorld()->GetTimerManager().ClearTimer(StopTimerHandle);
     FEntityParams& CurrentEntityParams = ParentEntity->GetCurrentEntityParams();
-    for(const FBuffAtom& BuffParam:MyBuff.EffectParams)
+    for(const FBuffAtom& BuffParam:MyBuff->EffectParams)
     {
         const FName& TargetChangedParmName = BuffParam.TargetPropertyName;
         // 目标要改变的数值
@@ -125,15 +138,15 @@ void UBuffEntity::Stop()
         }
     }
     // 发送消息
-    OnStopBuffDelegate.ExecuteIfBound(MyBuff.BuffID);
+    OnStopBuffDelegate.ExecuteIfBound(MyBuff->BuffID);
 }
 
 void UBuffEntity::StartContinuously()
 {
     FEntityParams& CurrentEntityParams = ParentEntity->GetCurrentEntityParams();
-    for(const FBuffAtom& BuffParam:MyBuff.EffectParams)
+    for(const FBuffAtom& BuffParam:MyBuff->EffectParams)
     {
-        float TargetOffsetValue = BuffParam.TargetValue/(MyBuff.duration/ContinuouslyAdditionIntervals);
+        float TargetOffsetValue = BuffParam.TargetValue/(MyBuff->duration/ContinuouslyAdditionIntervals);
         const FName& TargetChangedParmName = BuffParam.TargetPropertyName;
         // 目标要改变的数值
         FProperty* TargetChangdProperty = CurrentEntityParams.StaticStruct()->FindPropertyByName(TargetChangedParmName);
@@ -151,7 +164,6 @@ void UBuffEntity::StartContinuously()
         else
         {
             UE_LOG(LogTemp, Warning, TEXT("Can not Found Property %s in Base EntityParams"), *TargetChangedParmName.ToString());
-            continue;
         }
     }
 }
