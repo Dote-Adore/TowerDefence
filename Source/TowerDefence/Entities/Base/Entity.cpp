@@ -42,7 +42,7 @@ void AEntity::InitEntity(const FEntityParams& Params, const FEntityAnimation& An
     if(BaseEntityParams.Attacks.Num()>=0)
     {
         CurrentHitIdx = 0;
-        LeftHitTime = BaseEntityParams.Attacks[CurrentHitIdx].Stiff;
+        LeftHitTime = 0;
     }
     OnEntityInitialized.ExecuteIfBound();
 }
@@ -175,7 +175,7 @@ void AEntity::CalculateAttack(float DeltaSeconds)
     const FEntityHitAttack* CurrentAttack;
     if(BaseEntityParams.Attacks.Num()<=0)
     {
-        CurrentHitIdx = 0;
+        CurrentHitIdx = BaseEntityParams.Attacks.Num() - 1;
         LeftHitTime = 0;
         return;
     }

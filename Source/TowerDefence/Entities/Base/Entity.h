@@ -64,7 +64,7 @@ struct FEntityParams:public FTableRowBase
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
     int32 Attack;
     // 当前生命值
-    UPROPERTY(Transient, BlueprintReadOnly)
+    UPROPERTY(BlueprintReadOnly)
     int32 CurrentHP;
     // 策划配表的最大生命值
     UPROPERTY(EditAnywhere, BlueprintReadOnly)

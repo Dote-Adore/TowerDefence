@@ -11,11 +11,12 @@ class UBuffComponent:public UActorComponent
     GENERATED_BODY()
 public:
     UBuffComponent(const FObjectInitializer& ObjectInitializer);
-    void BeginPlay() override;
+    virtual void BeginPlay() override;
     void AddBuff(const FBuff* Buff);
     
 private:
     // 当前的Buff
+    UPROPERTY(Transient)
     TMap<int32, UBuffEntity*> CurrentBuffs;
     TMap<int32, FTimerHandle> BuffTimeHandle;
     AEntity* ParentEntity;
