@@ -34,8 +34,9 @@ class AFilghtHitBullet:public ABullet
 {
     GENERATED_BODY()
 public:
-    // 飞行速度
+    // 飞行速度,每秒
     UPROPERTY(EditDefaultsOnly)
-    float Speed;
+    float Speed = 10;
     virtual void File(AEntity* ParentEntity, AEntity* TargetAttackEntity, const FEntityHitAttack& CurrentAttack) override;
+    
 };

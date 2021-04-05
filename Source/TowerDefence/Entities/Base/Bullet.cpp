@@ -27,4 +27,7 @@ void AImmediateHitBullet::File(AEntity* ParentEntity, AEntity* TargetAttackEntit
 
 void AFilghtHitBullet::File(AEntity* ParentEntity, AEntity* TargetAttackEntity, const FEntityHitAttack& CurrentAttack)
 {
+    float AttackValue = ParentEntity->GetCurrentEntityParams().Attack*CurrentAttack.AttackRate;
+    UGlobalConfig* GlobalConf = GetMutableDefault<UGlobalConfig>();
+    const FBuff* Buff = GlobalConf->FindBuffByID(CurrentAttack.BuffID);
 }

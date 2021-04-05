@@ -47,35 +47,35 @@ USTRUCT(BlueprintType)
 struct FEntityParams:public FTableRowBase
 {
     GENERATED_BODY()
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
     int32 EntityID;
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
     FName DisplayName;
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
     TSoftObjectPtr<USkeletalMesh> SkeletalMesh;
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
     EEntityType EntityType;
         
     // 部署时间
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
     float DeployTime = 1.f;
    
     // 基础攻击值
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
     int32 Attack;
     // 当前生命值
-    UPROPERTY(Transient)
+    UPROPERTY(Transient, BlueprintReadOnly)
     int32 CurrentHP;
     // 策划配表的最大生命值
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
     int32 MaxHP;
     // 防御值
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
     int32 Defence;
     // 攻击速率
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
     float AttackSpeedRate = 1.f;
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
     float AttackRadius;
     
     // 暴击率
@@ -131,6 +131,7 @@ public:
     void InitEntity(const FEntityParams& Params, const FEntityAnimation& Anims, FTransform TargetTransform,
         const TArray<FBuff*>& BasePermanentBuffs);
     void Tick(float DeltaSeconds) override;
+    UFUNCTION(BlueprintCallable)
     FEntityParams& GetCurrentEntityParams() { return CurrentEntityParams;};
     const FEntityAnimation& GetAnimations() const {return Animations; };
     virtual void BeginPlay() override;
@@ -154,8 +155,11 @@ protected:
     
 private:
     FEntityParams BaseEntityParams;
+    UPROPERTY(Transient)
     FEntityParams CurrentEntityParams;
+    UPROPERTY(Transient)
     TArray<AEntity*> CurrentAttackedEntities;
+    
     FEntityAnimation Animations;    
     void CalculateAttackEntities();
     // 计算buff到主数值中

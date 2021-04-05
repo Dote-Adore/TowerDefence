@@ -71,7 +71,7 @@ protected:
     virtual void StartContinuously();
     // 如果类型是持续性质的影响，则这里表示其改变单次数值的间隔时间
     UPROPERTY(EditAnywhere)
-    float ContinuouslyAdditionIntervals = 0.2;
+    float ContinuouslyAdditionIntervals = 0.5;
 private:
     const FBuff* MyBuff;
     AEntity* ParentEntity;

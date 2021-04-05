@@ -175,6 +175,8 @@ void AEntity::CalculateAttack(float DeltaSeconds)
     const FEntityHitAttack* CurrentAttack;
     if(BaseEntityParams.Attacks.Num()<=0)
     {
+        CurrentHitIdx = 0;
+        LeftHitTime = 0;
         return;
     }
     // 切换招式
@@ -223,7 +225,11 @@ void AEntity::OnDamage(int32 DamageValue,  const FBuff* Buff)
     CurrentEntityParams.CurrentHP -= FinalAttack;
     if(Buff)
         BuffComponent->AddBuff(Buff);
-    OnDamageDelegate.ExecuteIfBound();
+    // 如果伤害为0，表示没有收到伤害，则不需要发送Damage事件
+    if(DamageValue > 0)
+    {
+        OnDamageDelegate.ExecuteIfBound();
+    }
     if(CurrentEntityParams.CurrentHP <=0)
     {
         OnDeath();

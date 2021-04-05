@@ -1,4 +1,6 @@
 ﻿#include "GlobalConfig.h"
+#include "Engine/DataTable.h"
+#include "TowerDefence/Entities/Base/Buff.h"
 
 const FBuff* UGlobalConfig::FindBuffByID(int32 ID)
 {

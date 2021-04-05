@@ -26,7 +26,7 @@ void UBuffEntity::ResetTimer()
 
 void UBuffEntity::Start()
 {
-    UE_LOG(LogTemp, Display, TEXT("Start Buff, ID:%d"), )
+    UE_LOG(LogTemp, Display, TEXT("Start Buff, ID:%d, Effect Entity: %s, Effect Param: "), MyBuff->BuffID, *ParentEntity->GetName());
     // 持续性的buff有单独一套,持续性的buff在buff结束后仍然保持数值不变
     if(MyBuff->BuffType == EBuffType::ContinuouslyAddition)
     {
@@ -44,17 +44,19 @@ void UBuffEntity::Start()
         const FName& TargetChangedParmName = BuffParam.TargetPropertyName;
         // 目标要改变的数值
         FProperty* TargetChangdProperty = CurrentEntityParams.StaticStruct()->FindPropertyByName(TargetChangedParmName);
-        float* TargetFloatValue = TargetChangdProperty->ContainerPtrToValuePtr<float>(CurrentEntityParams.StaticStruct());
-        int32* TargetIntValue = TargetChangdProperty->ContainerPtrToValuePtr<int32>(CurrentEntityParams.StaticStruct());
-        float BeforeValue;
-        if(TargetFloatValue)
+        FIntProperty* IntProperty = CastField<FIntProperty>(TargetChangdProperty);
+        FFloatProperty* FloatProperty =CastField<FFloatProperty>(TargetChangdProperty);
+        float BeforeValue = 0;
+        if(FloatProperty)
         {
+            float* TargetFloatValue = TargetChangdProperty->ContainerPtrToValuePtr<float>(&CurrentEntityParams);
             BeforeValue = *TargetFloatValue;
         }
         else
         {
-            if(TargetIntValue)
+            if(IntProperty)
             {
+                int32* TargetIntValue = TargetChangdProperty->ContainerPtrToValuePtr<int32>(&CurrentEntityParams);
                 BeforeValue = *TargetIntValue;
             }
             else
@@ -79,13 +81,13 @@ void UBuffEntity::Start()
                 break;
         }
         float TargetChangedValue = BeforeValue + TargetChangedOffest;
-        if(TargetFloatValue)
+        if(FloatProperty)
         {
-            *TargetFloatValue = TargetChangedValue;
+            FloatProperty->SetPropertyValue_InContainer(&CurrentEntityParams, TargetChangedValue);
         }
         else
         {
-            *TargetIntValue = TargetChangedValue;
+            IntProperty->SetPropertyValue_InContainer(&CurrentEntityParams, TargetChangedValue);
         }
         
     }
@@ -120,15 +122,17 @@ void UBuffEntity::Stop()
         const FName& TargetChangedParmName = BuffParam.TargetPropertyName;
         // 目标要改变的数值
         FProperty* TargetChangdProperty = CurrentEntityParams.StaticStruct()->FindPropertyByName(TargetChangedParmName);
-        float* TargetFloatValue = TargetChangdProperty->ContainerPtrToValuePtr<float>(CurrentEntityParams.StaticStruct());
-        int32* TargetIntValue = TargetChangdProperty->ContainerPtrToValuePtr<int32>(CurrentEntityParams.StaticStruct());
+        FIntProperty* IntProperty = CastField<FIntProperty>(TargetChangdProperty);
+        FFloatProperty* FloatProperty =CastField<FFloatProperty>(TargetChangdProperty);
         float* OffestValue = ChangedValueOffest.Find(TargetChangedParmName);
-        if(TargetFloatValue)
+        if(FloatProperty)
         {
+            float* TargetFloatValue = TargetChangdProperty->ContainerPtrToValuePtr<float>(&CurrentEntityParams);
             *TargetFloatValue = *TargetFloatValue - *OffestValue;
         }
-        else if(TargetIntValue)
+        else if(IntProperty)
         {
+            int32* TargetIntValue = TargetChangdProperty->ContainerPtrToValuePtr<int32>(&CurrentEntityParams);
             *TargetIntValue = *TargetIntValue - *OffestValue;
         }
         else
@@ -143,6 +147,7 @@ void UBuffEntity::Stop()
 
 void UBuffEntity::StartContinuously()
 {
+    UE_LOG(LogTemp, Display, TEXT("Continuous Buff, ID:%d, Effect Entity: %s, Effect Param: "), MyBuff->BuffID, *ParentEntity->GetName());
     FEntityParams& CurrentEntityParams = ParentEntity->GetCurrentEntityParams();
     for(const FBuffAtom& BuffParam:MyBuff->EffectParams)
     {
@@ -150,16 +155,19 @@ void UBuffEntity::StartContinuously()
         const FName& TargetChangedParmName = BuffParam.TargetPropertyName;
         // 目标要改变的数值
         FProperty* TargetChangdProperty = CurrentEntityParams.StaticStruct()->FindPropertyByName(TargetChangedParmName);
-        float* TargetFloatValue = TargetChangdProperty->ContainerPtrToValuePtr<float>(CurrentEntityParams.StaticStruct());
-        int32* TargetIntValue = TargetChangdProperty->ContainerPtrToValuePtr<int32>(CurrentEntityParams.StaticStruct());
-        if(TargetFloatValue)
+        FIntProperty* IntProperty = CastField<FIntProperty>(TargetChangdProperty);
+        FFloatProperty* FloatProperty =CastField<FFloatProperty>(TargetChangdProperty);
+        if(FloatProperty)
         {
-            *TargetFloatValue += TargetOffsetValue;
+            float* BeforeValue = TargetChangdProperty->ContainerPtrToValuePtr<float>(&CurrentEntityParams);
+            FloatProperty->SetPropertyValue_InContainer(&CurrentEntityParams, *BeforeValue+TargetOffsetValue);
             continue;
         }
-        if(TargetIntValue)
+        if(IntProperty)
         {
-            *TargetIntValue += TargetOffsetValue;
+            int32* BeforeValue = TargetChangdProperty->ContainerPtrToValuePtr<int32>(&CurrentEntityParams);
+            IntProperty->SetPropertyValue_InContainer(&CurrentEntityParams, *BeforeValue+TargetOffsetValue);
+            //*TargetIntValue += TargetOffsetValue;
         }
         else
         {

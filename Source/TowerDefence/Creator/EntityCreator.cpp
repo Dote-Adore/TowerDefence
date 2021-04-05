@@ -2,6 +2,7 @@
 
 #include "TowerDefence/GlobalConfig.h"
 #include "TowerDefence/Entities/Turrent.h"
+#include "TowerDefence/Entities/Enemy.h"
 
 void UEntityCreator::CreateTurrent(int32 EntityID, FTransform EntityTransform)
 {
@@ -10,7 +11,7 @@ void UEntityCreator::CreateTurrent(int32 EntityID, FTransform EntityTransform)
     UDataTable* AnimDataTable = GlobalConfig->TurrentAnimDataTable.LoadSynchronous();
     check(TurrentDataTable);
     check(AnimDataTable);
-    CreateEntity(EntityID, EntityTransform, ATurrent::StaticClass(), TurrentDataTable, AnimDataTable);
+    CreateEntity(EntityID, EntityTransform, GlobalConfig->TurrentEntityClass, TurrentDataTable, AnimDataTable);
 }
 
 void UEntityCreator::CreateEnemy(int32 EntityID, FTransform EntityTransform)
@@ -20,7 +21,7 @@ void UEntityCreator::CreateEnemy(int32 EntityID, FTransform EntityTransform)
     UDataTable* AnimDataTable = GlobalConfig->EnemyAnimDataTable.LoadSynchronous();
     check(EnemyDataTable);
     check(AnimDataTable);
-    CreateEntity(EntityID, EntityTransform, ATurrent::StaticClass(), EnemyDataTable, AnimDataTable);
+    CreateEntity(EntityID, EntityTransform, GlobalConfig->EnemyEntityClass, EnemyDataTable, AnimDataTable);
 }
 
 void UEntityCreator::CreateEntity(int32 EntityID, FTransform EntityTransform, TSubclassOf<AEntity> Entitylass, UDataTable* EntityDatas, UDataTable* AnimDatas)
