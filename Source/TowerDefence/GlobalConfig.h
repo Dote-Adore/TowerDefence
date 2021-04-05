@@ -18,6 +18,10 @@ public:
     TSoftObjectPtr<UDataTable> EnemyAnimDataTable;
     UPROPERTY(Config,EditAnywhere)
     TSubclassOf<UAnimInstance> TurrentAnimInstClass;
+    UPROPERTY(Config, EditAnywhere)
+    TSubclassOf<UAnimComponent> TurrentAnimComp;
+    UPROPERTY(Config, EditAnywhere)
+    TSubclassOf<UAnimComponent> EnemyAnimComp;
     UPROPERTY(Config,EditAnywhere)
     TSubclassOf<UAnimInstance> EnemyAnimInstClass;
 };

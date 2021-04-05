@@ -84,6 +84,11 @@ void AEntity::BeginDestroy()
     UE_LOG(LogTemp, Display ,TEXT("A Entity Destoryed"));
 }
 
+TSubclassOf<UAnimComponent> AEntity::GetAnimCompClass()
+{
+    return UAnimComponent::StaticClass();
+}
+
 void AEntity::CalculateAttackEntities()
 {
     TArray<AActor*> FoundActors;
@@ -96,7 +101,7 @@ void AEntity::CalculateAttackEntities()
             UGameplayStatics::GetAllActorsOfClass(GetWorld(), TargetAttackEntityClass, FoundActors);
             for(AActor* Actor: FoundActors)
             {
-                float Dist = FVector::DistSquaredXY(Actor->GetActorLocation(), GetActorLocation());
+                float Dist = FMath::Sqrt(FVector::DistSquaredXY(Actor->GetActorLocation(), GetActorLocation()));
                 if(Dist <= BaseEntityParams.AttackRadius)
                 {
                     CurrentAttackedEntities.Add(Cast<AEntity>(Actor));
@@ -109,7 +114,9 @@ void AEntity::CalculateAttackEntities()
             UGameplayStatics::GetAllActorsOfClass(GetWorld(), StaticClass(), FoundActors);
         for(AActor* Actor: FoundActors)
         {
-            float Dist = FVector::DistSquaredXY(Actor->GetActorLocation(), GetActorLocation());
+            if(Actor == this)
+                continue;
+            float Dist = FMath::Sqrt(FVector::DistSquaredXY(Actor->GetActorLocation(), GetActorLocation()));
             if(Dist <= BaseEntityParams.AttackRadius)
             {
                 CurrentAttackedEntities.Add(Cast<AEntity>(Actor));
@@ -120,7 +127,7 @@ void AEntity::CalculateAttackEntities()
         case EEntityType::SingleAttack:
             if(CurrentAttackedEntities.Num() > 0)
             {
-                float Distance = FVector::DistSquaredXY(CurrentAttackedEntities[0]->GetActorLocation(), GetActorLocation());
+                float Distance = FMath::Sqrt(FVector::DistSquaredXY(CurrentAttackedEntities[0]->GetActorLocation(), GetActorLocation()));
                 // 如果距离小于可攻击范围的的话就可以不用管
                 if(Distance> BaseEntityParams.AttackRadius)
                 {
@@ -136,8 +143,8 @@ void AEntity::CalculateAttackEntities()
                             NearestActor = Actor;
                             continue;
                         }
-                        float Dist = FVector::DistSquaredXY(Actor->GetActorLocation(), GetActorLocation());
-                        float NearestDist = FVector::DistSquaredXY(NearestActor->GetActorLocation(), GetActorLocation());
+                        float Dist =FMath::Sqrt( FVector::DistSquaredXY(Actor->GetActorLocation(), GetActorLocation()));
+                        float NearestDist = FMath::Sqrt(FVector::DistSquaredXY(NearestActor->GetActorLocation(), GetActorLocation()));
                         if(Dist<NearestDist)
                         {
                            NearestActor = Actor;
@@ -145,7 +152,7 @@ void AEntity::CalculateAttackEntities()
                     }
                     // 如果找到最接近的actor并且在攻击范围内，则将这个actor放到受攻击列表中
                     if(NearestActor&&
-                        FVector::DistSquaredXY(NearestActor->GetActorLocation(), GetActorLocation())<=BaseEntityParams.AttackRadius)
+                        FMath::Sqrt(FVector::DistSquaredXY(NearestActor->GetActorLocation(), GetActorLocation())<=BaseEntityParams.AttackRadius))
                     {
                         CurrentAttackedEntities.Add(Cast<AEntity>(NearestActor));
                     }
@@ -209,6 +216,7 @@ void AEntity::OnDamage(int32 DamageValue,  const FBuff& Buff)
     int32 FinalAttack = FMath::Max(0, DamageValue - CurrentEntityParams.Defence);
     CurrentEntityParams.HP -= FinalAttack;
     BuffComponent->AddBuff(Buff);
+    OnDamageDelegate.ExecuteIfBound();
     if(CurrentEntityParams.HP <=0)
     {
         OnDeath();

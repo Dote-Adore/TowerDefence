@@ -10,4 +10,5 @@ ATurrent::ATurrent(const FObjectInitializer& ObjectInitializer)
     TargetAttackEntityClass = AEnemy::StaticClass();
     const UGlobalConfig* Config = GetDefault<UGlobalConfig>();
     AnimInstanceClass = Config->TurrentAnimInstClass;
+    
 }

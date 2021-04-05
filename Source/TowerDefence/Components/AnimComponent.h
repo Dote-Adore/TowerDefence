@@ -11,11 +11,16 @@ class UAnimComponent:public UActorComponent
 public:
     UPROPERTY()
     FName IdleAnimParamName = "IdleAnim";
-    FName AttackAnimParamName;
+    FName DeathAnimParamName = "DeathAnim";
+    FName AttackAnimSlotName = "Attack";
     
     
     virtual void BeginPlay() override;
 private:
     void OnInit();
+    void OnAttack(int32 AttackIdx);
+    void OnDeath();
     AEntity* ParentEntity;
+    UAnimInstance* AnimInst;
+    
 };

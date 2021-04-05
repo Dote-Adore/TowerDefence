@@ -25,8 +25,6 @@ USTRUCT(BlueprintType)
 struct FEntityHitAttack
 {
     GENERATED_BODY()
-    UPROPERTY(EditAnywhere)
-    float Radius;
     // 攻击率，每一段攻击对应总攻击的百分比
     UPROPERTY(EditAnywhere)
     float AttackRate;
@@ -109,6 +107,7 @@ struct FEntityAnimation:public FTableRowBase
 // 攻击消息，参数是攻击下标
 DECLARE_DELEGATE_OneParam(FOnAttackDelegate, int32)
 DECLARE_DELEGATE(FOnEntityInitialized)
+DECLARE_DELEGATE(FOnDamageDelegate)
 DECLARE_DELEGATE(FOnIdleDelegate)
 DECLARE_DELEGATE(FOnDeathDelegate)
 UCLASS(Blueprintable)
@@ -124,6 +123,7 @@ public:
     FOnEntityInitialized OnEntityInitialized;
     FOnIdleDelegate OnIdleDelegate;
     FOnDeathDelegate OnDeathDelegate;
+    FOnDamageDelegate OnDamageDelegate;
     // 初始化实体
     void InitEntity(const FEntityParams& Params, const FEntityAnimation& Anims, FTransform TargetTransform,
         const TArray<FBuff>& BasePermanentBuffs);
@@ -144,8 +144,9 @@ protected:
     UPROPERTY(EditDefaultsOnly)
     TSubclassOf<UAnimInstance> AnimInstanceClass;
     UPROPERTY(EditDefaultsOnly)
-    float LeftDeathTime = 1.f;
+    float LeftDeathTime = 2.f;
 
+    virtual TSubclassOf<UAnimComponent> GetAnimCompClass();
     
 private:
     FEntityParams BaseEntityParams;
