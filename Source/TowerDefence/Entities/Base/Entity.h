@@ -151,7 +151,6 @@ protected:
     TSubclassOf<UAnimInstance> AnimInstanceClass;
     UPROPERTY(EditDefaultsOnly)
     float LeftDeathTime = 2.f;
-
     virtual TSubclassOf<UAnimComponent> GetAnimCompClass() const;
     virtual TSubclassOf<AEntity> GetAttackTargetClass();
     

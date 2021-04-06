@@ -10,12 +10,15 @@ AEntity::AEntity(const FObjectInitializer& ObjectInitializer)
 {
     AnimInstanceClass = UAnimInstance::StaticClass();
     BuffComponent = CreateDefaultSubobject<UBuffComponent>(TEXT("BuffComp"));
-    AnimComponent = Cast<UAnimComponent>(CreateDefaultSubobject(TEXT("AnimComp"), GetAnimCompClass(), GetAnimCompClass(), true, false));
+    // AnimComponent = Cast<UAnimComponent>(CreateDefaultSubobject(TEXT("AnimComp"), GetAnimCompClass(), GetAnimCompClass(), true, false));
 }
 
 void AEntity::InitEntity(const FEntityParams& Params, const FEntityAnimation& Anims, FTransform TargetTransform,
                          const TArray<FBuff*>& BasePermanentBuffs)
 {
+    //
+    AnimComponent = NewObject<UAnimComponent>(this, GetAnimCompClass(), TEXT("AnimComp"));
+    AnimComponent->RegisterComponent();
     // 初始化Mesh
     USkeletalMeshComponent* MeshComp = GetMesh();
     check(MeshComp);
@@ -24,7 +27,6 @@ void AEntity::InitEntity(const FEntityParams& Params, const FEntityAnimation& An
     // 对初始值进行初始化
     const UGlobalConfig* Config = GetDefault<UGlobalConfig>();
     MeshComp->SetAnimInstanceClass(AnimInstanceClass);
-    
     SetActorTransform(TargetTransform);
     // 初始化攻击时视觉特效
     Animations = Anims;
@@ -119,7 +121,7 @@ void AEntity::CalculateAttackEntities()
         // 辅助，对己方发动
         case EEntityType::Assist:
             CurrentAttackedEntities.Empty();
-            UGameplayStatics::GetAllActorsOfClass(GetWorld(), StaticClass(), FoundActors);
+            UGameplayStatics::GetAllActorsOfClass(GetWorld(), GetClass(), FoundActors);
         for(AActor* Actor: FoundActors)
         {
             if(Actor == this)
@@ -133,39 +135,39 @@ void AEntity::CalculateAttackEntities()
             break;
         // 单个攻击，对敌方有效
         case EEntityType::SingleAttack:
-            if(CurrentAttackedEntities.Num() > 0)
+            if(CurrentAttackedEntities.Num() > 0 && !CurrentAttackedEntities[0]->IsPendingKill())
             {
                 float Distance = FMath::Sqrt(FVector::DistSquaredXY(CurrentAttackedEntities[0]->GetActorLocation(), GetActorLocation()));
                 // 如果距离小于可攻击范围的的话就可以不用管
-                if(Distance> BaseEntityParams.AttackRadius)
+                if(Distance<= BaseEntityParams.AttackRadius)
                 {
-                    CurrentAttackedEntities.Empty();
-                   
-                    UGameplayStatics::GetAllActorsOfClass(GetWorld(), TargetAttackEntityClass, FoundActors);
-                    // get the nearest actor
-                    AActor* NearestActor = nullptr;
-                    for(AActor* Actor: FoundActors)
-                    {
-                        if(!NearestActor)
-                        {
-                            NearestActor = Actor;
-                            continue;
-                        }
-                        float Dist =FMath::Sqrt( FVector::DistSquaredXY(Actor->GetActorLocation(), GetActorLocation()));
-                        float NearestDist = FMath::Sqrt(FVector::DistSquaredXY(NearestActor->GetActorLocation(), GetActorLocation()));
-                        if(Dist<NearestDist)
-                        {
-                           NearestActor = Actor;
-                        }
-                    }
-                    // 如果找到最接近的actor并且在攻击范围内，则将这个actor放到受攻击列表中
-                    if(NearestActor&&
-                        FMath::Sqrt(FVector::DistSquaredXY(NearestActor->GetActorLocation(), GetActorLocation())<=BaseEntityParams.AttackRadius))
-                    {
-                        CurrentAttackedEntities.Add(Cast<AEntity>(NearestActor));
-                    }
-                    
+                    break;
                 }
+            }
+            CurrentAttackedEntities.Empty();           
+            UGameplayStatics::GetAllActorsOfClass(GetWorld(), TargetAttackEntityClass, FoundActors);
+            // get the nearest actor
+            AActor* NearestActor = nullptr;
+            for(AActor* Actor: FoundActors)
+            {
+                if(!NearestActor)
+                {
+                    NearestActor = Actor;
+                    continue;
+                }
+                float Dist =FMath::Sqrt( FVector::DistSquaredXY(Actor->GetActorLocation(), GetActorLocation()));
+                float NearestDist = FMath::Sqrt(FVector::DistSquaredXY(NearestActor->GetActorLocation(), GetActorLocation()));
+                if(Dist<NearestDist)
+                {
+                    NearestActor = Actor;
+                }
+            }
+            // 如果找到最接近的actor并且在攻击范围内，则将这个actor放到受攻击列表中
+        float Dist = FVector::DistSquaredXY(NearestActor->GetActorLocation(), GetActorLocation());
+            if(NearestActor&&
+                FMath::Sqrt(Dist)<=CurrentEntityParams.AttackRadius)
+            {
+                CurrentAttackedEntities.Add(Cast<AEntity>(NearestActor));
             }
             break;
     }
@@ -194,7 +196,7 @@ void AEntity::OnAttack()
 {
     // 计算可以攻击的目标对象组
     CalculateAttackEntities();
-    UE_LOG(LogTemp, Display, TEXT("Find Attack Nums: %d"), CurrentAttackedEntities.Num());
+    UE_LOG(LogTemp, Display, TEXT("%s: Find Attack Nums: %d"), *GetName(), CurrentAttackedEntities.Num());
     const FEntityHitAttack& CurrentAttack = BaseEntityParams.Attacks[CurrentHitIdx];
     const UGlobalConfig* Config = GetDefault<UGlobalConfig>();
     // 当前没有可攻击对象，则idle

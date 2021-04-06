@@ -10,5 +10,6 @@ class UEnemyAnimComponent:public UAnimComponent
 	GENERATED_BODY()
 public:
 	FName WalkAnimParamName = "WalkAnim";
+protected:
 	virtual void OnInit() override;
 };

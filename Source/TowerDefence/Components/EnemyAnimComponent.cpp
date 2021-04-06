@@ -10,6 +10,6 @@ void UEnemyAnimComponent::OnInit()
 	if(WalkProperty)
 	{
 		FObjectProperty* WalkObjectProperty = CastField<FObjectProperty>(WalkProperty);
-		WalkObjectProperty->SetPropertyValue_InContainer(AnimInst, Anims.IdleAnim.LoadSynchronous());
+		WalkObjectProperty->SetPropertyValue_InContainer(AnimInst, Anims.WalkAnim.LoadSynchronous());
 	}
 }
