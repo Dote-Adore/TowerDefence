@@ -103,6 +103,8 @@ struct FEntityAnimation:public FTableRowBase
     UPROPERTY(EditAnywhere)
     TSoftObjectPtr<UAnimSequenceBase> DeathAnim;
     UPROPERTY(EditAnywhere)
+    TSoftObjectPtr<UAnimSequenceBase> WalkAnim;
+    UPROPERTY(EditAnywhere)
     TArray<TSoftObjectPtr<UAnimSequenceBase>> AttackAnims;
 };
 

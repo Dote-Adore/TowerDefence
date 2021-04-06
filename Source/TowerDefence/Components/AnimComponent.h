@@ -16,9 +16,9 @@ public:
     
     
     virtual void BeginPlay() override;
-private:
-    void OnInit();
-    void OnAttack(int32 AttackIdx);
+protected :
+    virtual void OnInit();
+    virtual void OnAttack(int32 AttackIdx);
     void OnDeath();
     AEntity* ParentEntity;
     UAnimInstance* AnimInst;

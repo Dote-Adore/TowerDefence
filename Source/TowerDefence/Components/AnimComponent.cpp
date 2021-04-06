@@ -17,12 +17,17 @@ void UAnimComponent::OnInit()
     const FEntityAnimation& Anims = ParentEntity->GetAnimations();
     AnimInst = ParentEntity->GetMesh()->GetAnimInstance();
     FProperty* IdleProperty = AnimInst->GetClass()->FindPropertyByName(IdleAnimParamName);
-    FObjectProperty* ObejctProperty = CastField<FObjectProperty>(IdleProperty);
-    ObejctProperty->SetPropertyValue_InContainer(AnimInst,  Anims.IdleAnim.LoadSynchronous());
-
+    if(IdleProperty)
+    {
+        FObjectProperty* ObejctProperty = CastField<FObjectProperty>(IdleProperty);
+        ObejctProperty->SetPropertyValue_InContainer(AnimInst,  Anims.IdleAnim.LoadSynchronous());
+    }
     FProperty* DeathProperty = AnimInst->GetClass()->FindPropertyByName(DeathAnimParamName);
-    FObjectProperty* DetahObejctProperty = CastField<FObjectProperty>(DeathProperty);
-    DetahObejctProperty->SetPropertyValue_InContainer(AnimInst, Anims.DeathAnim.LoadSynchronous());
+    if(DeathProperty)
+    {
+        FObjectProperty* DetahObejctProperty = CastField<FObjectProperty>(DeathProperty);
+        DetahObejctProperty->SetPropertyValue_InContainer(AnimInst, Anims.DeathAnim.LoadSynchronous());
+    }
 
 }
 
