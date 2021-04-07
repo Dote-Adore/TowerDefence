@@ -33,9 +33,11 @@ public:
     TSubclassOf<ATurrent> TurrentEntityClass;
     UPROPERTY(Config,EditAnywhere)
     TSubclassOf<AEnemy> EnemyEntityClass;
-    // 所有Tile类的路径
-    UPROPERTY(Config,EditAnywhere, Category=LevelEditor)
-    FString TilesDirPath;
+
+    
+    // 所有的Tile品类
+    UPROPERTY(Config, EditAnywhere, Category=LevelEditor)
+    TMap<FName, TSoftObjectPtr<class ABaseTile>> AllTiles;
     const FBuff* FindBuffByID(int32 ID);
 private:
     TMap<int32, FBuff*> LoadedBuffs;

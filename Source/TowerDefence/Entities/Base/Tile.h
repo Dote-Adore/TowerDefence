@@ -26,6 +26,11 @@ public:
 	//可部署的EntityTypes
 	UPROPERTY(EditDefaultsOnly)
 	TArray<FName> DeployableEntityTypes;
+#if WITH_EDITOR
+	UPROPERTY(EditDefaultsOnly)
+	FLinearColor DebugColor;
+#endif
+
 
 	void SetDeployEntity(AEntity* TargetEntity);
 	bool CanDeploy();
