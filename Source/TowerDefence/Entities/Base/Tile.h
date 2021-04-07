@@ -4,7 +4,7 @@
 class UBoxComponent;
 class AEntity;
 UENUM()
-enum ETileType
+enum class ETileType
 {
 	Start,
 	End,
@@ -23,17 +23,21 @@ public:
 	ABaseTile(const FObjectInitializer& ObjectInitializer);
 	UPROPERTY(EditDefaultsOnly)
 	ETileType TileType;
+	//可部署的EntityTypes
 	UPROPERTY(EditDefaultsOnly)
-	FName DeployableEntityType;
+	TArray<FName> DeployableEntityTypes;
 
 	void SetDeployEntity(AEntity* TargetEntity);
 	bool CanDeploy();
+	void Deploy(AEntity* Entity);
 protected:
 	// 当前部署在上面的实体
 	UPROPERTY(Transient)
 	AEntity* CurrentDeployEntity;
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly)
 	UBoxComponent* BoxComponent;
 	UPROPERTY()
 	float BoxSize = 200.f;
+	UPROPERTY(EditAnywhere)
+	float HeightOffest = 0.f;
 };
