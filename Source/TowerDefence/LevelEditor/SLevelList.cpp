@@ -6,6 +6,7 @@
 
 void SLevelList::Construct(const SLevelList::FArguments& InArgs)
 {
+	OnSelectionChanged = InArgs._OnSelectionChanged;
 	const UGlobalConfig* Config = GetDefault<UGlobalConfig>();
 	auto AllLevels = Config->GetAllLevels();
 	
@@ -16,8 +17,7 @@ void SLevelList::Construct(const SLevelList::FArguments& InArgs)
 		.ListItemsSource(&ObjectArray)
 		.OnGenerateRow(this, &SLevelList::OnGenerateRow)
 		.SelectionMode(ESelectionMode::Single)
-		// SNew(STextBlock)
-		// .Text(LOCTEXT("LevelList", "LevelList"))
+		.OnSelectionChanged(this, &SLevelList::OnSelectionChangedFunc)
 	];
 }
 
@@ -29,6 +29,11 @@ TSharedRef<ITableRow> SLevelList::OnGenerateRow(ULevelInfomation* InItem,
 		SNew(STextBlock)
 		.Text(FText::FromString(InItem->GetName()))
 	];
+}
+
+void SLevelList::OnSelectionChangedFunc(ULevelInfomation* LevelInfomation, ESelectInfo::Type Type)
+{
+	OnSelectionChanged.ExecuteIfBound(LevelInfomation, Type);
 }
 
 #undef LOCTEXT_NAMESPACE
