@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include "Brushes/SlateColorBrush.h"
 
+class ULevelInfomation;
+class SMapCreatorPanel;
 class SLevelCreatorPanel:public SCompoundWidget
 {
 public:
@@ -11,4 +13,8 @@ public:
 private:
 	FSlateColorBrush MapCreatorBGBrush = FSlateColorBrush(FLinearColor::Black);
 	FSlateColorBrush LevelPaddingBrush = FSlateColorBrush(FLinearColor(0,0,0,0));
+	TSharedPtr<SMapCreatorPanel> MapCreatorPanel;
+	
+
+	void OnSelectionChangedFunc(ULevelInfomation* LevelInfomation, ESelectInfo::Type Type);
 };

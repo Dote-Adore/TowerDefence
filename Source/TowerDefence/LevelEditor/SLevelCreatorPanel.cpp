@@ -8,6 +8,7 @@
 
 void SLevelCreatorPanel::Construct(const SLevelCreatorPanel::FArguments& InArgs)
 {
+	MapCreatorPanel = SNew(SMapCreatorPanel);
 	ChildSlot
     [
         SNew(SHorizontalBox)
@@ -27,22 +28,23 @@ void SLevelCreatorPanel::Construct(const SLevelCreatorPanel::FArguments& InArgs)
        				SNew(SButton)
 		            .Text(LOCTEXT("Create New Level", "Create New Level"))
         		]
+        		// 所有的level列表在这里显示
         		+SVerticalBox::Slot()
        			.FillHeight(1)
        			[
        				SNew(SLevelList)
+       				.OnSelectionChanged(this, &SLevelCreatorPanel::OnSelectionChangedFunc)
        			]
        		]
 		]
-		// 关卡地图编辑器
+		// 选择关卡地图编辑器，
 		+SHorizontalBox::Slot()
+		// .AutoWidth()
 		[
 			SNew(SBorder)
-			.VAlign(VAlign_Center)
-			.HAlign(HAlign_Center)
 			.BorderImage(&MapCreatorBGBrush)
 			[
-				SNew(SMapCreatorPanel)
+				MapCreatorPanel.ToSharedRef()
 			]
 		]
 		// 关卡信息编辑器
@@ -53,4 +55,8 @@ void SLevelCreatorPanel::Construct(const SLevelCreatorPanel::FArguments& InArgs)
 	];
 }
 
+void SLevelCreatorPanel::OnSelectionChangedFunc(ULevelInfomation* LevelInfomation, ESelectInfo::Type Type)
+{
+	MapCreatorPanel->SetCurrentLevelInfo(LevelInfomation);
+}
 #undef LOCTEXT_NAMESPACE
