@@ -12,7 +12,7 @@ struct FTileInfo
 	int32 Witdh;
 	// 所有的地块保存到这里
 	UPROPERTY(EditAnywhere)
-	TArray<TArray<TSubclassOf<class ABaseTile>>> Tiles;
+	TArray<TSubclassOf<class ABaseTile>> Tiles;
 };
 
 // 每一波怪物生成
@@ -23,6 +23,7 @@ struct FEnemyGenerationInfo
 	// 每生成一个怪物的间隔时间
 	UPROPERTY(EditAnywhere)
 	float GrapTime;
+	// 生成的怪物ID
 	UPROPERTY(EditAnywhere)
 	TArray<int32> GeneratedID;
 	// 配置的路径
@@ -37,9 +38,13 @@ class ULevelInfomation:public UDataAsset
 {
 	GENERATED_BODY()
 public:
+	// 地图信息
 	UPROPERTY(EditAnywhere)
 	FTileInfo TileInfo;
+	UPROPERTY(EditAnywhere)
+	TSoftObjectPtr<class UWorld> BackgroundWorld;
 	// 生成怪物波数设定
 	UPROPERTY(EditAnywhere)
 	TArray<FEnemyGenerationInfo> Waves;
+	
 };

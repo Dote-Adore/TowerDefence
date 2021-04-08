@@ -9,6 +9,7 @@ struct FBuff;
 UCLASS(Config=Game)
 class UGlobalConfig:public UObject
 {
+    typedef TMap<FName, class ULevelInfomation*> AllLevelsMap;
     GENERATED_BODY()
 public:
     UPROPERTY(Config, EditAnywhere)
@@ -38,8 +39,14 @@ public:
     // 所有的Tile品类
     UPROPERTY(Config, EditAnywhere, Category=LevelEditor)
     TMap<FName, TSoftObjectPtr<class ABaseTile>> AllTiles;
+    // 整个游戏所有的关卡存放的位置
+    UPROPERTY(Config, EditAnywhere, Category=LevelEditor)
+    FString TargetLevelsPath;
+    
     const FBuff* FindBuffByID(int32 ID);
+    const AllLevelsMap GetAllLevels() const;
 private:
     TMap<int32, FBuff*> LoadedBuffs;
-    
+    // 所有的Levelsload进来
+    mutable AllLevelsMap LoadedLevels;
 };
