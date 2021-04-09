@@ -82,15 +82,11 @@ void SMapCreatorPanel::Construct(const SMapCreatorPanel::FArguments& InArgs)
                         return FOptionalSize(OuterBoxWidth);
                     })
 					[
-						SAssignNew(MapEditorTileView, STileView<ABaseTile*>)
+						SAssignNew(MapEditorTileView, STileView<TSharedPtr<FString>>)
 						.ItemWidth(EachTileSize)
 						.ItemHeight(EachTileSize)
 						.OnGenerateTile(this, &SMapCreatorPanel::OnGenerteTileMapItem)
 						.ListItemsSource(&CurrentMapEditorTiles)
-						.OnItemToString_Debug_Lambda([](ABaseTile* InItem)-> FString
-						{
-							return "WTF";
-						})
 						.SelectionMode(ESelectionMode::None)
 					]
 				]
@@ -118,31 +114,35 @@ void SMapCreatorPanel::SetCurrentLevelInfo(ULevelInfomation* LevelInformation)
 		OuterBoxHeight = LevelInformation->TileInfo.Height* EachTileSize;
 		// 如果不符合大小，则全部删除重新建立一个
 		int32 AllNum = LevelInformation->TileInfo.Witdh*LevelInformation->TileInfo.Height;
+		CurrentMapEditorTiles.Empty();
 		if(LevelInformation->TileInfo.Tiles.Num()!=AllNum)
 		{
 			LevelInformation->TileInfo.Tiles.Empty();
-			CurrentMapEditorTiles.Empty();
 			for(int32 i = 0;i<AllNum;i++)
 			{
 				LevelInformation->TileInfo.Tiles.Add(nullptr);
-				CurrentMapEditorTiles.Add(GetMutableDefault<ABaseTile>());
+				CurrentMapEditorTiles.Add(TSharedPtr<FString>(new FString("")));
 			}
-			MapEditorTileView->RequestListRefresh();
 			LevelInformation->MarkPackageDirty();
 		}
 		// 从那里面导入相应的defaultObject
 		else
 		{
-			CurrentMapEditorTiles.Empty();
 			for(int32 i = 0; i<AllNum;i++)
 			{
 				UClass* TargetCLass = LevelInformation->TileInfo.Tiles[i];
 				if(TargetCLass)
-					CurrentMapEditorTiles.Add(GetMutableDefault<ABaseTile>(TargetCLass));
+				{
+					CurrentMapEditorTiles.Add(TSharedPtr<FString>(
+						new FString(GetMutableDefault<ABaseTile>(TargetCLass)->GetName())));
+				}
 				else
-					CurrentMapEditorTiles.Add(GetMutableDefault<ABaseTile>());
+				{
+					CurrentMapEditorTiles.Add(MakeShared<FString>(FString("")));
+				}
 			}
 		}
+		MapEditorTileView->RequestListRefresh();
 	}
 	else
 	{
@@ -187,13 +187,20 @@ TSharedRef<ITableRow> SMapCreatorPanel::OnGenerateTileTypesRow(const ABaseTile* 
 	];
 }
 
-TSharedRef<ITableRow> SMapCreatorPanel::OnGenerteTileMapItem(ABaseTile* InTile,
+TSharedRef<ITableRow> SMapCreatorPanel::OnGenerteTileMapItem(TSharedPtr<FString> InTile,
 	const TSharedRef<STableViewBase>& TableViewBase)
 {
-
-	if(InTile == nullptr)
+	const ABaseTile** TargetFoundBaseTile =  AllBaseTiles.FindByPredicate([&](const ABaseTile* InItem)-> bool
 	{
-		return SNew(STableRow<const ABaseTile*>, TableViewBase)
+		if(InTile->Equals(InItem->GetName()))
+		{
+			return true;
+		}
+		return false;
+	});
+	if(!TargetFoundBaseTile||!*TargetFoundBaseTile)
+	{
+		return SNew(STableRow<TSharedPtr<FString>>, TableViewBase)
 		[
 			SNew(SBorder)
 			[
@@ -203,18 +210,15 @@ TSharedRef<ITableRow> SMapCreatorPanel::OnGenerteTileMapItem(ABaseTile* InTile,
 			]
 		];
 	}
-	else
-	{
-		return SNew(STableRow<const ABaseTile*>, TableViewBase)
-[
-	    SNew(SBorder)
-	    [
-	        SNew(SColorBlock)
-	        .Color(InTile->DebugColor)
-	        .Size(FVector2D(EachTileSize,EachTileSize))
-	    ]
-];
-	}
 
+	return SNew(STableRow<TSharedPtr<FString>>, TableViewBase)
+		[
+			SNew(SBorder)
+			[
+				SNew(SColorBlock)
+				.Color((*TargetFoundBaseTile)->DebugColor)
+				.Size(FVector2D(EachTileSize,EachTileSize))
+			]
+		];
 }
 #undef LOCTEXT_NAMESPACE

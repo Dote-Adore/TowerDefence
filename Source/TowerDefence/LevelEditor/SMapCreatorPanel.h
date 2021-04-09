@@ -22,9 +22,8 @@ private:
 	TArray<const ABaseTile*> AllBaseTiles;
 	TSharedPtr<SListView<const ABaseTile*>> TileTypeSelectList;
 	TSharedPtr<SBox> MapEditorOuterBox;
-	TSharedPtr<STileView<ABaseTile*>> MapEditorTileView;
-	TArray<ABaseTile*> CurrentMapEditorTiles;
-	TSubclassOf<ABaseTile> EmptyBaseTileClass;
+	TSharedPtr<STileView<TSharedPtr<FString>>> MapEditorTileView;
+	TArray<TSharedPtr<FString>> CurrentMapEditorTiles;
 	
 	int32 EachTileSize = 50;
 	int32 OuterBoxWidth;
@@ -33,9 +32,6 @@ private:
 	void GetDefaultBaseTiles();
 	TSharedRef<ITableRow> OnGenerateTileTypesRow(const ABaseTile* InItem,
 		const TSharedRef<STableViewBase>& TableViewBase);
-	TSharedRef<ITableRow> OnGenerteTileMapItem(ABaseTile* InTile,
+	TSharedRef<ITableRow> OnGenerteTileMapItem(TSharedPtr<FString> InTile,
 		const TSharedRef<STableViewBase>& TableViewBase);
-	
-	int32 GetOuterBoxWidthOverride();
-	int32 GetOuterBoxHeightOverride();
 };
