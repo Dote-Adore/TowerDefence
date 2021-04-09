@@ -1,7 +1,5 @@
 ﻿#include "SMapCreatorPanel.h"
 
-
-
 #include "Brushes/SlateColorBrush.h"
 #include "TowerDefence/GlobalConfig.h"
 #include "TowerDefence/Entities/Base/Tile.h"
@@ -52,10 +50,11 @@ void SMapCreatorPanel::Construct(const SMapCreatorPanel::FArguments& InArgs)
 					.AutoWidth()
 					[
 						SAssignNew(TileTypeSelectList , SListView<const ABaseTile*>)
-						.ListItemsSource(&AllBaseTiles)
+						.ListItemsSource(&AllBaseTileTypes)
 						.Orientation(EOrientation::Orient_Horizontal)
 						.OnGenerateRow(this, &SMapCreatorPanel::OnGenerateTileTypesRow)
 						.SelectionMode(ESelectionMode::Single)
+						.OnSelectionChanged(this, &SMapCreatorPanel::OnTileTypeSelectionChanged)
 						.ClearSelectionOnClick(false)
 					]
 				]
@@ -79,15 +78,19 @@ void SMapCreatorPanel::Construct(const SMapCreatorPanel::FArguments& InArgs)
 					})
 					.HeightOverride_Lambda([&]()->FOptionalSize
                     {
-                        return FOptionalSize(OuterBoxWidth);
+                        return FOptionalSize(OuterBoxHeight);
                     })
 					[
-						SAssignNew(MapEditorTileView, STileView<TSharedPtr<FString>>)
+						SAssignNew(MapEditorTileView, STileView<FMapEditorItemType>)
 						.ItemWidth(EachTileSize)
 						.ItemHeight(EachTileSize)
 						.OnGenerateTile(this, &SMapCreatorPanel::OnGenerteTileMapItem)
 						.ListItemsSource(&CurrentMapEditorTiles)
-						.SelectionMode(ESelectionMode::None)
+						.SelectionMode(ESelectionMode::Single)
+						.OnMouseButtonClick_Lambda([](FMapEditorItemType InItem)->void 
+						{
+							UE_LOG(LogTemp,Display, TEXT("On Map Item Click"));
+						})
 					]
 				]
 				+SHorizontalBox::Slot()
@@ -98,9 +101,9 @@ void SMapCreatorPanel::Construct(const SMapCreatorPanel::FArguments& InArgs)
 		]
 	];
 	// 默认选择第一个选项
-	if(AllBaseTiles.Num()>0)
+	if(AllBaseTileTypes.Num()>0)
 	{
-		TileTypeSelectList->SetSelection(AllBaseTiles[0]);
+		TileTypeSelectList->SetSelection(AllBaseTileTypes[0]);
 	}
 }
 
@@ -121,26 +124,15 @@ void SMapCreatorPanel::SetCurrentLevelInfo(ULevelInfomation* LevelInformation)
 			for(int32 i = 0;i<AllNum;i++)
 			{
 				LevelInformation->TileInfo.Tiles.Add(nullptr);
-				CurrentMapEditorTiles.Add(TSharedPtr<FString>(new FString("")));
+				//CurrentMapEditorTiles.Add(MakeShared<FMapTileEntry>(FMapTileEntry("",i)));
 			}
 			LevelInformation->MarkPackageDirty();
 		}
-		// 从那里面导入相应的defaultObject
-		else
+		for(int32 i = 0; i<AllNum;i++)
 		{
-			for(int32 i = 0; i<AllNum;i++)
-			{
-				UClass* TargetCLass = LevelInformation->TileInfo.Tiles[i];
-				if(TargetCLass)
-				{
-					CurrentMapEditorTiles.Add(TSharedPtr<FString>(
-						new FString(GetMutableDefault<ABaseTile>(TargetCLass)->GetName())));
-				}
-				else
-				{
-					CurrentMapEditorTiles.Add(MakeShared<FString>(FString("")));
-				}
-			}
+			auto& InItem = LevelInformation->TileInfo.Tiles[i];
+			CurrentMapEditorTiles.Add(
+				MakeShared<FMapTileEntry>(InItem,i));
 		}
 		MapEditorTileView->RequestListRefresh();
 	}
@@ -156,12 +148,17 @@ void SMapCreatorPanel::GetDefaultBaseTiles()
 	for(const auto BaseTileClass:Config->AllTiles)
 	{
 		const ABaseTile* BaseTile = GetDefault<ABaseTile>(BaseTileClass.Value);
-		AllBaseTiles.Add(BaseTile);
+		AllBaseTileTypes.Add(BaseTile);
 	}
 }
 
+void SMapCreatorPanel::OnTileTypeSelectionChanged(const ABaseTile* InTime, ESelectInfo::Type Type)
+{
+	CurrentSelectionTileTypeClass = InTime->GetClass();
+}
+
 TSharedRef<ITableRow> SMapCreatorPanel::OnGenerateTileTypesRow(const ABaseTile* InItem,
-	const TSharedRef<STableViewBase>& TableViewBase)
+                                                               const TSharedRef<STableViewBase>& TableViewBase)
 {
 	return SNew(STableRow<const ABaseTile*>, TableViewBase)
 	[
@@ -187,38 +184,53 @@ TSharedRef<ITableRow> SMapCreatorPanel::OnGenerateTileTypesRow(const ABaseTile* 
 	];
 }
 
-TSharedRef<ITableRow> SMapCreatorPanel::OnGenerteTileMapItem(TSharedPtr<FString> InTile,
+TSharedRef<ITableRow> SMapCreatorPanel::OnGenerteTileMapItem(FMapEditorItemType InTileTypeItem,
 	const TSharedRef<STableViewBase>& TableViewBase)
-{
-	const ABaseTile** TargetFoundBaseTile =  AllBaseTiles.FindByPredicate([&](const ABaseTile* InItem)-> bool
-	{
-		if(InTile->Equals(InItem->GetName()))
-		{
-			return true;
-		}
-		return false;
-	});
-	if(!TargetFoundBaseTile||!*TargetFoundBaseTile)
-	{
-		return SNew(STableRow<TSharedPtr<FString>>, TableViewBase)
-		[
-			SNew(SBorder)
-			[
-				SNew(SColorBlock)
-				.Color(FLinearColor(1,1,1,0.2))
-				.Size(FVector2D(EachTileSize,EachTileSize))
-			]
-		];
-	}
+{	
+	TSharedRef<SColorBlock> CurrentColorWidget =
+		SNew(SColorBlock)
+           .Color_Lambda([InTileTypeItem]()-> FLinearColor
+           {
+	           if(IsValid(InTileTypeItem->TileClass.Get()))
+	           {
+                   return GetDefault<ABaseTile>(*InTileTypeItem->TileClass)->DebugColor;
+               }
+               return FLinearColor(1,1,1,0.2);
+           });
+	
+	TSharedRef<STableRow<FMapEditorItemType>> TargetMap = SNew(STableRow<FMapEditorItemType>, TableViewBase)
+	[
+	SNew(SBorder)
+	    .OnMouseButtonDown_Lambda([&](const FGeometry&, const FPointerEvent&)-> FReply
+	    {
+	    	IsMouseBtnDown = true;
+	        UE_LOG(LogTemp, Display, TEXT("OnMouseMove Down, nullptr"));
+	        return FReply::Handled();
+	    })
+	    .OnMouseButtonUp_Lambda([&](const FGeometry&, const FPointerEvent&)-> FReply
+        {
+            IsMouseBtnDown = false;
+            return FReply::Handled();
+        })
+	    .OnMouseMove_Lambda([&,InTileTypeItem](const FGeometry&, const FPointerEvent&)-> FReply
+	    {
+	    	// 如果一直是按下去的，则将当前的class改掉
+	    	if(IsMouseBtnDown == true)
+	    	{
+	    		if(IsValid(InTileTypeItem->TileClass.Get())||
+	    			InTileTypeItem->TileClass.Get() != CurrentSelectionTileTypeClass.Get())
+	    		{
+	    			InTileTypeItem->TileClass = CurrentSelectionTileTypeClass;
+	    			CurrentLevelInfomation->MarkPackageDirty();
+	    		}
+	    	}
+	        return FReply::Handled();
+	    })
+	    [
+	    	CurrentColorWidget
+	    ]
+	];
 
-	return SNew(STableRow<TSharedPtr<FString>>, TableViewBase)
-		[
-			SNew(SBorder)
-			[
-				SNew(SColorBlock)
-				.Color((*TargetFoundBaseTile)->DebugColor)
-				.Size(FVector2D(EachTileSize,EachTileSize))
-			]
-		];
+	return TargetMap;
 }
 #undef LOCTEXT_NAMESPACE

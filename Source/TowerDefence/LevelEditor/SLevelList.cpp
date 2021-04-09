@@ -18,6 +18,7 @@ void SLevelList::Construct(const SLevelList::FArguments& InArgs)
 		.OnGenerateRow(this, &SLevelList::OnGenerateRow)
 		.SelectionMode(ESelectionMode::Single)
 		.OnSelectionChanged(this, &SLevelList::OnSelectionChangedFunc)
+		.ClearSelectionOnClick(false)
 	];
 }
 
