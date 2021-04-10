@@ -1,6 +1,7 @@
 ﻿#include "SInfoParamsPanel.h"
 
 #include "PropertyCustomizationHelpers.h"
+#include "SWaveSettingsPanel.h"
 #include "TowerDefence/Level/LevelInfomation.h"
 #include "EditorWidgets/Public/SAssetDropTarget.h"
 #include "Styling/SlateStyle.h"
@@ -14,12 +15,15 @@ void SInfoParamsPanel::Construct(const SInfoParamsPanel::FArguments& InArgs, ULe
 	TSharedPtr<FTextBlockStyle> CategoryTextStyle =
         MakeShared<FTextBlockStyle>(FCoreStyle::Get().GetWidgetStyle<FTextBlockStyle>( "NormalText" ));
 	CategoryTextStyle->SetFontSize(15);
+	TSharedPtr<FTextBlockStyle> SubCategoryTextStyle =
+    MakeShared<FTextBlockStyle>(FCoreStyle::Get().GetWidgetStyle<FTextBlockStyle>( "NormalText" ));
+	SubCategoryTextStyle->SetFontSize(12);
 	ChildSlot
     [
         SNew(SBorder)
         .Padding(10)
         [
-            SNew(SVerticalBox)
+            SAssignNew(MainVerticalBoxPanel, SVerticalBox)
             +SVerticalBox::Slot()
             .Padding(4)
             .AutoHeight()
@@ -94,6 +98,7 @@ void SInfoParamsPanel::Construct(const SInfoParamsPanel::FArguments& InArgs, ULe
             [
                 SNew(STextBlock)
                 .Text(LOCTEXT("AllWaveList", "All Waves"))
+                .TextStyle(SubCategoryTextStyle.Get())
             ]
             +SVerticalBox::Slot()
             .Padding(4)
@@ -141,6 +146,20 @@ void SInfoParamsPanel::Construct(const SInfoParamsPanel::FArguments& InArgs, ULe
 	                ]
 				]
 			]
+			+SVerticalBox::Slot()
+			.AutoHeight()
+			.Padding(0, 4)
+			[
+			    SNew(STextBlock)
+			    .Text(LOCTEXT("Current Selected Wave Settings", "Current Selected Wave Settings"))
+			    .TextStyle(SubCategoryTextStyle.Get())
+			]
+			+SVerticalBox::Slot()
+			.AutoHeight()
+			.Padding(4,10)
+			[
+				SAssignNew(EachWaveSettingWidget, SBorder)
+			]
         ]
     ];
 	// 默认选中一个
@@ -172,6 +191,12 @@ void SInfoParamsPanel::OnBGSelectorMenuOpenChanged(bool bOpen)
 
 void SInfoParamsPanel::OnWaveItemListSelectedChanged(FWaveItemEntry InItem, ESelectInfo::Type Type)
 {
+	MainVerticalBoxPanel->RemoveSlot(EachWaveSettingWidget.ToSharedRef());
+	MainVerticalBoxPanel->AddSlot()
+	.AutoHeight()
+	[
+		SAssignNew(EachWaveSettingWidget, SWaveSettingsPanel, &InItem->WaveItem, CurrentLevelInfomation)
+	];
 	CurrentSelectedWaveItem = InItem;
 }
 

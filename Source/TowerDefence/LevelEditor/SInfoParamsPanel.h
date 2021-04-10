@@ -26,7 +26,8 @@ private:
 	ULevelInfomation* CurrentLevelInfomation;
 	TSharedPtr<SComboButton> BGSelectorSelctorButton;
 	TArray<FWaveItemEntry> CurrentWaveItemArray;
-
+	TSharedPtr<SVerticalBox> MainVerticalBoxPanel;
+	TSharedPtr<SWidget> EachWaveSettingWidget;
 
 	// Wave Params
 	TSharedPtr<SListView<FWaveItemEntry>> WaveSelectorList;
