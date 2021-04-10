@@ -71,6 +71,10 @@ void SLevelCreatorPanel::OnSelectionChangedFunc(ULevelInfomation* LevelInfomatio
 			MapCreatorPanel->OnShowPath(InPath);
 			// UE_LOG(LogTemp, Display, TEXT("OnShowPath"))
 		})
+		.OnRedrawPath_Lambda([&](TArray<int32>* InPath, bool EnableRedrawPath)->void
+		{
+			MapCreatorPanel->OnRedrawPath(InPath, EnableRedrawPath);
+		})
 	];
 	
 }

@@ -109,6 +109,8 @@ void SMapCreatorPanel::Construct(const SMapCreatorPanel::FArguments& InArgs)
 
 void SMapCreatorPanel::SetCurrentLevelInfo(ULevelInfomation* LevelInformation)
 {
+	EnableRedrawPath = false;
+	TargetPathArray = nullptr;
 	CurrentLevelInfomation = LevelInformation;
 	if(LevelInformation)
 	{
@@ -205,6 +207,16 @@ TSharedRef<ITableRow> SMapCreatorPanel::OnGenerteTileMapItem(FMapEditorItemType 
 	    .OnMouseButtonDown_Lambda([&](const FGeometry&, const FPointerEvent&)-> FReply
 	    {
 	    	IsMouseBtnDown = true;
+	    	// 如果是绘制Path模式，则先将当前的path全部清空
+	    	if(EnableRedrawPath)
+	    	{
+	    		for(auto InTile:CurrentMapEditorTiles)
+	    		{
+                    InTile->ShowPath = false;
+                }
+                TargetPathArray->Empty();
+	    		CurrentPathNum = 0;
+	    	}
 	        UE_LOG(LogTemp, Display, TEXT("OnMouseMove Down, nullptr"));
 	        return FReply::Handled();
 	    })
@@ -215,6 +227,19 @@ TSharedRef<ITableRow> SMapCreatorPanel::OnGenerteTileMapItem(FMapEditorItemType 
         })
 	    .OnMouseMove_Lambda([&,InTileTypeItem](const FGeometry&, const FPointerEvent&)-> FReply
 	    {
+	    	// 如果当前是绘制路径
+	    	if(EnableRedrawPath)
+	    	{
+	    		if(IsMouseBtnDown == true&& InTileTypeItem->ShowPath == false)
+	    		{
+	    			InTileTypeItem->ShowPath = true;
+	    			InTileTypeItem->PathIndex = CurrentPathNum;
+	    			CurrentPathNum++;
+	    			TargetPathArray->Add(InTileTypeItem->TileIdx);
+	    			CurrentLevelInfomation->MarkPackageDirty();
+	    		}
+	    		return FReply::Handled();
+	    	}
 	    	// 如果一直是按下去的，则将当前的class改掉
 	    	if(IsMouseBtnDown == true)
 	    	{
@@ -262,7 +287,10 @@ TSharedRef<ITableRow> SMapCreatorPanel::OnGenerteTileMapItem(FMapEditorItemType 
 					.VAlign(VAlign_Center)
 					[
 						SNew(STextBlock)
-						.Text(FText::FromString(FString::FromInt(InTileTypeItem->PathIndex)))
+						.Text_Lambda([InTileTypeItem]()->FText
+						{
+							return FText::FromString(FString::FromInt(InTileTypeItem->PathIndex));
+						})
 						.ColorAndOpacity(FLinearColor(1, 1, 1, 1))
 					]
 				]
@@ -286,5 +314,11 @@ void SMapCreatorPanel::OnShowPath(TArray<int32>& InPath)
 		CurrentMapEditorTiles[TargetTileIdx]->PathIndex = i;
 	}
 	MapEditorTileView->RequestListRefresh();
+}
+
+void SMapCreatorPanel::OnRedrawPath(TArray<int32>* InPath, bool EnableRedraw)
+{
+	TargetPathArray = InPath;
+	EnableRedrawPath = EnableRedraw;
 }
 #undef LOCTEXT_NAMESPACE

@@ -27,8 +27,8 @@ public:
 	void SetCurrentLevelInfo(ULevelInfomation* LevelInformation);
 	//Wave 路径绘制
 	void OnShowPath(TArray<int32>& InPath);
-
-
+	void OnRedrawPath(TArray<int32>* InPath, bool EnableRedraw);
+	// ------------
 
 private:
 	ULevelInfomation* CurrentLevelInfomation;
@@ -44,6 +44,12 @@ private:
 	int32 OuterBoxHeight;
 	TSubclassOf<ABaseTile> CurrentSelectionTileTypeClass;
 	bool IsMouseBtnDown = false;
+
+	// Wave 路径绘制
+	bool EnableRedrawPath = false;
+	TArray<int32>* TargetPathArray;
+	int32 CurrentPathNum = 0;
+	// -------------
 	
 	void GetDefaultBaseTiles();
 	void OnTileTypeSelectionChanged(const ABaseTile* InTime, ESelectInfo::Type Type);

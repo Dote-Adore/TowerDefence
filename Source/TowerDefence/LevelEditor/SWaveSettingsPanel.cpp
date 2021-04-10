@@ -8,7 +8,7 @@ void SWaveSettingsPanel::Construct(const SWaveSettingsPanel::FArguments& InArgs,
 	FEnemyGenerationInfo* EnemyGenerationInfo, ULevelInfomation* ParentLevelInfomation)
 {
 	OnShowPath = InArgs._OnShowPath;
-	
+	OnRedrawPath = InArgs._OnRedrawPath;
 	CurrentWaveInfo = EnemyGenerationInfo;
 	CurrentLevelInfomation = ParentLevelInfomation;
 	OnShowPath.ExecuteIfBound(CurrentWaveInfo->Path);
@@ -75,6 +75,21 @@ void SWaveSettingsPanel::Construct(const SWaveSettingsPanel::FArguments& InArgs,
 			.OnGenerateTile(this, &SWaveSettingsPanel::OnGenerateIDTile)
 			.ListItemsSource(&GeneratedIDArray)
 		]
+		+SVerticalBox::Slot()
+		.Padding(0,5)
+		.AutoHeight()
+		[
+		    SNew(STextBlock)
+		    .Text(LOCTEXT("Redraw Path", "Redraw Path"))
+		]
+		+SVerticalBox::Slot()
+		.AutoHeight()
+		.Padding(0,5)
+		[
+			SNew(SCheckBox)
+			.OnCheckStateChanged(this, &SWaveSettingsPanel::OnRedrawPathCheckStateChanged)
+		]
+		
 	];
 }
 
@@ -168,6 +183,18 @@ FReply SWaveSettingsPanel::OnDeleteSelectedIDBtnClicked()
 	GeneratedIDListTileWidget->RequestListRefresh();
 	CurrentLevelInfomation->MarkPackageDirty();
 	return FReply::Handled();
+}
+
+void SWaveSettingsPanel::OnRedrawPathCheckStateChanged(ECheckBoxState InNewState)
+{
+	if(InNewState == ECheckBoxState::Checked)
+	{
+		OnRedrawPath.ExecuteIfBound(&CurrentWaveInfo->Path, true);
+	}
+	else
+	{
+		OnRedrawPath.ExecuteIfBound(&CurrentWaveInfo->Path, false);
+	}
 }
 
 #undef LOCTEXT_NAMESPACE

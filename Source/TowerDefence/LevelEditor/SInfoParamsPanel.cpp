@@ -10,6 +10,7 @@
 
 void SInfoParamsPanel::Construct(const SInfoParamsPanel::FArguments& InArgs, ULevelInfomation*LevelInfomation)
 {
+	OnRedrawPath = InArgs._OnRedrawPath;
 	OnShowPath = InArgs._OnShowPath;
 	this->CurrentLevelInfomation = LevelInfomation;
 	InitWaveArray();
@@ -195,12 +196,14 @@ void SInfoParamsPanel::OnWaveItemListSelectedChanged(FWaveItemEntry InItem, ESel
 
 	if(!InItem.IsValid())
 		return;
+	OnRedrawPath.ExecuteIfBound(nullptr, false);
 	MainVerticalBoxPanel->RemoveSlot(EachWaveSettingWidget.ToSharedRef());
 	MainVerticalBoxPanel->AddSlot()
 	.AutoHeight()
 	[
 		SAssignNew(EachWaveSettingWidget, SWaveSettingsPanel, &InItem->WaveItem, CurrentLevelInfomation)
 		.OnShowPath(OnShowPath)
+		.OnRedrawPath(OnRedrawPath)
 	];
 	CurrentSelectedWaveItem = InItem;
 }

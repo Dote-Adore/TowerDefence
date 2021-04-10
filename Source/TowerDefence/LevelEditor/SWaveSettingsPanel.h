@@ -17,9 +17,8 @@ class SWaveSettingsPanel:public SCompoundWidget
 {
 	typedef TSharedPtr<FGenerateIDWidgetItem> FGeneratedIDEntry;
 	SLATE_BEGIN_ARGS(SWaveSettingsPanel){}
-
-
 	SLATE_EVENT(FOnShowPath, OnShowPath)
+	SLATE_EVENT(FOnRedrawPath, OnRedrawPath)
 	SLATE_END_ARGS()
 public:
 	void Construct(const SWaveSettingsPanel::FArguments& InArgs,
@@ -29,6 +28,7 @@ private:
 	ULevelInfomation* CurrentLevelInfomation;
 	TSharedPtr<SEditableTextBox> GrapTimeInputWidget;
 	FOnShowPath OnShowPath;
+	FOnRedrawPath OnRedrawPath;
 	
 	// Generated IDs
 	TSharedPtr<STileView<FGeneratedIDEntry>> GeneratedIDListTileWidget;
@@ -45,4 +45,10 @@ private:
 	FReply OnAddNewGeneratedIDBtnClicked();
 	FReply OnDeleteSelectedIDBtnClicked();
 	// --------------
+
+	// DrawPath
+	void OnRedrawPathCheckStateChanged(ECheckBoxState InNewState);
+	// --------------
+
+	
 };

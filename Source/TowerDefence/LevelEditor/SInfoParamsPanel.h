@@ -15,17 +15,23 @@ struct FWaveWidgetItem
 };
 
 DECLARE_DELEGATE_OneParam(FOnShowPath, TArray<int32>&)
+// 重新绘制该wave的path
+// 第一个是目标存放结果的Array，第二个是是否要开启绘制Path
+DECLARE_DELEGATE_TwoParams(FOnRedrawPath, TArray<int32>*, bool)
 class SInfoParamsPanel:public SCompoundWidget
 {
 	typedef TSharedPtr<FWaveWidgetItem> FWaveItemEntry;
 	SLATE_BEGIN_ARGS(SInfoParamsPanel){}
 	SLATE_EVENT(FOnShowPath, OnShowPath)
+	SLATE_EVENT(FOnRedrawPath, OnRedrawPath)
 	SLATE_END_ARGS()
 public:
 	void Construct(const SInfoParamsPanel::FArguments& InArgs, ULevelInfomation*LevelInfomation);
 
 private:
 	FOnShowPath OnShowPath;
+	FOnRedrawPath OnRedrawPath;
+	
 	ULevelInfomation* CurrentLevelInfomation;
 	TSharedPtr<SComboButton> BGSelectorSelctorButton;
 	TArray<FWaveItemEntry> CurrentWaveItemArray;
