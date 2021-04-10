@@ -6,9 +6,11 @@ struct FMapTileEntry
 {
 	// 这里直接传引用，直接改源数据
 	TSubclassOf<ABaseTile>& TileClass;
-	int32 Idx;
-	FMapTileEntry(TSubclassOf<ABaseTile>& InTileClass, int32 InIdx)
-		:TileClass(InTileClass), Idx(InIdx)
+	int32 PathIndex;
+	int32 TileIdx;
+	bool ShowPath = false;
+	FMapTileEntry(TSubclassOf<ABaseTile>& InTileClass, int32 InTileIdx)
+		:TileClass(InTileClass), TileIdx(InTileIdx)
 	{};
 };
 
@@ -22,9 +24,11 @@ typedef TSharedPtr<FMapTileEntry> FMapEditorItemType;
 public:
 
 	void Construct(const SMapCreatorPanel::FArguments& InArgs);
-
-
 	void SetCurrentLevelInfo(ULevelInfomation* LevelInformation);
+	//Wave 路径绘制
+	void OnShowPath(TArray<int32>& InPath);
+
+
 
 private:
 	ULevelInfomation* CurrentLevelInfomation;
@@ -47,4 +51,5 @@ private:
 		const TSharedRef<STableViewBase>& TableViewBase);
 	TSharedRef<ITableRow> OnGenerteTileMapItem(FMapEditorItemType InTileTypeItem,
 		const TSharedRef<STableViewBase>& TableViewBase);
+	
 };

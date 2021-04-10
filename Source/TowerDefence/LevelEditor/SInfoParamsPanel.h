@@ -14,15 +14,18 @@ struct FWaveWidgetItem
 	{}
 };
 
+DECLARE_DELEGATE_OneParam(FOnShowPath, TArray<int32>&)
 class SInfoParamsPanel:public SCompoundWidget
 {
 	typedef TSharedPtr<FWaveWidgetItem> FWaveItemEntry;
 	SLATE_BEGIN_ARGS(SInfoParamsPanel){}
+	SLATE_EVENT(FOnShowPath, OnShowPath)
 	SLATE_END_ARGS()
 public:
 	void Construct(const SInfoParamsPanel::FArguments& InArgs, ULevelInfomation*LevelInfomation);
 
 private:
+	FOnShowPath OnShowPath;
 	ULevelInfomation* CurrentLevelInfomation;
 	TSharedPtr<SComboButton> BGSelectorSelctorButton;
 	TArray<FWaveItemEntry> CurrentWaveItemArray;

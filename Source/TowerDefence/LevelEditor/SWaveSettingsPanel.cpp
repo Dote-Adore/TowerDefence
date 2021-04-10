@@ -7,8 +7,11 @@
 void SWaveSettingsPanel::Construct(const SWaveSettingsPanel::FArguments& InArgs,
 	FEnemyGenerationInfo* EnemyGenerationInfo, ULevelInfomation* ParentLevelInfomation)
 {
+	OnShowPath = InArgs._OnShowPath;
+	
 	CurrentWaveInfo = EnemyGenerationInfo;
 	CurrentLevelInfomation = ParentLevelInfomation;
+	OnShowPath.ExecuteIfBound(CurrentWaveInfo->Path);
 	InitGenerateIDArray();
 	ChildSlot
 	[

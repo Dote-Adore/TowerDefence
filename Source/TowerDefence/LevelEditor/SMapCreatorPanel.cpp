@@ -132,7 +132,7 @@ void SMapCreatorPanel::SetCurrentLevelInfo(ULevelInfomation* LevelInformation)
 		{
 			auto& InItem = LevelInformation->TileInfo.Tiles[i];
 			CurrentMapEditorTiles.Add(
-				MakeShared<FMapTileEntry>(InItem,i));
+				MakeShared<FMapTileEntry>(InItem, i));
 		}
 		MapEditorTileView->RequestListRefresh();
 	}
@@ -186,7 +186,8 @@ TSharedRef<ITableRow> SMapCreatorPanel::OnGenerateTileTypesRow(const ABaseTile* 
 
 TSharedRef<ITableRow> SMapCreatorPanel::OnGenerteTileMapItem(FMapEditorItemType InTileTypeItem,
 	const TSharedRef<STableViewBase>& TableViewBase)
-{	
+{
+	TSharedPtr<SWidget> ShowPathWidget;
 	TSharedRef<SColorBlock> CurrentColorWidget =
 		SNew(SColorBlock)
            .Color_Lambda([InTileTypeItem]()-> FLinearColor
@@ -200,7 +201,7 @@ TSharedRef<ITableRow> SMapCreatorPanel::OnGenerteTileMapItem(FMapEditorItemType 
 	
 	TSharedRef<STableRow<FMapEditorItemType>> TargetMap = SNew(STableRow<FMapEditorItemType>, TableViewBase)
 	[
-	SNew(SBorder)
+		SNew(SBorder)
 	    .OnMouseButtonDown_Lambda([&](const FGeometry&, const FPointerEvent&)-> FReply
 	    {
 	    	IsMouseBtnDown = true;
@@ -227,10 +228,63 @@ TSharedRef<ITableRow> SMapCreatorPanel::OnGenerteTileMapItem(FMapEditorItemType 
 	        return FReply::Handled();
 	    })
 	    [
-	    	CurrentColorWidget
+	    	SNew(SOverlay)
+	    	+SOverlay::Slot()
+	    	[
+	    		CurrentColorWidget
+	    	]
+	    	+SOverlay::Slot()
+	    	[
+	    		//这后面是绘制path需要用到的UI
+	    		SAssignNew(ShowPathWidget, SOverlay)
+	    		.Visibility_Lambda([InTileTypeItem]()->EVisibility
+	    		{
+	    			if(!InTileTypeItem->ShowPath)
+	    				return EVisibility::Collapsed;
+	    			else
+	    				return EVisibility::All;
+	    		})
+				+SOverlay::Slot()
+				.HAlign(HAlign_Center)
+				.VAlign(VAlign_Center)
+				[
+					SNew(SOverlay)
+					+SOverlay::Slot()
+					.HAlign(HAlign_Center)
+					.VAlign(VAlign_Center)
+					[
+						SNew(SColorBlock)
+						.Size(EachTileSize-10)
+						.Color(FLinearColor(0,0,0.6,0.3))
+					]
+					+SOverlay::Slot()
+					.HAlign(HAlign_Center)
+					.VAlign(VAlign_Center)
+					[
+						SNew(STextBlock)
+						.Text(FText::FromString(FString::FromInt(InTileTypeItem->PathIndex)))
+						.ColorAndOpacity(FLinearColor(1, 1, 1, 1))
+					]
+				]
+			]
 	    ]
 	];
-
 	return TargetMap;
+}
+
+void SMapCreatorPanel::OnShowPath(TArray<int32>& InPath)
+{
+	// 首先绘制之前全部path清空
+	for(auto InTile:CurrentMapEditorTiles)
+	{
+		InTile->ShowPath = false;
+	}
+	for(int32 i = 0; i < InPath.Num(); i++)
+	{
+		int32 TargetTileIdx = InPath[i];
+		CurrentMapEditorTiles[TargetTileIdx]->ShowPath = true;
+		CurrentMapEditorTiles[TargetTileIdx]->PathIndex = i;
+	}
+	MapEditorTileView->RequestListRefresh();
 }
 #undef LOCTEXT_NAMESPACE

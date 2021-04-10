@@ -66,6 +66,11 @@ void SLevelCreatorPanel::OnSelectionChangedFunc(ULevelInfomation* LevelInfomatio
 	.AutoWidth()
 	[
 		SAssignNew(InfoParamContainterWidget, SInfoParamsPanel, LevelInfomation)
+		.OnShowPath_Lambda([&](TArray<int32>& InPath)->void
+		{
+			MapCreatorPanel->OnShowPath(InPath);
+			// UE_LOG(LogTemp, Display, TEXT("OnShowPath"))
+		})
 	];
 	
 }

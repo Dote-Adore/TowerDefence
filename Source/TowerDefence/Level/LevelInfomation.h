@@ -28,7 +28,7 @@ struct FEnemyGenerationInfo
 	TArray<int32> GeneratedID;
 	// 配置的路径
 	UPROPERTY(EditAnywhere)
-	TArray<FVector2D> Path;
+	TArray<int32> Path;
 };
 
 

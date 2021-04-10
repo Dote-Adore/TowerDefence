@@ -10,6 +10,7 @@
 
 void SInfoParamsPanel::Construct(const SInfoParamsPanel::FArguments& InArgs, ULevelInfomation*LevelInfomation)
 {
+	OnShowPath = InArgs._OnShowPath;
 	this->CurrentLevelInfomation = LevelInfomation;
 	InitWaveArray();
 	TSharedPtr<FTextBlockStyle> CategoryTextStyle =
@@ -196,6 +197,7 @@ void SInfoParamsPanel::OnWaveItemListSelectedChanged(FWaveItemEntry InItem, ESel
 	.AutoHeight()
 	[
 		SAssignNew(EachWaveSettingWidget, SWaveSettingsPanel, &InItem->WaveItem, CurrentLevelInfomation)
+		.OnShowPath(OnShowPath)
 	];
 	CurrentSelectedWaveItem = InItem;
 }
