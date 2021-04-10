@@ -14,7 +14,8 @@ private:
 	FSlateColorBrush MapCreatorBGBrush = FSlateColorBrush(FLinearColor::Black);
 	FSlateColorBrush LevelPaddingBrush = FSlateColorBrush(FLinearColor(0,0,0,0));
 	TSharedPtr<SMapCreatorPanel> MapCreatorPanel;
-	
+	TSharedPtr<SHorizontalBox> MainHorizontalBox;
+	TSharedPtr<SWidget> InfoParamContainterWidget;
 
 	void OnSelectionChangedFunc(ULevelInfomation* LevelInfomation, ESelectInfo::Type Type);
 };
