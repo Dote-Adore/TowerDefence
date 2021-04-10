@@ -192,6 +192,9 @@ void SInfoParamsPanel::OnBGSelectorMenuOpenChanged(bool bOpen)
 
 void SInfoParamsPanel::OnWaveItemListSelectedChanged(FWaveItemEntry InItem, ESelectInfo::Type Type)
 {
+
+	if(!InItem.IsValid())
+		return;
 	MainVerticalBoxPanel->RemoveSlot(EachWaveSettingWidget.ToSharedRef());
 	MainVerticalBoxPanel->AddSlot()
 	.AutoHeight()
@@ -216,22 +219,21 @@ void SInfoParamsPanel::InitWaveArray()
 FReply SInfoParamsPanel::OnCreateNewWaveBtnClicked()
 {
 	// 在原来的文件添加一个波，并在目前的array加一个引用波
-	FEnemyGenerationInfo NewEnemyGenerationInfo;
-	CurrentLevelInfomation->Waves.Add(NewEnemyGenerationInfo);
-	CurrentWaveItemArray.Add(MakeShared<FWaveWidgetItem>(
-		FWaveWidgetItem(NewEnemyGenerationInfo, CurrentWaveItemArray.Num()+1)));
+	CurrentLevelInfomation->Waves.Add(FEnemyGenerationInfo());
+	InitWaveArray();
+	// CurrentWaveItemArray.Add(MakeShared<FWaveWidgetItem>(
+	// 	FWaveWidgetItem(NewEnemyGenerationInfo, CurrentWaveItemArray.Num()+1)));
 	CurrentLevelInfomation->MarkPackageDirty();
 	WaveSelectorList->RequestListRefresh();
+	WaveSelectorList->SetSelection(CurrentWaveItemArray.Last());
 	return FReply::Handled();
 }
 
 FReply SInfoParamsPanel::OnDeleteSelectedWaveBtnClicked()
 {
-	if(!CurrentSelectedWaveItem.IsValid())
+	if(!CurrentSelectedWaveItem.IsValid()||CurrentLevelInfomation->Waves.Num() == 0)
 		return FReply::Handled();
-
 	// 直接将原来的Remove掉,然后重新载入wave
-
 	CurrentLevelInfomation->Waves.RemoveAt(CurrentSelectedWaveItem->Idx-1);
 	InitWaveArray();
 	WaveSelectorList->RequestListRefresh();
@@ -239,6 +241,8 @@ FReply SInfoParamsPanel::OnDeleteSelectedWaveBtnClicked()
 	{
 		WaveSelectorList->SetSelection(CurrentWaveItemArray[0]);
 	}
+	else
+		WaveSelectorList->ClearSelection();
 	return FReply::Handled();
 
 }
