@@ -10,7 +10,6 @@ AEntity::AEntity(const FObjectInitializer& ObjectInitializer)
 {
     AnimInstanceClass = UAnimInstance::StaticClass();
     BuffComponent = CreateDefaultSubobject<UBuffComponent>(TEXT("BuffComp"));
-    // AnimComponent = Cast<UAnimComponent>(CreateDefaultSubobject(TEXT("AnimComp"), GetAnimCompClass(), GetAnimCompClass(), true, false));
 }
 
 void AEntity::InitEntity(const FEntityParams& Params, const FEntityAnimation& Anims, FTransform TargetTransform,

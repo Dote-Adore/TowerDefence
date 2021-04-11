@@ -4,6 +4,8 @@
 #include "TowerDefence/GlobalConfig.h"
 #include "TowerDefence/Components/EnemyAnimComponent.h"
 
+FOnEnemyDeathEvent AEnemy::OnEnemyDeathEvent = FOnEnemyDeathEvent();
+
 AEnemy::AEnemy(const FObjectInitializer& ObjectInitializer):
 AEntity(ObjectInitializer)
 {
@@ -15,4 +17,10 @@ AEntity(ObjectInitializer)
 TSubclassOf<UAnimComponent> AEnemy::GetAnimCompClass() const
 {
     return UEnemyAnimComponent::StaticClass();
+}
+
+void AEnemy::OnDeath()
+{
+    Super::OnDeath();
+    OnEnemyDeathEvent.Broadcast(this);
 }

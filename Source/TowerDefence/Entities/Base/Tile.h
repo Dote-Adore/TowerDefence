@@ -32,6 +32,12 @@ public:
 #endif
 
 
+	static const float BoxSize;
+
+
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
+	void OnConstruction(const FTransform& Transform) override;
 	void SetDeployEntity(AEntity* TargetEntity);
 	bool CanDeploy();
 	void Deploy(AEntity* Entity);
@@ -41,8 +47,10 @@ protected:
 	AEntity* CurrentDeployEntity;
 	UPROPERTY(EditDefaultsOnly)
 	UBoxComponent* BoxComponent;
-	UPROPERTY()
-	float BoxSize = 200.f;
+	UPROPERTY(EditDefaultsOnly)
+	UStaticMeshComponent* SelectedPlaneComponent;
 	UPROPERTY(EditAnywhere)
 	float HeightOffest = 0.f;
+
+	UMaterialInstanceDynamic* SlectedShowMID;
 };

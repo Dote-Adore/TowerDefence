@@ -1,11 +1,17 @@
 ﻿#include "Tile.h"
 #include "Components/BoxComponent.h"
 #include "Components/BillboardComponent.h"
+#include "Components/StaticMeshComponent.h"
 
+const float ABaseTile::BoxSize = 50.f;
 ABaseTile::ABaseTile(const FObjectInitializer& ObjectInitializer)
+	:AActor(ObjectInitializer)
 {
-
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bStartWithTickEnabled = true;
 	UBillboardComponent* SpriteComponent = CreateEditorOnlyDefaultSubobject<UBillboardComponent>(TEXT("Sprite"));
+	SelectedPlaneComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SelectedUIComp"));
+	SelectedPlaneComponent->SetStaticMesh(LoadObject<UStaticMesh>(NULL, TEXT("StaticMesh'/Engine/BasicShapes/Plane.Plane'")));
 	struct FConstructorStatics
 	{
 		ConstructorHelpers::FObjectFinderOptional<UTexture2D> DecalTexture;
@@ -27,6 +33,31 @@ ABaseTile::ABaseTile(const FObjectInitializer& ObjectInitializer)
 	BoxComponent->SetupAttachment(RootComponent);
 	BoxComponent->SetRelativeLocation(FVector(0,0,-BoxSize+HeightOffest));
 	BoxComponent->SetBoxExtent(FVector(BoxSize,BoxSize,BoxSize));
+	BoxComponent->SetHiddenInGame(false);
+
+	SelectedPlaneComponent->SetupAttachment(RootComponent);
+	// SelectedPlaneComponent->SetRelativeLocation(FVector(0));
+}
+
+void ABaseTile::BeginPlay()
+{
+	Super::BeginPlay();
+	BoxComponent->ShapeColor = DebugColor.ToFColor(true);
+	SlectedShowMID = SelectedPlaneComponent->CreateDynamicMaterialInstance(0,
+        LoadObject<UMaterialInterface>(NULL, TEXT("MaterialInterface'/Game/Res/Materials/Tiles/M_BaseTileSelectedMat_Inst.M_BaseTileSelectedMat_Inst'")));
+	SelectedPlaneComponent->SetRelativeLocation(FVector(0, 0, HeightOffest));
+}
+
+void ABaseTile::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	SlectedShowMID->SetVectorParameterValue("Color", DebugColor);
+}
+
+void ABaseTile::OnConstruction(const FTransform& Transform)
+{
+	BoxComponent->SetRelativeLocation(FVector(0,0,-BoxSize+HeightOffest));
+	BoxComponent->ShapeColor = DebugColor.ToFColor(true);	
 }
 
 void ABaseTile::Deploy(AEntity* Entity)
