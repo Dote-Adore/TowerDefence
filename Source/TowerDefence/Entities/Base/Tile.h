@@ -30,8 +30,6 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	FLinearColor DebugColor;
 #endif
-
-
 	static const float BoxSize;
 
 
@@ -41,6 +39,8 @@ public:
 	void SetDeployEntity(AEntity* TargetEntity);
 	bool CanDeploy();
 	void Deploy(AEntity* Entity);
+	void ChangePlaneColor(FLinearColor InColor);
+	FVector GetSpawnEntityLocation();
 protected:
 	// 当前部署在上面的实体
 	UPROPERTY(Transient)

@@ -46,12 +46,13 @@ void ABaseTile::BeginPlay()
 	SlectedShowMID = SelectedPlaneComponent->CreateDynamicMaterialInstance(0,
         LoadObject<UMaterialInterface>(NULL, TEXT("MaterialInterface'/Game/Res/Materials/Tiles/M_BaseTileSelectedMat_Inst.M_BaseTileSelectedMat_Inst'")));
 	SelectedPlaneComponent->SetRelativeLocation(FVector(0, 0, HeightOffest));
+	SlectedShowMID->SetVectorParameterValue("Color", FLinearColor(0,0,0,0));
 }
 
 void ABaseTile::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-	SlectedShowMID->SetVectorParameterValue("Color", DebugColor);
+	// SlectedShowMID->SetVectorParameterValue("Color", DebugColor);
 }
 
 void ABaseTile::OnConstruction(const FTransform& Transform)
@@ -64,4 +65,14 @@ void ABaseTile::Deploy(AEntity* Entity)
 {
 	// if(TileType == Path || TileType == Deployable)
 	
+}
+
+void ABaseTile::ChangePlaneColor(FLinearColor InColor)
+{
+	SlectedShowMID->SetVectorParameterValue("Color", InColor);
+}
+
+FVector ABaseTile::GetSpawnEntityLocation()
+{
+	return GetActorLocation()+FVector(0,0,HeightOffest);
 }
