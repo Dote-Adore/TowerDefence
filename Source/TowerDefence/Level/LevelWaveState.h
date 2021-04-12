@@ -3,6 +3,7 @@
 
 struct FEnemyGenerationInfo;
 class UEntityCreator;
+class ABaseTile;
 class UBaseWaveState:public UState
 {
 public:
@@ -52,4 +53,5 @@ private:
 	UEntityCreator* EntityCreator;
 	float OnNextSpawnEnemtyTime = 0.f;
 	int32 currentSpawnedIdx = 0;
+	TArray<const ABaseTile*> PathTiles;
 };

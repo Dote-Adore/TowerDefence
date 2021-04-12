@@ -40,7 +40,7 @@ public:
 	bool CanDeploy();
 	void Deploy(AEntity* Entity);
 	void ChangePlaneColor(FLinearColor InColor);
-	FVector GetSpawnEntityLocation();
+	FVector GetSpawnEntityLocation() const;
 protected:
 	// 当前部署在上面的实体
 	UPROPERTY(Transient)

@@ -72,7 +72,7 @@ void ABaseTile::ChangePlaneColor(FLinearColor InColor)
 	SlectedShowMID->SetVectorParameterValue("Color", InColor);
 }
 
-FVector ABaseTile::GetSpawnEntityLocation()
+FVector ABaseTile::GetSpawnEntityLocation() const
 {
 	return GetActorLocation()+FVector(0,0,HeightOffest);
 }

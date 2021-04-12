@@ -1,8 +1,10 @@
 ﻿#include "LevelWaveState.h"
 #include "LevelManager.h"
 #include "TowerDefence/Entities/Base/Tile.h"
+#include "TowerDefence/Entities/Enemy.h"
 #include "LevelInfomation.h"
 #include "TowerDefence/Creator/EntityCreator.h"
+#include "TowerDefence/Components/EnemyMovementComponent.h"
 
 void UBaseWaveState::OnEnter()
 {
@@ -66,7 +68,7 @@ UGenerateEnemiesState::UGenerateEnemiesState(UStateMachineComponent* InStateMach
 	ALevelManager* LevelManager)
 	: UBaseWaveState(InStateMachineComponent, LevelManager)
 {
-	EntityCreator = NewObject<UEntityCreator>(LevelManager);
+	EntityCreator = NewObject<UEntityCreator>(LevelManager->GetWorld());
 }
 
 void UGenerateEnemiesState::Tick(float DeltaTime)
@@ -81,11 +83,13 @@ void UGenerateEnemiesState::Tick(float DeltaTime)
 		OnNextSpawnEnemtyTime -=DeltaTime;
 		return;
 	}
-	ABaseTile* StartTile = OwnerLevelManager->GetAllTiles()[CurrentWaveInfo->Path[0]];
-	EntityCreator->CreateEnemy(CurrentWaveInfo->GeneratedID[currentSpawnedIdx],
+	const ABaseTile* StartTile = PathTiles[0];
+	AEnemy* TargetEnemy = EntityCreator->CreateEnemy(CurrentWaveInfo->GeneratedID[currentSpawnedIdx],
 		FTransform(StartTile->GetSpawnEntityLocation()));
 	UE_LOG(LogTemp, Display, TEXT("GenerateEnemiesState:Spawn Enemy Success!"))
 
+	TargetEnemy->GetEnemyMovementComp()->SetPath(PathTiles);
+	
 	OnNextSpawnEnemtyTime = CurrentWaveInfo->GrapTime;
 	currentSpawnedIdx ++;
 }
@@ -93,8 +97,12 @@ void UGenerateEnemiesState::Tick(float DeltaTime)
 void UGenerateEnemiesState::OnEnter()
 {
 	UBaseWaveState::OnEnter();
-	OnNextSpawnEnemtyTime = CurrentWaveInfo->GrapTime;
+	OnNextSpawnEnemtyTime = 0;
 	currentSpawnedIdx = 0;
+	for(int32 PathID: CurrentWaveInfo->Path)
+	{
+		PathTiles.Add(OwnerLevelManager->GetAllTiles()[PathID]);
+	}
 }
 
 void UGenerateEnemiesState::OnExit()

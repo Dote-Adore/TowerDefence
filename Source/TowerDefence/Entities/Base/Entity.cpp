@@ -1,5 +1,6 @@
 ﻿#include "Entity.h"
 #include "Bullet.h"
+#include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "TowerDefence/GlobalConfig.h"
 #include "TowerDefence/Components/BuffComponent.h"
@@ -10,17 +11,22 @@ AEntity::AEntity(const FObjectInitializer& ObjectInitializer)
 {
     AnimInstanceClass = UAnimInstance::StaticClass();
     BuffComponent = CreateDefaultSubobject<UBuffComponent>(TEXT("BuffComp"));
+    AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+    GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+    GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Block);
+    GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
 }
 
 void AEntity::InitEntity(const FEntityParams& Params, const FEntityAnimation& Anims, FTransform TargetTransform,
                          const TArray<FBuff*>& BasePermanentBuffs)
 {
-    //
+    
     AnimComponent = NewObject<UAnimComponent>(this, GetAnimCompClass(), TEXT("AnimComp"));
     AnimComponent->RegisterComponent();
     // 初始化Mesh
     USkeletalMeshComponent* MeshComp = GetMesh();
     check(MeshComp);
+    MeshComp->SetRelativeRotation(FRotator(0,0,-90));
     MeshComp->SetSkeletalMesh(Params.SkeletalMesh.LoadSynchronous());
     MeshComp->SetRenderCustomDepth(true);
     // 对初始值进行初始化

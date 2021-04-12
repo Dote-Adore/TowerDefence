@@ -16,6 +16,7 @@ void ATowerDefenceGameModeBase::InitGame(const FString& MapName, const FString& 
 
 void ATowerDefenceGameModeBase::BeginPlay()
 {
+	Super::BeginPlay();
 	UGameplayStatics::GetPlayerControllerFromID(GetWorld(), 0)->SetShowMouseCursor(true);
 	GameInstance = Cast<UTDGameInstance>(GetGameInstance());
 	check(GameInstance);
