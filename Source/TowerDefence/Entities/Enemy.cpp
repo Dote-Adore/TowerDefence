@@ -11,8 +11,8 @@ AEnemy::AEnemy(const FObjectInitializer& ObjectInitializer):
 AEntity(ObjectInitializer)
 {
     TargetAttackEntityClass = ATurrent::StaticClass();
-    const UGlobalConfig* Config = GetDefault<UGlobalConfig>();
-    AnimInstanceClass = Config->EnemyAnimInstClass;
+    // const UGlobalConfig* Config = GetDefault<UGlobalConfig>();
+    // AnimInstanceClass = Config->EnemyAnimInstClass;
     EnemyMovementComponent = CreateDefaultSubobject<UEnemyMovementComponent>(TEXT("EnemyMovementComp"));
 }
 

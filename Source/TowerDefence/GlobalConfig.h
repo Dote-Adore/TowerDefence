@@ -26,10 +26,10 @@ public:
     TSoftObjectPtr<UDataTable> BuffDataTable;
 
     
-    UPROPERTY(Config,EditAnywhere)
-    TSubclassOf<UAnimInstance> TurrentAnimInstClass;
-    UPROPERTY(Config,EditAnywhere)
-    TSubclassOf<UAnimInstance> EnemyAnimInstClass;
+    // UPROPERTY(Config,EditAnywhere)
+    // TSubclassOf<UAnimInstance> TurrentAnimInstClass;
+    // UPROPERTY(Config,EditAnywhere)
+    // TSubclassOf<UAnimInstance> EnemyAnimInstClass;
     UPROPERTY(Config,EditAnywhere)
     TSubclassOf<ATurrent> TurrentEntityClass;
     UPROPERTY(Config,EditAnywhere)

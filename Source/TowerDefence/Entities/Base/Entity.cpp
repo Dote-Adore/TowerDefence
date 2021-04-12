@@ -9,7 +9,6 @@
 AEntity::AEntity(const FObjectInitializer& ObjectInitializer)
     :ACharacter(ObjectInitializer)
 {
-    AnimInstanceClass = UAnimInstance::StaticClass();
     BuffComponent = CreateDefaultSubobject<UBuffComponent>(TEXT("BuffComp"));
     AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
     GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
@@ -30,8 +29,7 @@ void AEntity::InitEntity(const FEntityParams& Params, const FEntityAnimation& An
     MeshComp->SetSkeletalMesh(Params.SkeletalMesh.LoadSynchronous());
     MeshComp->SetRenderCustomDepth(true);
     // 对初始值进行初始化
-    const UGlobalConfig* Config = GetDefault<UGlobalConfig>();
-    MeshComp->SetAnimInstanceClass(AnimInstanceClass);
+    MeshComp->SetAnimInstanceClass(Anims.AnimInstance);
     SetActorTransform(TargetTransform);
     // 初始化攻击时视觉特效
     Animations = Anims;

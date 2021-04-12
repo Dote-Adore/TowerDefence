@@ -97,6 +97,8 @@ struct FEntityAnimation:public FTableRowBase
 {
     GENERATED_BODY()
     UPROPERTY(EditAnywhere)
+    TSubclassOf<UAnimInstance> AnimInstance;
+    UPROPERTY(EditAnywhere)
     int32 EntityID;
     UPROPERTY(EditAnywhere)
     TSoftObjectPtr<UBlendSpace1D> Idle_WalkAnim;
@@ -152,8 +154,6 @@ protected:
     class UAnimComponent* AnimComponent;
     UPROPERTY(EditDefaultsOnly)
     TSubclassOf<AEntity> TargetAttackEntityClass;
-    UPROPERTY(EditDefaultsOnly)
-    TSubclassOf<UAnimInstance> AnimInstanceClass;
     UPROPERTY(EditDefaultsOnly)
     float LeftDeathTime = 2.f;
     virtual TSubclassOf<UAnimComponent> GetAnimCompClass() const;

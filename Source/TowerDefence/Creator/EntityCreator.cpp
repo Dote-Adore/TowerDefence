@@ -34,7 +34,6 @@ AEntity* UEntityCreator::CreateEntity(int32 EntityID, FTransform EntityTransform
     check(TargetFoundAnims);
     FActorSpawnParameters SpawnParameters;
     SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-    check(GetWorld());
     AEntity* SpawnedEntity = GetWorld()->SpawnActor<AEntity>(Entitylass, EntityTransform, SpawnParameters);
     SpawnedEntity->InitEntity(*TargetFoundParams, *TargetFoundAnims, EntityTransform, {});
     return SpawnedEntity;
