@@ -66,7 +66,7 @@ UGenerateEnemiesState::UGenerateEnemiesState(UStateMachineComponent* InStateMach
 	ALevelManager* LevelManager)
 	: UBaseWaveState(InStateMachineComponent, LevelManager)
 {
-	EntityCreator = GetMutableDefault<UEntityCreator>();
+	EntityCreator = NewObject<UEntityCreator>(LevelManager);
 }
 
 void UGenerateEnemiesState::Tick(float DeltaTime)
@@ -82,8 +82,8 @@ void UGenerateEnemiesState::Tick(float DeltaTime)
 		return;
 	}
 	ABaseTile* StartTile = OwnerLevelManager->GetAllTiles()[CurrentWaveInfo->Path[0]];
-	//EntityCreator->CreateEnemy(CurrentWaveInfo->GeneratedID[currentSpawnedIdx],
-	//	FTransform(StartTile->GetSpawnEntityLocation()));
+	EntityCreator->CreateEnemy(CurrentWaveInfo->GeneratedID[currentSpawnedIdx],
+		FTransform(StartTile->GetSpawnEntityLocation()));
 	UE_LOG(LogTemp, Display, TEXT("GenerateEnemiesState:Spawn Enemy Success!"))
 
 	OnNextSpawnEnemtyTime = CurrentWaveInfo->GrapTime;

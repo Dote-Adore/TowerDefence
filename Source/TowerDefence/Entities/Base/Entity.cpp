@@ -161,8 +161,10 @@ void AEntity::CalculateAttackEntities()
                     NearestActor = Actor;
                 }
             }
+            if(NearestActor == nullptr)
+                return;
             // 如果找到最接近的actor并且在攻击范围内，则将这个actor放到受攻击列表中
-        float Dist = FVector::DistSquaredXY(NearestActor->GetActorLocation(), GetActorLocation());
+            float Dist = FVector::DistSquaredXY(NearestActor->GetActorLocation(), GetActorLocation());
             if(NearestActor&&
                 FMath::Sqrt(Dist)<=CurrentEntityParams.AttackRadius)
             {

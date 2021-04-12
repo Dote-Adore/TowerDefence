@@ -32,6 +32,7 @@ void UEntityCreator::CreateEntity(int32 EntityID, FTransform EntityTransform, TS
     check(TargetFoundAnims);
     FActorSpawnParameters SpawnParameters;
     SpawnParameters.bNoFail = true;
+    check(GetWorld());
     AEntity* SpawnedEntity = GetWorld()->SpawnActor<AEntity>(Entitylass, EntityTransform, SpawnParameters);
     SpawnedEntity->InitEntity(*TargetFoundParams, *TargetFoundAnims, EntityTransform, {});
 }

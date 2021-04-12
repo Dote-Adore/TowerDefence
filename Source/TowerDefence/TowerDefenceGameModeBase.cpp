@@ -11,6 +11,7 @@
 void ATowerDefenceGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
+	DefaultPawnClass = nullptr;
 }
 
 void ATowerDefenceGameModeBase::BeginPlay()
