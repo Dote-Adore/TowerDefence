@@ -15,7 +15,7 @@ public:
     
     static FOnEnemyDeathEvent OnEnemyDeathEvent;
 protected:
-    virtual TSubclassOf<UAnimComponent> GetAnimCompClass() const override;
+   // virtual TSubclassOf<UAnimComponent> GetAnimCompClass() const override;
     virtual void OnDeath() override;
 
     UEnemyMovementComponent* EnemyMovementComponent;

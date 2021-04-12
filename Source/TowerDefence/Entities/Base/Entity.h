@@ -6,7 +6,7 @@
 
 #include "Entity.generated.h"
 
-
+class UBlendSpace1D;
 class ABullet;
 class UAnimationAsset;
 UENUM()
@@ -99,11 +99,9 @@ struct FEntityAnimation:public FTableRowBase
     UPROPERTY(EditAnywhere)
     int32 EntityID;
     UPROPERTY(EditAnywhere)
-    TSoftObjectPtr<UAnimSequenceBase> IdleAnim;
+    TSoftObjectPtr<UBlendSpace1D> Idle_WalkAnim;
     UPROPERTY(EditAnywhere)
     TSoftObjectPtr<UAnimSequenceBase> DeathAnim;
-    UPROPERTY(EditAnywhere)
-    TSoftObjectPtr<UAnimSequenceBase> WalkAnim;
     UPROPERTY(EditAnywhere)
     TArray<TSoftObjectPtr<UAnimSequenceBase>> AttackAnims;
 };
@@ -129,6 +127,13 @@ public:
     FOnIdleDelegate OnIdleDelegate;
     FOnDeathDelegate OnDeathDelegate;
     FOnDamageDelegate OnDamageDelegate;
+
+
+    UPROPERTY(Transient)
+    TArray<AEntity*> CurrentAttackedEntities;
+
+
+    
     // 初始化实体
     void InitEntity(const FEntityParams& Params, const FEntityAnimation& Anims, FTransform TargetTransform,
         const TArray<FBuff*>& BasePermanentBuffs);
@@ -158,8 +163,6 @@ private:
     FEntityParams BaseEntityParams;
     UPROPERTY(Transient)
     FEntityParams CurrentEntityParams;
-    UPROPERTY(Transient)
-    TArray<AEntity*> CurrentAttackedEntities;
     
     FEntityAnimation Animations;    
     void CalculateAttackEntities();

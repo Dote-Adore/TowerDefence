@@ -84,8 +84,14 @@ void UGenerateEnemiesState::Tick(float DeltaTime)
 		return;
 	}
 	const ABaseTile* StartTile = PathTiles[0];
+	const ABaseTile* NextTile = PathTiles[1];
+
+	// 计算初始的方向
+
+	FVector InitDirection = (NextTile->GetActorLocation() - StartTile->GetActorLocation()).GetSafeNormal2D();
+	
 	AEnemy* TargetEnemy = EntityCreator->CreateEnemy(CurrentWaveInfo->GeneratedID[currentSpawnedIdx],
-		FTransform(StartTile->GetSpawnEntityLocation()));
+		FTransform(InitDirection.ToOrientationQuat(), StartTile->GetSpawnEntityLocation()));
 	UE_LOG(LogTemp, Display, TEXT("GenerateEnemiesState:Spawn Enemy Success!"))
 
 	TargetEnemy->GetEnemyMovementComp()->SetPath(PathTiles);

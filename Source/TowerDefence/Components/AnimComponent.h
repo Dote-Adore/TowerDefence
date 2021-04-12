@@ -10,7 +10,7 @@ class UAnimComponent:public UActorComponent
     GENERATED_BODY()
 public:
     UPROPERTY()
-    FName IdleAnimParamName = "IdleAnim";
+    FName IdleAnimParamName = "Idle_WalkAnim";
     FName DeathAnimParamName = "DeathAnim";
     FName AttackAnimSlotName = "Attack";
     

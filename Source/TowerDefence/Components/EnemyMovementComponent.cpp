@@ -37,6 +37,11 @@ void UEnemyMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType
 		CurrentWalkToTileIdx++;
 		return;
 	}
+	// 如果当前有攻击对象，则停止walk
+	if (ParentEnemy->CurrentAttackedEntities.Num()>0)
+	{
+		return;
+	}
 	FVector Direction = TargetMoveToLocation - ParentEnemy->GetActorLocation();
 	Direction = Direction.GetSafeNormal2D();
 	ParentEnemy->AddMovementInput(Direction, 1);

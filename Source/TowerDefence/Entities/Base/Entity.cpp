@@ -26,7 +26,7 @@ void AEntity::InitEntity(const FEntityParams& Params, const FEntityAnimation& An
     // 初始化Mesh
     USkeletalMeshComponent* MeshComp = GetMesh();
     check(MeshComp);
-    MeshComp->SetRelativeRotation(FRotator(0,0,-90));
+    MeshComp->SetRelativeRotation(FRotator(0,-90 ,0));
     MeshComp->SetSkeletalMesh(Params.SkeletalMesh.LoadSynchronous());
     MeshComp->SetRenderCustomDepth(true);
     // 对初始值进行初始化

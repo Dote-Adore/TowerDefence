@@ -20,11 +20,11 @@ UEnemyMovementComponent* AEnemy::GetEnemyMovementComp() const
 {
     return EnemyMovementComponent;
 }
-
-TSubclassOf<UAnimComponent> AEnemy::GetAnimCompClass() const
-{
-    return UEnemyAnimComponent::StaticClass();
-}
+//
+// TSubclassOf<UAnimComponent> AEnemy::GetAnimCompClass() const
+// {
+//     return UEnemyAnimComponent::StaticClass();
+// }
 
 void AEnemy::OnDeath()
 {

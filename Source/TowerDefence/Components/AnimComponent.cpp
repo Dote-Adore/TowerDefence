@@ -1,5 +1,5 @@
 ﻿#include "AnimComponent.h"
-
+#include "Animation/BlendSpace1D.h"
 #include "AITypes.h"
 #include "TowerDefence/Entities/Base/Entity.h"
 void UAnimComponent::BeginPlay()
@@ -20,7 +20,7 @@ void UAnimComponent::OnInit()
     if(IdleProperty)
     {
         FObjectProperty* ObejctProperty = CastField<FObjectProperty>(IdleProperty);
-        ObejctProperty->SetPropertyValue_InContainer(AnimInst,  Anims.IdleAnim.LoadSynchronous());
+        ObejctProperty->SetPropertyValue_InContainer(AnimInst,  Anims.Idle_WalkAnim.LoadSynchronous());
     }
     FProperty* DeathProperty = AnimInst->GetClass()->FindPropertyByName(DeathAnimParamName);
     if(DeathProperty)
