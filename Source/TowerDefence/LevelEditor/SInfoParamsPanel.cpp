@@ -2,6 +2,7 @@
 
 #include "PropertyCustomizationHelpers.h"
 #include "SWaveSettingsPanel.h"
+#include "Widgets/Input/SEditableTextBox.h"
 #include "TowerDefence/Level/LevelInfomation.h"
 #include "EditorWidgets/Public/SAssetDropTarget.h"
 #include "Styling/SlateStyle.h"
@@ -84,6 +85,36 @@ void SInfoParamsPanel::Construct(const SInfoParamsPanel::FArguments& InArgs, ULe
                         ]
                     //.OnAssetDropped(this, )
                 ]
+            ]
+            +SVerticalBox::Slot()
+            .Padding(4)
+            .AutoHeight()
+            [
+            	SNew(SHorizontalBox)
+            	+SHorizontalBox::Slot()
+            	.Padding(0,0,5,0)
+            	.AutoWidth()
+            	[
+            		SNew(STextBlock)
+            		.Text(LOCTEXT("Deployment Points", "Initial deployment points:"))
+            	]
+            	+SHorizontalBox::Slot()
+            	.AutoWidth()
+            	[
+            		SNew(SEditableTextBox)
+            		.Text(FText::Format(LOCTEXT("DeployPoints Input Text", "{0}"),
+            			CurrentLevelInfomation->InitDeployPoints))
+            		.OnTextChanged_Lambda([&](const FText& InText)->void
+            		{
+            			if(InText.IsNumeric())
+            			{
+            				int32 TargetInputFloat = FCString::Atoi(*InText.ToString());
+            				CurrentLevelInfomation->InitDeployPoints = TargetInputFloat;
+            				CurrentLevelInfomation->MarkPackageDirty();
+            			}
+            		})
+            	]
+            	
             ]
             // 设置wave
 			

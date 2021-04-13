@@ -5,7 +5,7 @@ class ABaseTile;
 struct FEnemyGenerationInfo;
 class UStateMachineComponent;
 class UTDGameInstance;
-
+class UEntityCreator;
 UCLASS()
 class ALevelManager:public AActor
 {
@@ -28,23 +28,31 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	TSharedPtr<const FEnemyGenerationInfo> GetCurrentWaveInfoPtr();
 	TArray<ABaseTile*> GetAllTiles() {return AllTiles; };
+	UFUNCTION(BlueprintCallable)
+	TArray<ABaseTile*> OnGetDeployableTiles(int32 TurrentID, FName Category);
+	UFUNCTION(BlueprintCallable)
+	void RequsetDeployToTile(int32 TurrentID, ABaseTile* TargetTile);
+
+
+	UEntityCreator* EntityCreator;
+	// 该关卡的部署点数
+	UPROPERTY(BlueprintReadWrite)
+	int32 DeployPoint;
 private:
 	UStateMachineComponent* StateMachineComponent;
 	UTDGameInstance* TDGameInstance;
 	TArray<ABaseTile*> AllTiles;
 	void GenerateLevelMap();
-	// void StartRound(int32 RoundIdx);
-	// void ShowEnemyPath(const FEnemyGenerationInfo& TargetWave);
-	// void OnInitWave(float DeltaSeconds);
-	// void OnGenerateWave(float DeltaSeconds);
-	// void WaitForNextWave(float DeltaSeconds);
-	// void OnEndWave(float DeltaSeconds);
-	
 	ERoundState RoundState;
 	int32 CurrentWaveIdx;
 	int32 TotalWaves;
 
-	
 	int32 DeathEnemyNums = 0;
 	int32 CurrentDeathTurrentNums = 0;
+
+
+
+	// Some Deploy Params
+	FLinearColor CanDeployColor = FColor(86, 186, 38 , 125);
+	// ------------------
 };

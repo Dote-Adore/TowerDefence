@@ -50,7 +50,6 @@ public:
 	virtual void OnExit() override ;
 	virtual FName GetStateName() override;
 private:
-	UEntityCreator* EntityCreator;
 	float OnNextSpawnEnemtyTime = 0.f;
 	int32 currentSpawnedIdx = 0;
 	TArray<const ABaseTile*> PathTiles;

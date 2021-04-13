@@ -68,7 +68,6 @@ UGenerateEnemiesState::UGenerateEnemiesState(UStateMachineComponent* InStateMach
 	ALevelManager* LevelManager)
 	: UBaseWaveState(InStateMachineComponent, LevelManager)
 {
-	EntityCreator = NewObject<UEntityCreator>(LevelManager->GetWorld());
 }
 
 void UGenerateEnemiesState::Tick(float DeltaTime)
@@ -90,7 +89,7 @@ void UGenerateEnemiesState::Tick(float DeltaTime)
 
 	FVector InitDirection = (NextTile->GetActorLocation() - StartTile->GetActorLocation()).GetSafeNormal2D();
 	
-	AEnemy* TargetEnemy = EntityCreator->CreateEnemy(CurrentWaveInfo->GeneratedID[currentSpawnedIdx],
+	AEnemy* TargetEnemy = OwnerLevelManager->EntityCreator->CreateEnemy(CurrentWaveInfo->GeneratedID[currentSpawnedIdx],
 		FTransform(InitDirection.ToOrientationQuat(), StartTile->GetSpawnEntityLocation()));
 	UE_LOG(LogTemp, Display, TEXT("GenerateEnemiesState:Spawn Enemy Success!"))
 

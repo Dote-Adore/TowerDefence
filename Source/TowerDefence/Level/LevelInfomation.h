@@ -40,6 +40,9 @@ public:
 	// 地图信息
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FTileInfo TileInfo;
+	// 初始的可用部署点数
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 InitDeployPoints;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSoftObjectPtr<class UWorld> BackgroundWorld;
 	// 生成怪物波数设定

@@ -26,15 +26,15 @@ public:
     TSoftObjectPtr<UDataTable> BuffDataTable;
 
     
-    // UPROPERTY(Config,EditAnywhere)
-    // TSubclassOf<UAnimInstance> TurrentAnimInstClass;
-    // UPROPERTY(Config,EditAnywhere)
-    // TSubclassOf<UAnimInstance> EnemyAnimInstClass;
     UPROPERTY(Config,EditAnywhere)
     TSubclassOf<ATurrent> TurrentEntityClass;
     UPROPERTY(Config,EditAnywhere)
     TSubclassOf<AEnemy> EnemyEntityClass;
 
+
+    // 炮塔额外的表格
+    UPROPERTY(Config, EditAnywhere)
+    TSoftObjectPtr<UDataTable> TurrentAdditialTable;
     
     // 所有的Tile品类
     UPROPERTY(Config, EditAnywhere, Category=LevelEditor)

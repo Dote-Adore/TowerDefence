@@ -19,7 +19,8 @@ class TOWERDEFENCE_API ATowerDefenceGameModeBase : public AGameModeBase
 
 	virtual void BeginPlay() override;
 
-
+	UFUNCTION(BlueprintCallable)
+	ALevelManager* GetLevelManager();
 private:
 	UTDGameInstance* GameInstance;
 	ALevelManager* LevelManager;

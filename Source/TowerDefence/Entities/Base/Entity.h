@@ -55,7 +55,12 @@ struct FEntityParams:public FTableRowBase
     TSoftObjectPtr<USkeletalMesh> SkeletalMesh;
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
     EEntityType EntityType;
-        
+    // 分类
+    UPROPERTY(EditAnywhere,BlueprintReadOnly)
+    FName Category;
+    // 部署点数（如果时敌人，配置的是被击败时获得的部署点数）
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    int32 DeployPoints;
     // 部署时间
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
     float DeployTime = 1.f;

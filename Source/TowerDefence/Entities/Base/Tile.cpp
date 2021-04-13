@@ -1,4 +1,6 @@
 ﻿#include "Tile.h"
+
+#include "Entity.h"
 #include "Components/BoxComponent.h"
 #include "Components/BillboardComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -59,6 +61,23 @@ void ABaseTile::OnConstruction(const FTransform& Transform)
 {
 	BoxComponent->SetRelativeLocation(FVector(0,0,-BoxSize+HeightOffest));
 	BoxComponent->ShapeColor = DebugColor.ToFColor(true);	
+}
+
+void ABaseTile::SetDeployEntity(AEntity* TargetEntity)
+{
+	CurrentDeployEntity = TargetEntity;
+}
+
+bool ABaseTile::CanDeploy()
+{
+	if(TileType == ETileType::Disable||
+       TileType == ETileType::End||
+       TileType == ETileType::Start||
+       IsValid(CurrentDeployEntity))
+	{
+		return false;
+	}
+	return true;
 }
 
 void ABaseTile::Deploy(AEntity* Entity)
