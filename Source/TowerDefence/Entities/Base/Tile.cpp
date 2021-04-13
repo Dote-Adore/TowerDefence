@@ -68,12 +68,13 @@ void ABaseTile::SetDeployEntity(AEntity* TargetEntity)
 	CurrentDeployEntity = TargetEntity;
 }
 
-bool ABaseTile::CanDeploy()
+bool ABaseTile::CanDeploy(FName TargetCategory)
 {
 	if(TileType == ETileType::Disable||
        TileType == ETileType::End||
        TileType == ETileType::Start||
-       IsValid(CurrentDeployEntity))
+       IsValid(CurrentDeployEntity)||
+       DeployableEntityTypes.Find(TargetCategory) == INDEX_NONE)
 	{
 		return false;
 	}

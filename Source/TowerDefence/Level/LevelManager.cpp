@@ -73,7 +73,7 @@ TArray<ABaseTile*> ALevelManager::OnGetDeployableTiles(int32 TurrentID, FName Ca
 	TArray<ABaseTile*> Res;
 	for(auto Tile:AllTiles)
 	{
-		if(Tile->CanDeploy())
+		if(Tile->CanDeploy(Category))
 		{
 			Res.Add(Tile);
 		}	
@@ -85,13 +85,19 @@ TArray<ABaseTile*> ALevelManager::OnGetDeployableTiles(int32 TurrentID, FName Ca
 	return Res;
 }
 
-void ALevelManager::RequsetDeployToTile(int32 TurrentID, ABaseTile* TargetTile)
+void ALevelManager::RequsetDeployToTile(int32 TurrentID, ABaseTile* TargetTile, int32 Cost)
 {
 	AEntity* SpawnedTurrent = EntityCreator->CreateTurrent(TurrentID,
 		FTransform(TargetTile->GetSpawnEntityLocation()));
 	check(SpawnedTurrent);
 	TargetTile->SetDeployEntity(SpawnedTurrent);
 	// 将所有tile的颜色去除
+	OnCancelDeploy();
+	DeployPoint -= Cost;
+}
+
+void ALevelManager::OnCancelDeploy()
+{
 	for(auto Tile:AllTiles)
 	{
 		Tile->ChangePlaneColor(FLinearColor(0,0,0,0));

@@ -37,7 +37,7 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	void OnConstruction(const FTransform& Transform) override;
 	void SetDeployEntity(AEntity* TargetEntity);
-	bool CanDeploy();
+	bool CanDeploy(FName TargetCategory);
 	void Deploy(AEntity* Entity);
 	void ChangePlaneColor(FLinearColor InColor);
 	FVector GetSpawnEntityLocation() const;

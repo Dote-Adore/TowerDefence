@@ -31,8 +31,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TArray<ABaseTile*> OnGetDeployableTiles(int32 TurrentID, FName Category);
 	UFUNCTION(BlueprintCallable)
-	void RequsetDeployToTile(int32 TurrentID, ABaseTile* TargetTile);
-
+	void RequsetDeployToTile(int32 TurrentID, ABaseTile* TargetTile, int32 Cost);
+	UFUNCTION(BlueprintCallable)
+	void OnCancelDeploy();
 
 	UEntityCreator* EntityCreator;
 	// 该关卡的部署点数
