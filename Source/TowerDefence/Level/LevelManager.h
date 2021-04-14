@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "TowerDefence/TDPlayerController.h"
 #include "LevelManager.generated.h"
 
 class ABaseTile;
@@ -6,6 +7,8 @@ struct FEnemyGenerationInfo;
 class UStateMachineComponent;
 class UTDGameInstance;
 class UEntityCreator;
+class ALevelManager;
+// DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_OneParam(FOnTileClickedSignature, ALevelManager, OnTileClicked, ABaseTile*, TargetTile);
 UCLASS()
 class ALevelManager:public AActor
 {
@@ -23,18 +26,18 @@ class ALevelManager:public AActor
 	};
 	GENERATED_BODY()
 public:
+	
 	ALevelManager(const FObjectInitializer& ObjectInitializer);
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 	TSharedPtr<const FEnemyGenerationInfo> GetCurrentWaveInfoPtr();
 	TArray<ABaseTile*> GetAllTiles() {return AllTiles; };
 	UFUNCTION(BlueprintCallable)
-	TArray<ABaseTile*> OnGetDeployableTiles(int32 TurrentID, FName Category);
-	UFUNCTION(BlueprintCallable)
-	void RequsetDeployToTile(int32 TurrentID, ABaseTile* TargetTile, int32 Cost);
+	void  OnRequestToDeploy(int32 TurrentID, FName Category, int32 Cost);
 	UFUNCTION(BlueprintCallable)
 	void OnCancelDeploy();
 
+	UPROPERTY()
 	UEntityCreator* EntityCreator;
 	// 该关卡的部署点数
 	UPROPERTY(BlueprintReadWrite)
@@ -55,5 +58,11 @@ private:
 
 	// Some Deploy Params
 	FLinearColor CanDeployColor = FColor(86, 186, 38 , 125);
+	int32 TargetGenereatedID;
+	FName TargetGeneratedCategory;
+	int32 TargetDeployCost;
+	// UFUNCTION()
+	void OnTileClickedListener(ABaseTile* TargetTile);
+	
 	// ------------------
 };

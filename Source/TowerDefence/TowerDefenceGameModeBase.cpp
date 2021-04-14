@@ -5,6 +5,7 @@
 
 
 #include "TDGameInstance.h"
+#include "TDPlayerController.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Level/LevelManager.h"
@@ -14,6 +15,7 @@ void ATowerDefenceGameModeBase::InitGame(const FString& MapName, const FString& 
 	LevelManager = nullptr;
 	Super::InitGame(MapName, Options, ErrorMessage);
 	DefaultPawnClass = nullptr;
+	PlayerControllerClass = ATDPlayerController::StaticClass();
 }
 
 void ATowerDefenceGameModeBase::BeginPlay()

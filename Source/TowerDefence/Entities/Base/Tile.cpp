@@ -38,9 +38,8 @@ ABaseTile::ABaseTile(const FObjectInitializer& ObjectInitializer)
 	BoxComponent->SetHiddenInGame(false);
 
 	SelectedPlaneComponent->SetupAttachment(RootComponent);
-	// SelectedPlaneComponent->SetRelativeLocation(FVector(0));
+	// BoxComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);	
 }
-
 void ABaseTile::BeginPlay()
 {
 	Super::BeginPlay();
@@ -49,6 +48,7 @@ void ABaseTile::BeginPlay()
         LoadObject<UMaterialInterface>(NULL, TEXT("MaterialInterface'/Game/Res/Materials/Tiles/M_BaseTileSelectedMat_Inst.M_BaseTileSelectedMat_Inst'")));
 	SelectedPlaneComponent->SetRelativeLocation(FVector(0, 0, HeightOffest));
 	SlectedShowMID->SetVectorParameterValue("Color", FLinearColor(0,0,0,0));
+
 }
 
 void ABaseTile::Tick(float DeltaSeconds)

@@ -38,7 +38,7 @@ void UEnemyMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType
 		return;
 	}
 	// 如果当前有攻击对象，则停止walk
-	if (ParentEnemy->CurrentAttackedEntities.Num()>0)
+	if (ParentEnemy->CurrentAttackedEntities.Num()>0||ParentEnemy->GetCurrentEntityParams().CurrentHP<=0)
 	{
 		return;
 	}

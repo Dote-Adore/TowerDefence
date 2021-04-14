@@ -21,13 +21,13 @@ AEntity::AEntity(const FObjectInitializer& ObjectInitializer)
 void AEntity::InitEntity(const FEntityParams& Params, const FEntityAnimation& Anims, FTransform TargetTransform,
                          const TArray<FBuff*>& BasePermanentBuffs)
 {
-    
     AnimComponent = NewObject<UAnimComponent>(this, GetAnimCompClass(), TEXT("AnimComp"));
     AnimComponent->RegisterComponent();
     // 初始化Mesh
     USkeletalMeshComponent* MeshComp = GetMesh();
     check(MeshComp);
     MeshComp->SetRelativeRotation(FRotator(0,-90 ,0));
+   MeshComp->SetRelativeLocation(FVector(0,0, -1 * GetCapsuleComponent()->GetScaledCapsuleHalfHeight()));
     MeshComp->SetSkeletalMesh(Params.SkeletalMesh.LoadSynchronous());
     MeshComp->SetRenderCustomDepth(true);
     // 对初始值进行初始化
@@ -140,7 +140,7 @@ void AEntity::CalculateAttackEntities()
             break;
         // 单个攻击，对敌方有效
         case EEntityType::SingleAttack:
-            if(CurrentAttackedEntities.Num() > 0 && !CurrentAttackedEntities[0]->IsPendingKill())
+            if(CurrentAttackedEntities.Num() > 0 && CurrentAttackedEntities[0]->CurrentEntityParams.CurrentHP > 0)
             {
                 float Distance = FMath::Sqrt(FVector::DistSquaredXY(CurrentAttackedEntities[0]->GetActorLocation(), GetActorLocation()));
                 // 如果距离小于可攻击范围的的话就可以不用管

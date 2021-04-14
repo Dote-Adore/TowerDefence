@@ -15,15 +15,16 @@ ALevelManager::ALevelManager(const FObjectInitializer& ObjectInitializer)
 	
 	
 	StateMachineComponent = CreateDefaultSubobject<UStateMachineComponent>(TEXT("WaveStateComp"));
+	ATDPlayerController::OnTileSelectedEvent.AddUObject(this, &ALevelManager::OnTileClickedListener);
 }
 
 void ALevelManager::BeginPlay()
 {
 	Super::BeginPlay();
+	EntityCreator = NewObject<UEntityCreator>(this);
 	TDGameInstance = Cast<UTDGameInstance>(GetGameInstance());
 	check(TDGameInstance);
 	GenerateLevelMap();
-	EntityCreator = NewObject<UEntityCreator>(GetWorld());
 
 	
 	TotalWaves = TDGameInstance->CurrentLevelInfomation->Waves.Num();
@@ -62,14 +63,29 @@ void ALevelManager::GenerateLevelMap()
 	}
 }
 
+void ALevelManager::OnTileClickedListener(ABaseTile* TargetTile)
+{
+	if(TargetGenereatedID == INDEX_NONE||TargetTile->CanDeploy(TargetGeneratedCategory) == false)
+	{
+		return;
+	}
+	AEntity* SpawnedTurrent = EntityCreator->CreateTurrent(TargetGenereatedID,
+        FTransform(TargetTile->GetSpawnEntityLocation()));
+	check(SpawnedTurrent);
+	TargetTile->SetDeployEntity(SpawnedTurrent);
+	DeployPoint -= TargetDeployCost;
+	OnCancelDeploy();
+}
+
 TSharedPtr<const FEnemyGenerationInfo> ALevelManager::GetCurrentWaveInfoPtr()
 {
     const FEnemyGenerationInfo& TargetWave = TDGameInstance->CurrentLevelInfomation->Waves[CurrentWaveIdx];
     return MakeShared<FEnemyGenerationInfo>(TargetWave);
 }
 
-TArray<ABaseTile*> ALevelManager::OnGetDeployableTiles(int32 TurrentID, FName Category)
+void ALevelManager::OnRequestToDeploy(int32 TurrentID, FName Category, int32 Cost)
 {
+	OnCancelDeploy();
 	TArray<ABaseTile*> Res;
 	for(auto Tile:AllTiles)
 	{
@@ -82,22 +98,16 @@ TArray<ABaseTile*> ALevelManager::OnGetDeployableTiles(int32 TurrentID, FName Ca
 	{
 		Tile->ChangePlaneColor(CanDeployColor);
 	}
-	return Res;
+	TargetGenereatedID = TurrentID;
+	TargetGeneratedCategory = Category;
+	TargetDeployCost = Cost;
 }
 
-void ALevelManager::RequsetDeployToTile(int32 TurrentID, ABaseTile* TargetTile, int32 Cost)
-{
-	AEntity* SpawnedTurrent = EntityCreator->CreateTurrent(TurrentID,
-		FTransform(TargetTile->GetSpawnEntityLocation()));
-	check(SpawnedTurrent);
-	TargetTile->SetDeployEntity(SpawnedTurrent);
-	// 将所有tile的颜色去除
-	OnCancelDeploy();
-	DeployPoint -= Cost;
-}
 
 void ALevelManager::OnCancelDeploy()
 {
+	TargetGeneratedCategory = NAME_None;
+	TargetGenereatedID = INDEX_NONE;
 	for(auto Tile:AllTiles)
 	{
 		Tile->ChangePlaneColor(FLinearColor(0,0,0,0));

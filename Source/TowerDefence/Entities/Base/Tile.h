@@ -3,6 +3,7 @@
 
 class UBoxComponent;
 class AEntity;
+class ABaseTile;
 UENUM()
 enum class ETileType
 {
@@ -14,7 +15,6 @@ enum class ETileType
 	// 可部署的
 	Deployable
 };
-
 UCLASS(BlueprintType)
 class ABaseTile:public  AActor
 {
@@ -31,8 +31,6 @@ public:
 	FLinearColor DebugColor;
 #endif
 	static const float BoxSize;
-
-
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 	void OnConstruction(const FTransform& Transform) override;
