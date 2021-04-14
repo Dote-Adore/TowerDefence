@@ -2,10 +2,12 @@
 #include "TowerDefence/Entities/Enemy.h"
 #include "TowerDefence/Entities/Base/Tile.h"
 
+FOnEnemyArrivalToEndDelegate UEnemyMovementComponent::OnEnemyArrivalToEndDelegate = FOnEnemyArrivalToEndDelegate();
 
 UEnemyMovementComponent::UEnemyMovementComponent(const FObjectInitializer& ObjectInitializer)
 	:UActorComponent(ObjectInitializer)
 {
+	HasBoardCastOnArrivalEndEvent = false;
 	PrimaryComponentTick.bCanEverTick = true;
 	ParentEnemy = Cast<AEnemy>(GetOwner());
 }
@@ -22,11 +24,19 @@ void UEnemyMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	if(EnemyWalkTiles.Num() == 0)
 		return;
+
+	// 结束了，走到了最后
 	if(CurrentWalkToTileIdx == EnemyWalkTiles.Num() -1)
 	{
-		// 结束了，走到了最后
+		if(HasBoardCastOnArrivalEndEvent == false)
+		{
+			OnEnemyArrivalToEndDelegate.Broadcast(ParentEnemy);
+			HasBoardCastOnArrivalEndEvent = true;
+		}
 		return;
 	}
+
+	
 	int32 TargetMoveToTileIdx = CurrentWalkToTileIdx + 1;
 	const ABaseTile* TargetMoveToTile = EnemyWalkTiles[TargetMoveToTileIdx];
 	// 如果目标位置已经到了，则切换移动的目标

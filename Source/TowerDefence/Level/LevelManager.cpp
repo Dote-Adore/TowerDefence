@@ -5,6 +5,7 @@
 #include "TowerDefence/Components/StateMachineComponent.h"
 #include "LevelWaveState.h"
 #include "TowerDefence/Entities/Turrent.h"
+#include "TowerDefence/Components/EnemyMovementComponent.h"
 #include "TowerDefence/Creator/EntityCreator.h"
 #include "TowerDefence/Entities/Enemy.h"
 
@@ -16,12 +17,14 @@ ALevelManager::ALevelManager(const FObjectInitializer& ObjectInitializer)
 	
 	
 	StateMachineComponent = CreateDefaultSubobject<UStateMachineComponent>(TEXT("WaveStateComp"));
-	ATDPlayerController::OnTileSelectedEvent.AddUObject(this, &ALevelManager::OnTileClickedListener);
 }
 
 void ALevelManager::BeginPlay()
 {
 	Super::BeginPlay();
+	UEnemyMovementComponent::OnEnemyArrivalToEndDelegate.AddUObject(this, &ALevelManager::OnEnemyArrivalToTheEndListener);
+	ATDPlayerController::OnTileSelectedEvent.AddUObject(this, &ALevelManager::OnTileClickedListener);
+
 	EntityCreator = NewObject<UEntityCreator>(this);
 	TDGameInstance = Cast<UTDGameInstance>(GetGameInstance());
 	check(TDGameInstance);
@@ -31,9 +34,8 @@ void ALevelManager::BeginPlay()
 	TotalWaves = TDGameInstance->CurrentLevelInfomation->Waves.Num();
 	// 初始化部署点数
 	DeployPoint = TDGameInstance->CurrentLevelInfomation->InitDeployPoints;
-	
+	SurplusEnemyArrivalNum = TDGameInstance->CurrentLevelInfomation->MaxEnemyToEndNums;
 	CurrentWaveIdx = 0;
-	RoundState = Init;
 	StateMachineComponent->RegisterState(
 		MakeShared<UInitWaveState>(UInitWaveState(StateMachineComponent, this)));
 	StateMachineComponent->RegisterState(
@@ -85,6 +87,20 @@ void ALevelManager::OnEnemyDeathListener(AEnemy* TargetDeathEnemy)
 	CurrentWaveEnemyDeathNum++;
 }
 
+void ALevelManager::OnEnemyArrivalToTheEndListener(AEnemy* TargetDeathEnemy)
+{
+	SurplusEnemyArrivalNum --;
+	TargetDeathEnemy->Destroy();
+	// 如果到达终点的敌人数量超过通关限定条件，则说明游戏失败,这里只执行一次
+	if(SurplusEnemyArrivalNum == -1)
+	{
+		// 游戏失败
+		OnLevelFailedDelegate.Broadcast();
+		GetWorld()->GetFirstPlayerController()->SetPause(true);
+	}
+	
+}
+
 TSharedPtr<const FEnemyGenerationInfo> ALevelManager::GetCurrentWaveInfoPtr()
 {
     const FEnemyGenerationInfo& TargetWave = TDGameInstance->CurrentLevelInfomation->Waves[CurrentWaveIdx];
@@ -120,4 +136,10 @@ void ALevelManager::OnCancelDeploy()
 	{
 		Tile->ChangePlaneColor(FLinearColor(0,0,0,0));
 	}
+}
+
+void ALevelManager::OnNextWave()
+{
+	CurrentWaveIdx++;
+	OnNextWaveDeleagate.Broadcast();
 }

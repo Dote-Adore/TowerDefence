@@ -23,5 +23,6 @@ class TOWERDEFENCE_API ATowerDefenceGameModeBase : public AGameModeBase
 	ALevelManager* GetLevelManager();
 private:
 	UTDGameInstance* GameInstance;
+	UPROPERTY()
 	ALevelManager* LevelManager;
 };

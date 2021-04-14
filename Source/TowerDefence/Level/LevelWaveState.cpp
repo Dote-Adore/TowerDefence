@@ -144,11 +144,12 @@ void UWaitForNextState::Tick(float DeltaTime)
 			DelayForNext -= DeltaTime;
 			return;
 		}
-		OwnerLevelManager->CurrentWaveIdx++;
+		OwnerLevelManager->OnNextWave();
 		OwnerStateMachine->ChangeState("Init");
 	}
 	else
 	{
+		OwnerLevelManager->OnLevelSuccessDelegate.Broadcast();
 		OwnerStateMachine->ChangeState("End");
 	}
 }

@@ -10,21 +10,16 @@ class UEntityCreator;
 class ALevelManager;
 class AEnemy;
 // DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_OneParam(FOnTileClickedSignature, ALevelManager, OnTileClicked, ABaseTile*, TargetTile);
+// 闯关失败事件
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLevelFailedDelegate);
+// 闯关成功事件
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLevelSuccessDelegate);
+// 下一波事件
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnNextWaveDeleagate);
 UCLASS()
 class ALevelManager:public AActor
 {
 	friend class UBaseWaveState;
-	enum ERoundState
-	{
-		// 初始化
-		Init,
-		// 生成敌人
-		GenerateEnemies,
-		// 等待所有敌人死亡，到下一个回合
-		WaitForNext,
-		// 结束
-		End
-	};
 	GENERATED_BODY()
 public:
 	
@@ -39,18 +34,30 @@ public:
 	void  OnRequestToDeploy(int32 TurrentID, FName Category, int32 Cost);
 	UFUNCTION(BlueprintCallable)
 	void OnCancelDeploy();
+
+	void OnNextWave();
 	UPROPERTY()
 	UEntityCreator* EntityCreator;
 	// 该关卡的部署点数
 	UPROPERTY(BlueprintReadWrite)
 	int32 DeployPoint;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnLevelFailedDelegate OnLevelFailedDelegate;
+	UPROPERTY(BlueprintAssignable)
+	FOnLevelSuccessDelegate OnLevelSuccessDelegate;
+	UPROPERTY(BlueprintAssignable)
+	FOnNextWaveDeleagate OnNextWaveDeleagate;
 	
 	// ----wave state params----
 	// 当前波数敌人死亡的数量
 	int32 CurrentWaveEnemyDeathNum;
+	UPROPERTY(BlueprintReadOnly)
 	int32 CurrentWaveIdx;
+	UPROPERTY(BlueprintReadOnly)
 	int32 TotalWaves;
+	UPROPERTY(BlueprintReadOnly)
+	int32 SurplusEnemyArrivalNum;
 	// -------------------------
 
 
@@ -59,10 +66,9 @@ private:
 	UTDGameInstance* TDGameInstance;
 	TArray<ABaseTile*> AllTiles;
 	void GenerateLevelMap();
-	ERoundState RoundState;
-	// ---------------
 
-	// Some Deploy Params
+	
+	// ---------------  Some Deploy Params
 	FLinearColor CanDeployColor = FColor(86, 186, 38 , 125);
 	int32 TargetGeneratedID;
 	FName TargetGeneratedCategory;
@@ -74,4 +80,5 @@ private:
 
 	// 敌人死亡的监听事件
 	void OnEnemyDeathListener(AEnemy* TargetDeathEnemy);
+	void OnEnemyArrivalToTheEndListener(AEnemy* TargetDeathEnemy);
 };
