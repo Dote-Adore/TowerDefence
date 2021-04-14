@@ -8,6 +8,7 @@ class UStateMachineComponent;
 class UTDGameInstance;
 class UEntityCreator;
 class ALevelManager;
+class AEnemy;
 // DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_OneParam(FOnTileClickedSignature, ALevelManager, OnTileClicked, ABaseTile*, TargetTile);
 UCLASS()
 class ALevelManager:public AActor
@@ -32,37 +33,45 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	TSharedPtr<const FEnemyGenerationInfo> GetCurrentWaveInfoPtr();
 	TArray<ABaseTile*> GetAllTiles() {return AllTiles; };
+
+	void OnLevelPass();
 	UFUNCTION(BlueprintCallable)
 	void  OnRequestToDeploy(int32 TurrentID, FName Category, int32 Cost);
 	UFUNCTION(BlueprintCallable)
 	void OnCancelDeploy();
-
 	UPROPERTY()
 	UEntityCreator* EntityCreator;
 	// 该关卡的部署点数
 	UPROPERTY(BlueprintReadWrite)
 	int32 DeployPoint;
+
+	
+	// ----wave state params----
+	// 当前波数敌人死亡的数量
+	int32 CurrentWaveEnemyDeathNum;
+	int32 CurrentWaveIdx;
+	int32 TotalWaves;
+	// -------------------------
+
+
 private:
 	UStateMachineComponent* StateMachineComponent;
 	UTDGameInstance* TDGameInstance;
 	TArray<ABaseTile*> AllTiles;
 	void GenerateLevelMap();
 	ERoundState RoundState;
-	int32 CurrentWaveIdx;
-	int32 TotalWaves;
-
-	int32 DeathEnemyNums = 0;
-	int32 CurrentDeathTurrentNums = 0;
-
-
+	// ---------------
 
 	// Some Deploy Params
 	FLinearColor CanDeployColor = FColor(86, 186, 38 , 125);
-	int32 TargetGenereatedID;
+	int32 TargetGeneratedID;
 	FName TargetGeneratedCategory;
 	int32 TargetDeployCost;
 	// UFUNCTION()
 	void OnTileClickedListener(ABaseTile* TargetTile);
-	
 	// ------------------
+
+
+	// 敌人死亡的监听事件
+	void OnEnemyDeathListener(AEnemy* TargetDeathEnemy);
 };

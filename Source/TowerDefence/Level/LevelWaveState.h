@@ -54,3 +54,15 @@ private:
 	int32 currentSpawnedIdx = 0;
 	TArray<const ABaseTile*> PathTiles;
 };
+
+class UWaitForNextState:public UBaseWaveState
+{
+public:
+	UWaitForNextState(UStateMachineComponent* InStateMachineComponent, class ALevelManager* LevelManager);
+	virtual void Tick(float DeltaTime) override;
+	virtual void OnEnter() override;
+	virtual void OnExit() override;
+	virtual FName GetStateName() override;
+private:
+	float DelayForNext = 2.f;
+};

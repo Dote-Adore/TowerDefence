@@ -117,7 +117,7 @@ void AEntity::CalculateAttackEntities()
             for(AActor* Actor: FoundActors)
             {
                 float Dist = FMath::Sqrt(FVector::DistSquaredXY(Actor->GetActorLocation(), GetActorLocation()));
-                if(Dist <= BaseEntityParams.AttackRadius)
+                if(Dist <= BaseEntityParams.AttackRadius && BaseEntityParams.CurrentHP>0)
                 {
                     CurrentAttackedEntities.Add(Cast<AEntity>(Actor));
                 }
@@ -132,7 +132,7 @@ void AEntity::CalculateAttackEntities()
             if(Actor == this)
                 continue;
             float Dist = FMath::Sqrt(FVector::DistSquaredXY(Actor->GetActorLocation(), GetActorLocation()));
-            if(Dist <= BaseEntityParams.AttackRadius)
+            if(Dist <= BaseEntityParams.AttackRadius && BaseEntityParams.CurrentHP > 0)
             {
                 CurrentAttackedEntities.Add(Cast<AEntity>(Actor));
             }
@@ -140,11 +140,11 @@ void AEntity::CalculateAttackEntities()
             break;
         // 单个攻击，对敌方有效
         case EEntityType::SingleAttack:
-            if(CurrentAttackedEntities.Num() > 0 && CurrentAttackedEntities[0]->CurrentEntityParams.CurrentHP > 0)
+            if(CurrentAttackedEntities.Num() > 0)
             {
                 float Distance = FMath::Sqrt(FVector::DistSquaredXY(CurrentAttackedEntities[0]->GetActorLocation(), GetActorLocation()));
-                // 如果距离小于可攻击范围的的话就可以不用管
-                if(Distance<= BaseEntityParams.AttackRadius)
+                // 如果距离小于可攻击范围并且还未死亡的话就可以不用管
+                if(Distance<= BaseEntityParams.AttackRadius && !CurrentAttackedEntities[0]->IsDeath())
                 {
                     break;
                 }
@@ -152,19 +152,23 @@ void AEntity::CalculateAttackEntities()
             CurrentAttackedEntities.Empty();           
             UGameplayStatics::GetAllActorsOfClass(GetWorld(), TargetAttackEntityClass, FoundActors);
             // get the nearest actor
-            AActor* NearestActor = nullptr;
+            AEntity* NearestActor = nullptr;
             for(AActor* Actor: FoundActors)
             {
+                AEntity* EntityActor = Cast<AEntity>(Actor);
                 if(!NearestActor)
                 {
-                    NearestActor = Actor;
+                    if(!EntityActor->IsDeath())
+                    {
+                        NearestActor = EntityActor;
+                    }
                     continue;
                 }
                 float Dist =FMath::Sqrt( FVector::DistSquaredXY(Actor->GetActorLocation(), GetActorLocation()));
                 float NearestDist = FMath::Sqrt(FVector::DistSquaredXY(NearestActor->GetActorLocation(), GetActorLocation()));
-                if(Dist<NearestDist)
+                if(Dist<NearestDist&& !EntityActor->IsDeath())
                 {
-                    NearestActor = Actor;
+                    NearestActor = EntityActor;
                 }
             }
             if(NearestActor == nullptr)
@@ -174,7 +178,7 @@ void AEntity::CalculateAttackEntities()
             if(NearestActor&&
                 FMath::Sqrt(Dist)<=CurrentEntityParams.AttackRadius)
             {
-                CurrentAttackedEntities.Add(Cast<AEntity>(NearestActor));
+                CurrentAttackedEntities.Add(NearestActor);
             }
             break;
     }
@@ -203,7 +207,7 @@ void AEntity::OnAttack()
 {
     // 计算可以攻击的目标对象组
     CalculateAttackEntities();
-    UE_LOG(LogTemp, Display, TEXT("%s: Find Attack Nums: %d"), *GetName(), CurrentAttackedEntities.Num());
+    // UE_LOG(LogTemp, Display, TEXT("%s: Find Attack Nums: %d"), *GetName(), CurrentAttackedEntities.Num());
     const FEntityHitAttack& CurrentAttack = BaseEntityParams.Attacks[CurrentHitIdx];
     const UGlobalConfig* Config = GetDefault<UGlobalConfig>();
     // 当前没有可攻击对象，则idle
@@ -248,4 +252,9 @@ void AEntity::OnDeath()
 {
     const UGlobalConfig* Config = GetDefault<UGlobalConfig>();
     OnDeathDelegate.ExecuteIfBound();
+}
+
+bool AEntity::IsDeath()
+{
+    return CurrentEntityParams.CurrentHP<=0;
 }

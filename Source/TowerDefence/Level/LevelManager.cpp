@@ -6,6 +6,7 @@
 #include "LevelWaveState.h"
 #include "TowerDefence/Entities/Turrent.h"
 #include "TowerDefence/Creator/EntityCreator.h"
+#include "TowerDefence/Entities/Enemy.h"
 
 ALevelManager::ALevelManager(const FObjectInitializer& ObjectInitializer)
 	:AActor(ObjectInitializer)
@@ -26,11 +27,10 @@ void ALevelManager::BeginPlay()
 	check(TDGameInstance);
 	GenerateLevelMap();
 
-	
+	AEnemy::OnEnemyDeathEvent.AddUObject(this, &ALevelManager::OnEnemyDeathListener);
 	TotalWaves = TDGameInstance->CurrentLevelInfomation->Waves.Num();
 	// 初始化部署点数
 	DeployPoint = TDGameInstance->CurrentLevelInfomation->InitDeployPoints;
-
 	
 	CurrentWaveIdx = 0;
 	RoundState = Init;
@@ -38,6 +38,8 @@ void ALevelManager::BeginPlay()
 		MakeShared<UInitWaveState>(UInitWaveState(StateMachineComponent, this)));
 	StateMachineComponent->RegisterState(
 		MakeShared<UGenerateEnemiesState>(UGenerateEnemiesState(StateMachineComponent, this)));
+	StateMachineComponent->RegisterState(
+		MakeShared<UWaitForNextState>(UWaitForNextState(StateMachineComponent, this)));
 	StateMachineComponent->ChangeState("init");
 }
 
@@ -65,16 +67,22 @@ void ALevelManager::GenerateLevelMap()
 
 void ALevelManager::OnTileClickedListener(ABaseTile* TargetTile)
 {
-	if(TargetGenereatedID == INDEX_NONE||TargetTile->CanDeploy(TargetGeneratedCategory) == false)
+	if(TargetGeneratedID == INDEX_NONE||TargetTile->CanDeploy(TargetGeneratedCategory) == false)
 	{
 		return;
 	}
-	AEntity* SpawnedTurrent = EntityCreator->CreateTurrent(TargetGenereatedID,
+	AEntity* SpawnedTurrent = EntityCreator->CreateTurrent(TargetGeneratedID,
         FTransform(TargetTile->GetSpawnEntityLocation()));
 	check(SpawnedTurrent);
 	TargetTile->SetDeployEntity(SpawnedTurrent);
 	DeployPoint -= TargetDeployCost;
 	OnCancelDeploy();
+}
+
+void ALevelManager::OnEnemyDeathListener(AEnemy* TargetDeathEnemy)
+{	
+    DeployPoint += TargetDeathEnemy->GetCurrentEntityParams().DeployPoints;
+	CurrentWaveEnemyDeathNum++;
 }
 
 TSharedPtr<const FEnemyGenerationInfo> ALevelManager::GetCurrentWaveInfoPtr()
@@ -98,7 +106,7 @@ void ALevelManager::OnRequestToDeploy(int32 TurrentID, FName Category, int32 Cos
 	{
 		Tile->ChangePlaneColor(CanDeployColor);
 	}
-	TargetGenereatedID = TurrentID;
+	TargetGeneratedID = TurrentID;
 	TargetGeneratedCategory = Category;
 	TargetDeployCost = Cost;
 }
@@ -107,7 +115,7 @@ void ALevelManager::OnRequestToDeploy(int32 TurrentID, FName Category, int32 Cos
 void ALevelManager::OnCancelDeploy()
 {
 	TargetGeneratedCategory = NAME_None;
-	TargetGenereatedID = INDEX_NONE;
+	TargetGeneratedID = INDEX_NONE;
 	for(auto Tile:AllTiles)
 	{
 		Tile->ChangePlaneColor(FLinearColor(0,0,0,0));

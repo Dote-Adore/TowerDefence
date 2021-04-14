@@ -154,6 +154,7 @@ public:
     virtual void OnAttack();
     virtual void OnDamage(int32 DamageValue, const FBuff* Buff = nullptr);
     virtual void OnDeath();
+    bool IsDeath();
 protected:
     class UBuffComponent* BuffComponent;
     class UAnimComponent* AnimComponent;

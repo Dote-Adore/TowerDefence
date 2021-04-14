@@ -43,6 +43,9 @@ public:
 	// 初始的可用部署点数
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 InitDeployPoints;
+	// 最大敌人进入终点的数量
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 MaxEnemyToEndNums;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSoftObjectPtr<class UWorld> BackgroundWorld;
 	// 生成怪物波数设定

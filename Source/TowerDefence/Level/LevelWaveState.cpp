@@ -40,11 +40,15 @@ void UInitWaveState::Tick(float DeltaTime)
 void UInitWaveState::OnEnter()
 {
 	UBaseWaveState::OnEnter();
+	TilesPlayAnimLeftTime.Empty();
 	TotalPathNum = CurrentWaveInfo->Path.Num();
+	UE_LOG(LogTemp, Display, TEXT("Start To A Round %d, %d enemies Coming in......"),
+		OwnerLevelManager->CurrentWaveIdx, CurrentWaveInfo->GeneratedID.Num());
 	for(int32 i = 0;i < TotalPathNum;i++)
 	{
 		TilesPlayAnimLeftTime.Add(CurrentWaveInfo->Path[i], EachTileDurationTime + GrapShowPathTime*i);
 	}
+	FinishedAnimTilesIdx.Empty();
 }
 
 void UInitWaveState::OnExit()
@@ -108,6 +112,8 @@ void UGenerateEnemiesState::OnEnter()
 	{
 		PathTiles.Add(OwnerLevelManager->GetAllTiles()[PathID]);
 	}
+	// 这里将其初始化为0
+	OwnerLevelManager->CurrentWaveEnemyDeathNum = 0;
 }
 
 void UGenerateEnemiesState::OnExit()
@@ -118,4 +124,48 @@ FName UGenerateEnemiesState::GetStateName()
 {
 	return "GenerateEnemies";
 }
+
+UWaitForNextState::UWaitForNextState(UStateMachineComponent* InStateMachineComponent, ALevelManager* LevelManager)
+	:UBaseWaveState(InStateMachineComponent, LevelManager)
+{
+}
+
+void UWaitForNextState::Tick(float DeltaTime)
+{
+	// 如果还没有全部死亡的话则继续等待
+	if(OwnerLevelManager->CurrentWaveEnemyDeathNum<CurrentWaveInfo->GeneratedID.Num())
+	{
+		return;
+	}
+	if(OwnerLevelManager->CurrentWaveIdx<OwnerLevelManager->TotalWaves - 1)
+	{
+		if(DelayForNext>0)
+		{
+			DelayForNext -= DeltaTime;
+			return;
+		}
+		OwnerLevelManager->CurrentWaveIdx++;
+		OwnerStateMachine->ChangeState("Init");
+	}
+	else
+	{
+		OwnerStateMachine->ChangeState("End");
+	}
+}
+
+void UWaitForNextState::OnEnter()
+{
+	UBaseWaveState::OnEnter();
+	DelayForNext = 2.f;
+}
+
+void UWaitForNextState::OnExit()
+{
+}
+
+FName UWaitForNextState::GetStateName()
+{
+	return "WaitForNext";
+}
+
 // -------------------------------------

@@ -99,7 +99,7 @@ void SInfoParamsPanel::Construct(const SInfoParamsPanel::FArguments& InArgs, ULe
             		.Text(LOCTEXT("Deployment Points", "Initial deployment points:"))
             	]
             	+SHorizontalBox::Slot()
-            	.AutoWidth()
+            	.MaxWidth(100)
             	[
             		SNew(SEditableTextBox)
             		.Text(FText::Format(LOCTEXT("DeployPoints Input Text", "{0}"),
@@ -116,6 +116,36 @@ void SInfoParamsPanel::Construct(const SInfoParamsPanel::FArguments& InArgs, ULe
             	]
             	
             ]
+            +SVerticalBox::Slot()
+			.Padding(4)
+			.AutoHeight()
+			[
+			    SNew(SHorizontalBox)
+			    +SHorizontalBox::Slot()
+			    .Padding(0,0,5,0)
+			    .AutoWidth()
+			    [
+			        SNew(STextBlock)
+			        .Text(LOCTEXT("Max Enemy To End Nums", "Max Enemy To End Nums:"))
+			    ]
+			    +SHorizontalBox::Slot()
+			    .MaxWidth(100)
+			    [
+			        SNew(SEditableTextBox)
+			        .Text(FText::Format(LOCTEXT("MaxEnemyToEndNums Input Text", "{0}"),
+			            CurrentLevelInfomation->MaxEnemyToEndNums))
+			        .OnTextChanged_Lambda([&](const FText& InText)->void
+			        {
+			            if(InText.IsNumeric())
+			            {
+			                int32 TargetInputFloat = FCString::Atoi(*InText.ToString());
+			                CurrentLevelInfomation->MaxEnemyToEndNums = TargetInputFloat;
+			                CurrentLevelInfomation->MarkPackageDirty();
+			            }
+			        })
+			    ]
+            				
+			]
             // 设置wave
 			
             +SVerticalBox::Slot()
