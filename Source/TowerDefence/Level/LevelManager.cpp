@@ -35,14 +35,20 @@ void ALevelManager::BeginPlay()
 	// 初始化部署点数
 	DeployPoint = TDGameInstance->CurrentLevelInfomation->InitDeployPoints;
 	SurplusEnemyArrivalNum = TDGameInstance->CurrentLevelInfomation->MaxEnemyToEndNums;
-	CurrentWaveIdx = 0;
+	CurrentWaveIdx = -1;
 	StateMachineComponent->RegisterState(
 		MakeShared<UInitWaveState>(UInitWaveState(StateMachineComponent, this)));
 	StateMachineComponent->RegisterState(
 		MakeShared<UGenerateEnemiesState>(UGenerateEnemiesState(StateMachineComponent, this)));
 	StateMachineComponent->RegisterState(
 		MakeShared<UWaitForNextState>(UWaitForNextState(StateMachineComponent, this)));
-	StateMachineComponent->ChangeState("init");
+	GetWorldTimerManager().SetTimer(StartGameDelayTimeHandle, [&]()->void
+	{
+		GetWorldTimerManager().ClearTimer(StartGameDelayTimeHandle);
+		OnNextWave();
+		StateMachineComponent->ChangeState("init");
+	}, 2.f, false);
+
 }
 
 void ALevelManager::Tick(float DeltaSeconds)

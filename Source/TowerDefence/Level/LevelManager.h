@@ -62,6 +62,7 @@ public:
 
 
 private:
+	FTimerHandle StartGameDelayTimeHandle;
 	UStateMachineComponent* StateMachineComponent;
 	UTDGameInstance* TDGameInstance;
 	TArray<ABaseTile*> AllTiles;

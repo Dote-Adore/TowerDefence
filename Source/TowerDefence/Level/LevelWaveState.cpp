@@ -14,6 +14,11 @@ void UBaseWaveState::OnEnter()
 // -------Init------------
 void UInitWaveState::Tick(float DeltaTime)
 {
+	if(LeftDelayForStartTick>0)
+	{
+		LeftDelayForStartTick -= DeltaTime;
+		return;
+	}
 	if(FinishedAnimTilesIdx.Num() == TotalPathNum)
 	{
 		OwnerStateMachine->ChangeState("GenerateEnemies");
@@ -49,6 +54,7 @@ void UInitWaveState::OnEnter()
 		TilesPlayAnimLeftTime.Add(CurrentWaveInfo->Path[i], EachTileDurationTime + GrapShowPathTime*i);
 	}
 	FinishedAnimTilesIdx.Empty();
+	LeftDelayForStartTick = DelayForStartTick;
 }
 
 void UInitWaveState::OnExit()
@@ -105,6 +111,7 @@ void UGenerateEnemiesState::Tick(float DeltaTime)
 
 void UGenerateEnemiesState::OnEnter()
 {
+	PathTiles.Empty();
 	UBaseWaveState::OnEnter();
 	OnNextSpawnEnemtyTime = 0;
 	currentSpawnedIdx = 0;
@@ -157,7 +164,7 @@ void UWaitForNextState::Tick(float DeltaTime)
 void UWaitForNextState::OnEnter()
 {
 	UBaseWaveState::OnEnter();
-	DelayForNext = 2.f;
+	DelayForNext =2.f;
 }
 
 void UWaitForNextState::OnExit()

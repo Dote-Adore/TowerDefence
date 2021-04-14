@@ -39,6 +39,8 @@ private:
 	TSet<int32> FinishedAnimTilesIdx;
 	FLinearColor TargetShowPathLinearColor = FLinearColor(0.5,1,1, 0.8);
 	FLinearColor EndColor = FLinearColor(0.5,1,1, 0);
+	const float DelayForStartTick = 3.f;
+	float LeftDelayForStartTick = 0;
 };
 
 class UGenerateEnemiesState:public UBaseWaveState
