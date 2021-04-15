@@ -77,13 +77,16 @@ void ALevelManager::OnTileClickedListener(ABaseTile* TargetTile)
 {
 	if(TargetGeneratedID == INDEX_NONE||TargetTile->CanDeploy(TargetGeneratedCategory) == false)
 	{
+		OnCancelDeploy();
+		OnDeployTurrentEvent.Broadcast(nullptr, nullptr);
 		return;
 	}
-	AEntity* SpawnedTurrent = EntityCreator->CreateTurrent(TargetGeneratedID,
+	ATurrent* SpawnedTurrent = EntityCreator->CreateTurrent(TargetGeneratedID,
         FTransform(TargetTile->GetSpawnEntityLocation()));
 	check(SpawnedTurrent);
 	TargetTile->SetDeployEntity(SpawnedTurrent);
 	DeployPoint -= TargetDeployCost;
+	OnDeployTurrentEvent.Broadcast(SpawnedTurrent, TargetTile);
 	OnCancelDeploy();
 }
 

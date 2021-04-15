@@ -9,6 +9,7 @@ class UTDGameInstance;
 class UEntityCreator;
 class ALevelManager;
 class AEnemy;
+class ATurrent;
 // DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_OneParam(FOnTileClickedSignature, ALevelManager, OnTileClicked, ABaseTile*, TargetTile);
 // 闯关失败事件
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLevelFailedDelegate);
@@ -16,6 +17,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLevelFailedDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLevelSuccessDelegate);
 // 下一波事件
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnNextWaveDeleagate);
+// 部署成功事件
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDeployTurrentEvent, ATurrent*, Turrent, ABaseTile*, TargetTile);
 UCLASS()
 class ALevelManager:public AActor
 {
@@ -48,6 +51,8 @@ public:
 	FOnLevelSuccessDelegate OnLevelSuccessDelegate;
 	UPROPERTY(BlueprintAssignable)
 	FOnNextWaveDeleagate OnNextWaveDeleagate;
+	UPROPERTY(BlueprintAssignable)
+	FOnDeployTurrentEvent OnDeployTurrentEvent;
 	
 	// ----wave state params----
 	// 当前波数敌人死亡的数量

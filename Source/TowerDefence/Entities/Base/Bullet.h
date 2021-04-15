@@ -3,6 +3,8 @@
 #include "Entity.h"
 #include "Bullet.generated.h"
 
+
+class USplineComponent;
 UCLASS(BlueprintType)
 class ABullet:public AActor
 {
@@ -34,9 +36,17 @@ class AFilghtHitBullet:public ABullet
 {
     GENERATED_BODY()
 public:
+    AFilghtHitBullet(const FObjectInitializer& ObjectInitializer);
     // 飞行速度,每秒
     UPROPERTY(EditDefaultsOnly)
     float Speed = 10;
     virtual void File(AEntity* ParentEntity, AEntity* TargetAttackEntity, const FEntityHitAttack& CurrentAttack) override;
+    virtual void Tick(float DeltaSeconds) override;
+
+    UPROPERTY(EditAnywhere)
+    USplineComponent* BulletFlightSplinePathComp;
+
+private:
+
     
 };
