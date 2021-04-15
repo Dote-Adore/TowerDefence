@@ -115,11 +115,11 @@ struct FEntityAnimation:public FTableRowBase
 
 
 // 攻击消息，参数是攻击下标
-DECLARE_DELEGATE_OneParam(FOnAttackDelegate, int32)
-DECLARE_DELEGATE(FOnEntityInitialized)
-DECLARE_DELEGATE(FOnDamageDelegate)
-DECLARE_DELEGATE(FOnIdleDelegate)
-DECLARE_DELEGATE(FOnDeathDelegate)
+DECLARE_DELEGATE_OneParam(FOnAttackDelegate, int32);
+DECLARE_DELEGATE(FOnEntityInitialized);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageDelegate, int32, DamageValue);
+DECLARE_DELEGATE(FOnIdleDelegate);
+DECLARE_DELEGATE(FOnDeathDelegate);
 UCLASS(Blueprintable)
 class AEntity: public ACharacter
 // ,public IEntityAppearanceInterface
@@ -133,6 +133,7 @@ public:
     FOnEntityInitialized OnEntityInitialized;
     FOnIdleDelegate OnIdleDelegate;
     FOnDeathDelegate OnDeathDelegate;
+    UPROPERTY(BlueprintAssignable)
     FOnDamageDelegate OnDamageDelegate;
 
 
@@ -174,11 +175,13 @@ private:
     void CalculateAttackEntities();
     // 计算buff到主数值中
     void CalculateAttack(float DeltaSeconds);
+    void SetMeshMaterialsColorParams(FName ParamName, FLinearColor Color);
     // 连招
     // 当前连招使用哪个id
     int32 CurrentHitIdx = 0;
     // 该招式的剩余时间
     float LeftHitTime;
+    FTimerHandle HitTimerHandle;
 };
 
 

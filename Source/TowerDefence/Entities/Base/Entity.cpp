@@ -2,9 +2,11 @@
 #include "Bullet.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Materials/MaterialInstanceConstant.h"
 #include "TowerDefence/GlobalConfig.h"
 #include "TowerDefence/Components/BuffComponent.h"
 #include "TowerDefence/Components/AnimComponent.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 AEntity::AEntity(const FObjectInitializer& ObjectInitializer)
     :ACharacter(ObjectInitializer)
@@ -52,6 +54,13 @@ void AEntity::InitEntity(const FEntityParams& Params, const FEntityAnimation& An
         LeftHitTime = 0;
     }
     OnEntityInitialized.ExecuteIfBound();
+
+    // 动态材质
+    int32 MaterialNum = GetMesh()->GetNumMaterials();
+    for(int32 i =0 ;i<MaterialNum;i++)
+    {
+        GetMesh()->CreateDynamicMaterialInstance(i, GetMesh()->GetMaterial(i));
+    }
 }
 
 void AEntity::Tick(float DeltaSeconds)
@@ -203,6 +212,20 @@ void AEntity::CalculateAttack(float DeltaSeconds)
     LeftHitTime -= DeltaSeconds;
 }
 
+void AEntity::SetMeshMaterialsColorParams(FName ParamName, FLinearColor Color)
+{
+   TArray<UMaterialInterface*> AllMaterials = GetMesh()->GetMaterials();
+    for(auto Mat: AllMaterials)
+    {
+        UMaterialInstanceDynamic* MID =Cast<UMaterialInstanceDynamic>(Mat);
+        if(MID)
+        {
+            UE_LOG(LogTemp, Display, TEXT(" Change Target Materials '%s' Color Params"), *MID->GetName());
+            MID->SetVectorParameterValue(ParamName, Color);
+        }
+    }
+}
+
 void AEntity::OnAttack()
 {
     // 计算可以攻击的目标对象组
@@ -234,15 +257,22 @@ void AEntity::OnDamage(int32 DamageValue,  const FBuff* Buff)
     if(CurrentEntityParams.CurrentHP <= 0)
         return;
     // 减掉防御力
-    int32 FinalAttack = FMath::Max(0, DamageValue - CurrentEntityParams.Defence);
+    int32 FinalAttack = FMath::Max(1, DamageValue - CurrentEntityParams.Defence);
     CurrentEntityParams.CurrentHP -= FinalAttack;
     if(Buff)
         BuffComponent->AddBuff(Buff);
+    
     // 如果伤害为0，表示没有收到伤害，则不需要发送Damage事件
-    if(DamageValue > 0)
-    {
-        OnDamageDelegate.ExecuteIfBound();
-    }
+    SetMeshMaterialsColorParams("HitColor", FLinearColor(0.6, 0,0,0.7));
+    GetWorld()->GetTimerManager().SetTimer(HitTimerHandle,
+        [&]()->void
+        {
+            GetWorld()->GetTimerManager().ClearTimer(HitTimerHandle);
+            SetMeshMaterialsColorParams("HitColor", FLinearColor(0,0,0,0));
+        }, 0.3f, false);
+
+        OnDamageDelegate.Broadcast(FinalAttack);
+
     if(CurrentEntityParams.CurrentHP <=0)
     {
         OnDeath();
