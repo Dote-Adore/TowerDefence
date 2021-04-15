@@ -176,12 +176,15 @@ private:
     // 计算buff到主数值中
     void CalculateAttack(float DeltaSeconds);
     void SetMeshMaterialsColorParams(FName ParamName, FLinearColor Color);
+    void OnSpawnAttackBullet(int32 AttackIdx, TArray<AEntity*> TargetEntities);
     // 连招
     // 当前连招使用哪个id
     int32 CurrentHitIdx = 0;
     // 该招式的剩余时间
     float LeftHitTime;
-    FTimerHandle HitTimerHandle;
+    FTimerHandle DamageEffectTimerHandle;
+    //攻击有一个前摇时间，这里进行延时
+    FTimerHandle AttackTimerHandle;
 };
 
 

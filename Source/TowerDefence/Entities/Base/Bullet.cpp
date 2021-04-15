@@ -5,6 +5,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "TowerDefence/GlobalConfig.h"
 #include "Components/SplineComponent.h"
+#include "Engine/SkeletalMeshSocket.h"
 
 ABullet::ABullet(const FObjectInitializer& ObjectInitializer)
     :AActor(ObjectInitializer)
@@ -31,6 +32,7 @@ void AImmediateHitBullet::File(AEntity* ParentEntity, AEntity* TargetAttackEntit
 AFilghtHitBullet::AFilghtHitBullet(const FObjectInitializer& ObjectInitializer)
     :ABullet(ObjectInitializer)
 {
+    PrimaryActorTick.bCanEverTick = true;
     BulletFlightSplinePathComp = CreateDefaultSubobject<USplineComponent>("FlightPathSplineComp");
     BulletFlightSplinePathComp->SetHiddenInGame(false);
     BulletFlightSplinePathComp->SetUsingAbsoluteLocation(true);
@@ -38,28 +40,37 @@ AFilghtHitBullet::AFilghtHitBullet(const FObjectInitializer& ObjectInitializer)
 
 void AFilghtHitBullet::File(AEntity* ParentEntity, AEntity* TargetAttackEntity, const FEntityHitAttack& CurrentAttack)
 {
-    float AttackValue = ParentEntity->GetCurrentEntityParams().Attack*CurrentAttack.AttackRate;
+    FEntityParams& Params =  ParentEntity->GetCurrentEntityParams();
+    AttackValue = Params.Attack*CurrentAttack.AttackRate;
     UGlobalConfig* GlobalConf = GetMutableDefault<UGlobalConfig>();
-    const FBuff* Buff = GlobalConf->FindBuffByID(CurrentAttack.BuffID);
+    Buff = GlobalConf->FindBuffByID(CurrentAttack.BuffID);
     BulletFlightSplinePathComp->ClearSplinePoints();
-  //   FSplinePoint StartPoint;
-  //   StartPoint.Position = ParentEntity->GetActorLocation();
-  // //  StartPoint.ArriveTangent = ParentEntity->GetActorLocation() - FVector(0,0,100);
-  //   
-  //   ButtonFlightSplinePathComp->AddPoint(StartPoint,true);
-  //   FSplinePoint EndPoint;
-  //   EndPoint.Type = ESplinePointType::CurveCustomTangent;
-  //   EndPoint.Position = TargetAttackEntity->GetActorLocation();
-    // EndPoint.LeaveTangent = TargetAttackEntity->GetActorLocation() - FVector(0,0,100);
-    //ButtonFlightSplinePathComp->AddPoint(EndPoint, true);
-   BulletFlightSplinePathComp->AddSplinePoint(ParentEntity->GetActorLocation(), ESplineCoordinateSpace::World);
-    FVector MiddlePoint = (ParentEntity->GetActorLocation() +TargetAttackEntity->GetActorLocation())/2 +FVector(0,0,100);
+    USkeletalMeshSocket* TargetSocket = ParentEntity->GetMesh()->SkeletalMesh->FindSocket("SpawnBullet");
+    BulletFlightSplinePathComp->AddSplinePoint(TargetSocket->GetSocketLocation(ParentEntity->GetMesh()), ESplineCoordinateSpace::World);
+    FVector MiddlePoint = (TargetSocket->GetSocketLocation(ParentEntity->GetMesh()) +TargetAttackEntity->GetActorLocation())/2 +FVector(0,0,100);
+    MyTargetAttackEntity = TargetAttackEntity;
     BulletFlightSplinePathComp->AddSplinePoint(MiddlePoint,ESplineCoordinateSpace::World);
-   BulletFlightSplinePathComp->AddSplinePoint(TargetAttackEntity->GetActorLocation(), ESplineCoordinateSpace::World, true);
-    TargetAttackEntity->OnDamage(AttackValue, Buff);
+    BulletFlightSplinePathComp->AddSplinePoint(TargetAttackEntity->GetActorLocation(), ESplineCoordinateSpace::World, true);
+    StartFlight = true;
+    BulletPathLength = BulletFlightSplinePathComp->GetSplineLength();
 }
 
 void AFilghtHitBullet::Tick(float DeltaSeconds)
 {
+    Super::Tick(DeltaSeconds);
+    if(StartFlight == false)
+    {
+        return;
+    }
+    FVector TargetLocation = BulletFlightSplinePathComp->GetLocationAtTime(CurrentFlightTime, ESplineCoordinateSpace::World);
+    FVector TargetDirection = BulletFlightSplinePathComp->GetDirectionAtTime(CurrentFlightTime,ESplineCoordinateSpace::World);
+    SetActorLocation(TargetLocation);
+    SetActorRotation(TargetDirection.Rotation());
+    if(CurrentFlightTime >=1)
+    {
+        MyTargetAttackEntity->OnDamage(AttackValue, Buff);
+        Destroy();
+    }
+    CurrentFlightTime += Speed*DeltaSeconds/BulletPathLength;
     
 }

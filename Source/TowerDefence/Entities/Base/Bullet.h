@@ -39,14 +39,18 @@ public:
     AFilghtHitBullet(const FObjectInitializer& ObjectInitializer);
     // 飞行速度,每秒
     UPROPERTY(EditDefaultsOnly)
-    float Speed = 10;
+    float Speed = 300;
     virtual void File(AEntity* ParentEntity, AEntity* TargetAttackEntity, const FEntityHitAttack& CurrentAttack) override;
     virtual void Tick(float DeltaSeconds) override;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(VisibleAnywhere)
     USplineComponent* BulletFlightSplinePathComp;
 
 private:
-
-    
+    bool StartFlight = false;
+    float CurrentFlightTime;
+    float BulletPathLength;
+    float AttackValue;
+    AEntity* MyTargetAttackEntity;
+    const FBuff* Buff;
 };

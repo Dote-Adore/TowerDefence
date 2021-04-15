@@ -226,6 +226,18 @@ void AEntity::SetMeshMaterialsColorParams(FName ParamName, FLinearColor Color)
     }
 }
 
+void AEntity::OnSpawnAttackBullet(int32 AttackIdx, TArray<AEntity*> TargetEntities)
+{
+    GetWorld()->GetTimerManager().ClearTimer(AttackTimerHandle);
+    const FEntityHitAttack& AttackParam = CurrentEntityParams.Attacks[AttackIdx];
+    for(AEntity* AttackEntity: CurrentAttackedEntities)
+    {
+        ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(AttackParam.BulletClass);
+        UE_LOG(LogTemp, Display, TEXT("Spawn Bullet"));
+        Bullet->File(this, AttackEntity, AttackParam);
+    }
+}
+
 void AEntity::OnAttack()
 {
     // 计算可以攻击的目标对象组
@@ -238,17 +250,12 @@ void AEntity::OnAttack()
     {
         CurrentHitIdx = 0;
         OnIdleDelegate.ExecuteIfBound();
+        return;
     }
-    else
-    {
-        OnAttackDelegate.ExecuteIfBound(CurrentHitIdx);
-    }
-    for(AEntity* AttackEntity: CurrentAttackedEntities)
-    {
-        ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(CurrentAttack.BulletClass);
-        UE_LOG(LogTemp, Display, TEXT("Spawn Bullet"));
-        Bullet->File(this, AttackEntity, CurrentAttack);
-    }
+    OnAttackDelegate.ExecuteIfBound(CurrentHitIdx);
+    GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle,
+        FSimpleDelegate::CreateUObject(this, &AEntity::OnSpawnAttackBullet, CurrentHitIdx, CurrentAttackedEntities),
+        CurrentAttack.AttackTime, false);
 }
 
 void AEntity::OnDamage(int32 DamageValue,  const FBuff* Buff)
@@ -264,10 +271,10 @@ void AEntity::OnDamage(int32 DamageValue,  const FBuff* Buff)
     
     // 如果伤害为0，表示没有收到伤害，则不需要发送Damage事件
     SetMeshMaterialsColorParams("HitColor", FLinearColor(0.6, 0,0,0.7));
-    GetWorld()->GetTimerManager().SetTimer(HitTimerHandle,
+    GetWorld()->GetTimerManager().SetTimer(DamageEffectTimerHandle,
         [&]()->void
         {
-            GetWorld()->GetTimerManager().ClearTimer(HitTimerHandle);
+            GetWorld()->GetTimerManager().ClearTimer(DamageEffectTimerHandle);
             SetMeshMaterialsColorParams("HitColor", FLinearColor(0,0,0,0));
         }, 0.3f, false);
 
