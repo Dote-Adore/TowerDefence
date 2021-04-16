@@ -2,6 +2,13 @@
 #include "Animation/BlendSpace1D.h"
 #include "AITypes.h"
 #include "TowerDefence/Entities/Base/Entity.h"
+
+UAnimComponent::UAnimComponent(const FObjectInitializer& ObjectInitializer)
+    :UActorComponent(ObjectInitializer)
+{
+    PrimaryComponentTick.bCanEverTick = true;
+}
+
 void UAnimComponent::BeginPlay()
 {
     Super::BeginPlay();
@@ -10,6 +17,30 @@ void UAnimComponent::BeginPlay()
     ParentEntity->OnEntityInitialized.BindUObject(this, &UAnimComponent::OnInit);
     ParentEntity->OnAttackDelegate.BindUObject(this, &UAnimComponent::OnAttack);
     ParentEntity->OnDeathDelegate.BindUObject(this, &UAnimComponent::OnDeath);
+}
+
+void UAnimComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+    Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+    if(!AnimInst)
+    {
+        return;
+    }
+    float PlayRate = ParentEntity->GetCurrentEntityParams().AttackSpeedRate;
+    if(AttackAnimMontage)
+    {
+        AnimInst->Montage_SetPlayRate(AttackAnimMontage, PlayRate);
+    }
+    FProperty* PlayRateProperty = AnimInst->GetClass()->FindPropertyByName(PlayRateName);
+    if(PlayRateProperty)
+    {
+        FFloatProperty* PlayRateFloatProperty = CastField<FFloatProperty>(PlayRateProperty);
+        if(PlayRateFloatProperty)
+        {
+            PlayRateFloatProperty->SetPropertyValue_InContainer(AnimInst, PlayRate);
+        }
+    }
+
 }
 
 void UAnimComponent::OnInit()
@@ -34,7 +65,7 @@ void UAnimComponent::OnInit()
 void UAnimComponent::OnAttack(int32 AttackIdx)
 {
     UAnimSequenceBase* TargetAttackAnims =  ParentEntity->GetAnimations().AttackAnims[AttackIdx].LoadSynchronous();
-    AnimInst->PlaySlotAnimationAsDynamicMontage(TargetAttackAnims, AttackAnimSlotName);
+    AttackAnimMontage = AnimInst->PlaySlotAnimationAsDynamicMontage(TargetAttackAnims, AttackAnimSlotName);
 }
 
 void UAnimComponent::OnDeath()

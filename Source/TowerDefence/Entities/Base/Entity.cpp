@@ -71,6 +71,7 @@ void AEntity::Tick(float DeltaSeconds)
         BaseEntityParams.DeployTime -=DeltaSeconds;
         return;
     }
+    DeltaSeconds = DeltaSeconds*CurrentEntityParams.AttackSpeedRate;
     // 这里将玩家当前的Hp限定为0~最大值
     CurrentEntityParams.CurrentHP = FMath::Clamp(CurrentEntityParams.CurrentHP, 0, CurrentEntityParams.MaxHP);
     // 攻击

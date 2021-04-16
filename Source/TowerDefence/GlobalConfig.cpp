@@ -12,7 +12,10 @@ const FBuff* UGlobalConfig::FindBuffByID(int32 ID)
     UDataTable* Datas = BuffDataTable.LoadSynchronous();
     check(Datas);
     FBuff* TargetBuff = Datas->FindRow<FBuff>(FName(*FString::FromInt(ID)), GET_MEMBER_NAME_STRING_CHECKED(FBuff, BuffID));
-    LoadedBuffs.Add(ID, TargetBuff);
+    if(TargetBuff!=nullptr)
+    {
+        LoadedBuffs.Add(ID, TargetBuff);
+    }
     return TargetBuff;
 }
 

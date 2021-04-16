@@ -46,8 +46,19 @@ void AFilghtHitBullet::File(AEntity* ParentEntity, AEntity* TargetAttackEntity, 
     Buff = GlobalConf->FindBuffByID(CurrentAttack.BuffID);
     BulletFlightSplinePathComp->ClearSplinePoints();
     USkeletalMeshSocket* TargetSocket = ParentEntity->GetMesh()->SkeletalMesh->FindSocket("SpawnBullet");
-    BulletFlightSplinePathComp->AddSplinePoint(TargetSocket->GetSocketLocation(ParentEntity->GetMesh()), ESplineCoordinateSpace::World);
-    FVector MiddlePoint = (TargetSocket->GetSocketLocation(ParentEntity->GetMesh()) +TargetAttackEntity->GetActorLocation())/2 +FVector(0,0,100);
+    FVector MiddlePoint;
+    if(TargetSocket)
+    {
+        BulletFlightSplinePathComp->AddSplinePoint(TargetSocket->GetSocketLocation(ParentEntity->GetMesh()), ESplineCoordinateSpace::World);
+        float XYLength = FVector::Distance(TargetSocket->GetSocketLocation(ParentEntity->GetMesh()), TargetAttackEntity->GetActorLocation());
+        MiddlePoint = (TargetSocket->GetSocketLocation(ParentEntity->GetMesh()) +TargetAttackEntity->GetActorLocation())/2 +FVector(0,0,XYLength/4);
+    }
+    else
+    {
+        BulletFlightSplinePathComp->AddSplinePoint(ParentEntity->GetActorLocation(), ESplineCoordinateSpace::World);
+        float XYLength = FVector::Distance(ParentEntity->GetActorLocation(), TargetAttackEntity->GetActorLocation());        
+        MiddlePoint = (ParentEntity->GetActorLocation() +TargetAttackEntity->GetActorLocation())/2 +FVector(0,0,XYLength/4);
+    }
     MyTargetAttackEntity = TargetAttackEntity;
     BulletFlightSplinePathComp->AddSplinePoint(MiddlePoint,ESplineCoordinateSpace::World);
     BulletFlightSplinePathComp->AddSplinePoint(TargetAttackEntity->GetActorLocation(), ESplineCoordinateSpace::World, true);

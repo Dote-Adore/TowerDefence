@@ -54,5 +54,5 @@ void UEnemyMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType
 	}
 	FVector Direction = TargetMoveToLocation - ParentEnemy->GetActorLocation();
 	Direction = Direction.GetSafeNormal2D();
-	ParentEnemy->AddMovementInput(Direction, 1);
+	ParentEnemy->AddMovementInput(Direction, ParentEnemy->GetCurrentEntityParams().AttackSpeedRate);
 }
