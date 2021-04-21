@@ -3,6 +3,7 @@
 
 class ULevelInfomation;
 class SMapCreatorPanel;
+class SLevelList;
 class SLevelCreatorPanel:public SCompoundWidget
 {
 public:
@@ -16,6 +17,15 @@ private:
 	TSharedPtr<SMapCreatorPanel> MapCreatorPanel;
 	TSharedPtr<SHorizontalBox> MainHorizontalBox;
 	TSharedPtr<SWidget> InfoParamContainterWidget;
-
+	TSharedPtr<SLevelList> LevelListWidget;
+	
+	// 新建一个LevelInfo的数据
+	FString NewLevelName;
+	int32 NewWidth;
+	int32 NewHeight;
+	
 	void OnSelectionChangedFunc(ULevelInfomation* LevelInfomation, ESelectInfo::Type Type);
+	FReply OnCreateNewLevelBtnClicked();
+
+
 };

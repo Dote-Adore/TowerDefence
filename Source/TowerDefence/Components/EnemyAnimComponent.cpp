@@ -1,7 +1,7 @@
 ﻿#include "EnemyAnimComponent.h"
 #include "Animation/BlendSpace1D.h"
 #include "TowerDefence/Entities/Base/Entity.h"
-
+#include "Animation/AnimInstance.h"
 void UEnemyAnimComponent::OnInit()
 {
 	Super::OnInit();

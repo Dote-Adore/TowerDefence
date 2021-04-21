@@ -15,9 +15,12 @@ public:
 	SLATE_END_ARGS()
 
 	void Construct(const SLevelList::FArguments& InArgs);
+	void RefreshList();
+	void SetSelection(ULevelInfomation* TargetLevel);
 private:
 	TArray<class ULevelInfomation*> ObjectArray;
 	FOnSelectionChanged OnSelectionChanged;
+	TSharedPtr<SListView<ULevelInfomation*>> ListView;
 	
 	
 	TSharedRef<class ITableRow> OnGenerateRow(ULevelInfomation* InItem,

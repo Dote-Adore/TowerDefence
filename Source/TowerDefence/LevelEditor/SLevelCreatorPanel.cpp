@@ -1,10 +1,15 @@
 ﻿#include "SLevelCreatorPanel.h"
 
+
+#include "Editor.h"
 #include "SInfoParamsPanel.h"
 #include "SMapCreatorPanel.h"
 #include "SLevelList.h"
-#include "Brushes/SlateColorBrush.h"
-
+#include "AssetRegistry/AssetRegistryModule.h"
+#include "TowerDefence/GlobalConfig.h"
+#include "TowerDefence/Level/LevelInfomation.h"
+#include "Widgets/Input/SEditableTextBox.h"
+#include "Widgets/SWindow.h"
 
 #define LOCTEXT_NAMESPACE "LevelCreatorEditor"
 
@@ -29,12 +34,13 @@ void SLevelCreatorPanel::Construct(const SLevelCreatorPanel::FArguments& InArgs)
        			[
        				SNew(SButton)
 		            .Text(LOCTEXT("Create New Level", "Create New Level"))
+		            .OnClicked(this, &SLevelCreatorPanel::OnCreateNewLevelBtnClicked)
         		]
         		// 所有的level列表在这里显示
         		+SVerticalBox::Slot()
        			.FillHeight(1)
        			[
-       				SNew(SLevelList)
+       				SAssignNew(LevelListWidget, SLevelList)
        				.OnSelectionChanged(this, &SLevelCreatorPanel::OnSelectionChangedFunc)
        			]
        		]
@@ -78,4 +84,138 @@ void SLevelCreatorPanel::OnSelectionChangedFunc(ULevelInfomation* LevelInfomatio
 	];
 	
 }
+
+FReply SLevelCreatorPanel::OnCreateNewLevelBtnClicked()
+{
+	TSharedPtr<SWindow> NewLevelWindow ;
+	SAssignNew(NewLevelWindow, SWindow)
+	.Title(LOCTEXT("CreateNewLevelWindow", "Create New Level"))
+	.ClientSize(FVector2D(300, 120))
+	.Content()
+	[
+		SNew(SVerticalBox)
+		+SVerticalBox::Slot()
+		.AutoHeight()
+		.Padding(10, 5)
+		[
+			SNew(SHorizontalBox)
+			+SHorizontalBox::Slot()
+			.FillWidth(1)
+			[
+				SNew(STextBlock)
+				.Text(LOCTEXT("New Level Name","New Level Name:"))
+			]
+			+SHorizontalBox::Slot()
+			.FillWidth(1)
+			[
+				SNew(SEditableTextBox)
+				.OnTextChanged_Lambda([&](const FText& InText)->void
+				{
+					NewLevelName = InText.ToString();
+				})
+			]
+		]
+		+SVerticalBox::Slot()
+		.Padding(10, 5)
+		.AutoHeight()
+		[
+		    SNew(SHorizontalBox)
+		    +SHorizontalBox::Slot()
+		    .FillWidth(1)
+		    [
+		        SNew(STextBlock)
+		        .Text(LOCTEXT("New Map Width","Map Width:"))
+		    ]
+		    +SHorizontalBox::Slot()
+		    .FillWidth(1)
+		    [
+		        SNew(SEditableTextBox)
+		        .OnTextChanged_Lambda([&](const FText& InText)->void
+		        {
+			        if(InText.IsNumeric())
+			        {
+				        NewWidth = FCString::Atoi(*InText.ToString());
+			        }
+		        })
+		    ]
+		]
+		+SVerticalBox::Slot()
+		.Padding(10, 5)
+		.AutoHeight()
+		[
+		    SNew(SHorizontalBox)
+		    +SHorizontalBox::Slot()
+		    .FillWidth(1)
+		    [
+		        SNew(STextBlock)
+		        .Text(LOCTEXT("New Map Height","Map Height:"))
+		    ]
+		    +SHorizontalBox::Slot()
+		    .FillWidth(1)
+		    [
+		        SNew(SEditableTextBox)
+		        .OnTextChanged_Lambda([&](const FText& InText)->void
+               {
+                   if(InText.IsNumeric())
+                   {
+                       NewHeight = FCString::Atoi(*InText.ToString());
+                   }
+               })
+		    ]
+		]
+		+SVerticalBox::Slot()
+		.Padding(10, 5)
+		.AutoHeight()
+		[
+			SNew(SHorizontalBox)
+			+SHorizontalBox::Slot()
+			.HAlign(HAlign_Left)
+			[
+				SNew(SButton)
+				.ButtonStyle(FEditorStyle::Get(), "FlatButton.Success")
+				.Text(LOCTEXT("Confirm Create Btn", "Create"))
+               .ForegroundColor(FSlateColor::UseForeground())
+               .OnClicked_Lambda([&]()->FReply
+               {
+               		FString PackageName = GetDefault<UGlobalConfig>()->TargetLevelsPath + "/" + NewLevelName;
+               		UPackage* Package = CreatePackage(*PackageName);
+               		ULevelInfomation* NewLevelInfomation =
+               			NewObject<ULevelInfomation>(Package, ULevelInfomation::StaticClass(),
+               				*NewLevelName, RF_Public|RF_Standalone);
+               		NewLevelInfomation->TileInfo.Height = NewHeight;
+               		NewLevelInfomation->TileInfo.Witdh = NewWidth;
+               		FAssetRegistryModule::AssetCreated(NewLevelInfomation);
+               		NewLevelInfomation->MarkPackageDirty();
+               		FString ContentPath = FPaths::ProjectContentDir();
+               		FString TargetFilePath = PackageName.Replace(*FString("/Game/"), *ContentPath, ESearchCase::IgnoreCase);
+               		TargetFilePath = FString::Printf(TEXT("%s%s"), *TargetFilePath, *FPackageName::GetAssetPackageExtension());
+               		bool bSuccess = UPackage::SavePackage(Package, NewLevelInfomation,
+               			RF_Public|RF_Standalone, *TargetFilePath);
+               		NewLevelWindow->RequestDestroyWindow();
+               		LevelListWidget->RefreshList();
+               		LevelListWidget->SetSelection(NewLevelInfomation);
+               		return FReply::Handled();
+               })
+			]
+			+SHorizontalBox::Slot()
+            .HAlign(HAlign_Right)
+            [
+                SNew(SButton)
+                .Text(LOCTEXT("Cancel Create Btn", "Cancel"))
+                .ButtonStyle(FEditorStyle::Get(), "FlatButton.Danger")
+               .ForegroundColor(FSlateColor::UseForeground())
+               .OnClicked_Lambda([&]()->FReply
+               {
+               		NewLevelWindow->RequestDestroyWindow();
+               		return FReply::Handled();
+               })
+            ]
+			
+		]
+	];
+	GEditor->EditorAddModalWindow(NewLevelWindow.ToSharedRef());
+	return FReply::Handled();
+}
+
+
 #undef LOCTEXT_NAMESPACE

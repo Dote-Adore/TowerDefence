@@ -2,11 +2,11 @@
 #include "Bullet.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Materials/MaterialInstanceConstant.h"
 #include "TowerDefence/GlobalConfig.h"
 #include "TowerDefence/Components/BuffComponent.h"
 #include "TowerDefence/Components/AnimComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "Animation/AnimInstance.h"
 
 AEntity::AEntity(const FObjectInitializer& ObjectInitializer)
     :ACharacter(ObjectInitializer)

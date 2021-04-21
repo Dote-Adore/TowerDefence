@@ -10,7 +10,7 @@ public class TowerDefence : ModuleRules
 	
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
 
-		PrivateDependencyModuleNames.AddRange(new string[] { "ToolMenus","Slate","EditorStyle","SlateCore","PropertyEditor","EditorWidgets", "UMG" });
+		PrivateDependencyModuleNames.AddRange(new string[] { "ToolMenus","Slate","EditorStyle","SlateCore","PropertyEditor","EditorWidgets", "UMG", "UnrealEd" });
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });

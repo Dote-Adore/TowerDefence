@@ -1,6 +1,6 @@
 ﻿#pragma once
+#include "GameFramework/PlayerController.h"
 #include "TDPlayerController.generated.h"
-
 
 
 class ABaseTile;

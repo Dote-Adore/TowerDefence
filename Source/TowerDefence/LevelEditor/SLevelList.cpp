@@ -13,7 +13,7 @@ void SLevelList::Construct(const SLevelList::FArguments& InArgs)
 	AllLevels.GenerateValueArray(ObjectArray);
 	ChildSlot
 	[
-		SNew(SListView<ULevelInfomation*>)
+		SAssignNew(ListView, SListView<ULevelInfomation*>)
 		.ListItemsSource(&ObjectArray)
 		.OnGenerateRow(this, &SLevelList::OnGenerateRow)
 		.SelectionMode(ESelectionMode::Single)
@@ -22,8 +22,21 @@ void SLevelList::Construct(const SLevelList::FArguments& InArgs)
 	];
 }
 
+void SLevelList::RefreshList()
+{
+	const UGlobalConfig* Config = GetDefault<UGlobalConfig>();
+	auto AllLevels = Config->GetAllLevels();
+	AllLevels.GenerateValueArray(ObjectArray);
+	ListView->RequestListRefresh();	
+}
+
+void SLevelList::SetSelection(ULevelInfomation* TargetLevel)
+{
+	ListView->SetSelection(TargetLevel);
+}
+
 TSharedRef<ITableRow> SLevelList::OnGenerateRow(ULevelInfomation* InItem,
-	const TSharedRef<STableViewBase>& TableViewBase)
+                                                const TSharedRef<STableViewBase>& TableViewBase)
 {
 	return SNew(STableRow<ULevelInfomation*>,TableViewBase)
 	[

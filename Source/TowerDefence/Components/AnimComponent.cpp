@@ -1,6 +1,6 @@
 ﻿#include "AnimComponent.h"
 #include "Animation/BlendSpace1D.h"
-#include "AITypes.h"
+#include "Animation/AnimInstance.h"
 #include "TowerDefence/Entities/Base/Entity.h"
 
 UAnimComponent::UAnimComponent(const FObjectInitializer& ObjectInitializer)

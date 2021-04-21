@@ -4,6 +4,8 @@
 #include "Components/BoxComponent.h"
 #include "Components/BillboardComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "UObject/ConstructorHelpers.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 const float ABaseTile::BoxSize = 50.f;
 ABaseTile::ABaseTile(const FObjectInitializer& ObjectInitializer)
