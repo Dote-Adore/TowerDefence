@@ -37,18 +37,17 @@ void AEntity::InitEntity(const FEntityParams& Params, const FEntityAnimation& An
     SetActorTransform(TargetTransform);
     // 初始化攻击时视觉特效
     Animations = Anims;
-    BaseEntityParams = Params;
 
+    CurrentEntityParams = Params;
     // 当前生命值点满
-    BaseEntityParams.CurrentHP = BaseEntityParams.MaxHP;
+    CurrentEntityParams.CurrentHP = CurrentEntityParams.MaxHP;
     
-    CurrentEntityParams = BaseEntityParams;
     for(auto Buff:BasePermanentBuffs)
     {
         BuffComponent->AddBuff(Buff);
     }
     // OnDeploy();
-    if(BaseEntityParams.Attacks.Num()>=0)
+    if(CurrentEntityParams.Attacks.Num()>=0)
     {
         CurrentHitIdx = 0;
         LeftHitTime = 0;
@@ -66,9 +65,9 @@ void AEntity::InitEntity(const FEntityParams& Params, const FEntityAnimation& An
 void AEntity::Tick(float DeltaSeconds)
 {
     // 首先看是否是在部署
-    if(BaseEntityParams.DeployTime>=0)
+    if(CurrentEntityParams.DeployTime>=0)
     {
-        BaseEntityParams.DeployTime -=DeltaSeconds;
+        CurrentEntityParams.DeployTime -=DeltaSeconds;
         return;
     }
     DeltaSeconds = DeltaSeconds*CurrentEntityParams.AttackSpeedRate;
@@ -118,7 +117,7 @@ void AEntity::CalculateAttackEntities()
 {
     TArray<AActor*> FoundActors;
 
-    switch (BaseEntityParams.EntityType)
+    switch (CurrentEntityParams.EntityType)
     {
         // 范围攻击，查找攻击范围所有的目标
         case EEntityType::RangeAttack:
@@ -127,7 +126,7 @@ void AEntity::CalculateAttackEntities()
             for(AActor* Actor: FoundActors)
             {
                 float Dist = FMath::Sqrt(FVector::DistSquaredXY(Actor->GetActorLocation(), GetActorLocation()));
-                if(Dist <= BaseEntityParams.AttackRadius && BaseEntityParams.CurrentHP>0)
+                if(Dist <= CurrentEntityParams.AttackRadius && CurrentEntityParams.CurrentHP>0)
                 {
                     CurrentAttackedEntities.Add(Cast<AEntity>(Actor));
                 }
@@ -142,7 +141,7 @@ void AEntity::CalculateAttackEntities()
             if(Actor == this)
                 continue;
             float Dist = FMath::Sqrt(FVector::DistSquaredXY(Actor->GetActorLocation(), GetActorLocation()));
-            if(Dist <= BaseEntityParams.AttackRadius && BaseEntityParams.CurrentHP > 0)
+            if(Dist <= CurrentEntityParams.AttackRadius && CurrentEntityParams.CurrentHP > 0)
             {
                 CurrentAttackedEntities.Add(Cast<AEntity>(Actor));
             }
@@ -154,7 +153,7 @@ void AEntity::CalculateAttackEntities()
             {
                 float Distance = FMath::Sqrt(FVector::DistSquaredXY(CurrentAttackedEntities[0]->GetActorLocation(), GetActorLocation()));
                 // 如果距离小于可攻击范围并且还未死亡的话就可以不用管
-                if(Distance<= BaseEntityParams.AttackRadius && !CurrentAttackedEntities[0]->IsDeath())
+                if(Distance<= CurrentEntityParams.AttackRadius && !CurrentAttackedEntities[0]->IsDeath())
                 {
                     break;
                 }
@@ -196,17 +195,17 @@ void AEntity::CalculateAttackEntities()
 void AEntity::CalculateAttack(float DeltaSeconds)
 {
     const FEntityHitAttack* CurrentAttack;
-    if(BaseEntityParams.Attacks.Num()<=0)
+    if(CurrentEntityParams.Attacks.Num()<=0)
     {
-        CurrentHitIdx = BaseEntityParams.Attacks.Num() - 1;
+        CurrentHitIdx = CurrentEntityParams.Attacks.Num() - 1;
         LeftHitTime = 0;
         return;
     }
     // 切换招式
     if(LeftHitTime <= 0)
     {
-        CurrentHitIdx = (CurrentHitIdx+1)%BaseEntityParams.Attacks.Num();
-        CurrentAttack = &BaseEntityParams.Attacks[CurrentHitIdx];
+        CurrentHitIdx = (CurrentHitIdx+1)%CurrentEntityParams.Attacks.Num();
+        CurrentAttack = &CurrentEntityParams.Attacks[CurrentHitIdx];
         LeftHitTime = CurrentAttack->Stiff;
         OnAttack();
     }
@@ -244,7 +243,7 @@ void AEntity::OnAttack()
     // 计算可以攻击的目标对象组
     CalculateAttackEntities();
     // UE_LOG(LogTemp, Display, TEXT("%s: Find Attack Nums: %d"), *GetName(), CurrentAttackedEntities.Num());
-    const FEntityHitAttack& CurrentAttack = BaseEntityParams.Attacks[CurrentHitIdx];
+    const FEntityHitAttack& CurrentAttack = CurrentEntityParams.Attacks[CurrentHitIdx];
     const UGlobalConfig* Config = GetDefault<UGlobalConfig>();
     // 当前没有可攻击对象，则idle
     if(CurrentAttackedEntities.Num() == 0)

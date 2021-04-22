@@ -167,7 +167,6 @@ protected:
     virtual TSubclassOf<AEntity> GetAttackTargetClass();
     
 private:
-    FEntityParams BaseEntityParams;
     UPROPERTY(Transient)
     FEntityParams CurrentEntityParams;
     
