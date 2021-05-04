@@ -42,6 +42,10 @@ public:
     // 整个游戏所有的关卡存放的位置
     UPROPERTY(Config, EditAnywhere, Category=LevelEditor)
     FString TargetLevelsPath;
+
+    // 角色升级策略配置表
+    UPROPERTY(Config, EditAnywhere, Category=Character)
+    TSoftObjectPtr<UDataTable> CharacterRankConfigTable;
     
     const FBuff* FindBuffByID(int32 ID);
     const AllLevelsMap GetAllLevels() const;

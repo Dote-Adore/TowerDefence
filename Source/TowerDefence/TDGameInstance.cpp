@@ -3,6 +3,12 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "Level/LevelInfomation.h"
+#include "Systems/ArchiveSystem.h"
+
+UTDGameInstance::UTDGameInstance(const FObjectInitializer& ObjectInitializer)
+	:UGameInstance(ObjectInitializer)
+{
+}
 
 void UTDGameInstance::OpenLevel(const ULevelInfomation* InLevelInfo)
 {

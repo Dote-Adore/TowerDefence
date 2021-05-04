@@ -9,9 +9,10 @@ class TOWERDEFENCE_API UTDGameInstance:public UGameInstance
 {
 	GENERATED_BODY()
 public:
-
+	UTDGameInstance(const FObjectInitializer& ObjectInitializer);
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	const ULevelInfomation* CurrentLevelInfomation;
 	UFUNCTION(BlueprintCallable)
 	void OpenLevel(const ULevelInfomation* InLevelInfo);
+private:
 };
