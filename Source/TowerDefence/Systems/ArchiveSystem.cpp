@@ -46,7 +46,7 @@ ULevelArchive* UArchiveSystem::GetLevelArchive()
 void UArchiveSystem::Deinitialize()
 {
 	Super::Deinitialize();
-	SaveArchive();
+	// SaveArchive();
 
 }
 
