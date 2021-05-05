@@ -24,14 +24,14 @@ class UUserArchive: public USaveGame
 	GENERATED_BODY()
 public:
 	// 当前体力
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	int32 PhysicalStrength;
 	const int32 MaxPhysicalStrength = 120;
 	// 游戏内金币数量
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	int32 GameCoinNum;
 	// 付费充值的金币数量
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	int32 PaidCoinNum;
 	// 最大体力
 
@@ -41,6 +41,6 @@ public:
 
 	
 	// 该用户拥有的所有角色信息
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	TMap<int32, FCharacterSavedInfo> OwnedCharacters;	
 };

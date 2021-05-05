@@ -27,7 +27,7 @@ public:
 private:
 	// 读档
 	template<class SavedClass>
-	void LoadArchive(SavedClass** outVal, const FString& SlotName);
+	void LoadArchive(SavedClass*& outVal, const FString& SlotName);
 
 
 private:

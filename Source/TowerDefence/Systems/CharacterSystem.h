@@ -10,6 +10,23 @@ DECLARE_LOG_CATEGORY_EXTERN(CharacterSystem, Log, All);
 class UArchiveSystem;
 // struct FTurrentAdditionalInfo;
 // struct FEntityParams;
+
+
+// 传给UI界面需要用的object类，
+UCLASS(BlueprintType)
+class UCharacterEntryItem:public UObject
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(BlueprintReadOnly)
+	FCharacterSavedInfo SavedInfo;
+	UPROPERTY(BlueprintReadOnly)
+	FTurrentAdditionalInfo AdditionalInfo;
+	UPROPERTY(BlueprintReadOnly)
+	FEntityParams EntityParams;
+	UPROPERTY(BlueprintReadWrite)
+	UUserWidget* BindWidget;
+};
 UCLASS()
 class TOWERDEFENCE_API UCharacterSystem:public UGameInstanceSubsystem
 {
@@ -21,7 +38,7 @@ public:
 	FCharacterSavedInfo UpgradeCharacter(int32 ID, int32 UpgradePoints);
 	// 得到用户拥有的所有角色的信息
 	UFUNCTION(BlueprintCallable)
-	TArray<FCharacterSavedInfo> GetAllOwnedCharacters();
+	TArray<UCharacterEntryItem*> GetAllOwnedCharacters();
 	UFUNCTION(BlueprintGetter)
 	const FTurrentAdditionalInfo GetCharacterAdditionalInfo(int32 ID);
 	UFUNCTION(BlueprintGetter)

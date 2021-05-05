@@ -37,28 +37,28 @@ struct FCharacterSavedInfo
 {
 	GENERATED_BODY()
 	// 目标炮塔的id
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	int32 TargetTurretId;
 	// 当前等级
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	int32 CurrentLevel;
 	// 需要升级到下一级所需要全部的点数
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	int32 TotalUpgradeNextNeededPoints;
 	// 剩余的升级点数
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	int32 LeftUpgradePoints;
 	// 当前的生命上限
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	int32 MaxHP;
 	// 当前的防御值
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	int32 Defence;
 	// 攻击值
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	int32 Attack;
 	// 当前拿的武器guid
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	FGuid AttachedWeaponID;
 	// 圣遗物再说吧
 };

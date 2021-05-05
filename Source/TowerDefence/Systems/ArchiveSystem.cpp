@@ -7,8 +7,8 @@
 void UArchiveSystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
-	LoadArchive(&SavedUserArchive, TEXT("UserArchive"));
-	LoadArchive(&SavedLevelArchive, TEXT("LevelArchive"));
+	LoadArchive<UUserArchive>(SavedUserArchive, TEXT("UserArchive"));
+	LoadArchive<ULevelArchive>(SavedLevelArchive, TEXT("LevelArchive"));
 }
 
 void UArchiveSystem::SaveArchive()
@@ -51,19 +51,19 @@ void UArchiveSystem::Deinitialize()
 }
 
 template <class SavedClass>
-void UArchiveSystem::LoadArchive(SavedClass** outVal, const FString& SlotName)
+void UArchiveSystem::LoadArchive(SavedClass*& outVal, const FString& SlotName)
 {
 	bool bRet = UGameplayStatics::DoesSaveGameExist(SlotName, 0);
 	
 	if(bRet)
 	{
 		UE_LOG(LogTemp, Display, TEXT("Load Archive '%s', success!"), *SlotName);
-		*outVal = Cast<SavedClass>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
+		outVal = Cast<SavedClass>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
 	}
 	else
 	{
 		UE_LOG(LogTemp, Display, TEXT("Load Archive '%s', failed!"), *SlotName);
 
-		*outVal = Cast<SavedClass>(UGameplayStatics::CreateSaveGameObject(SavedClass::StaticClass()));
+		outVal = Cast<SavedClass>(UGameplayStatics::CreateSaveGameObject(SavedClass::StaticClass()));
 	}
 }

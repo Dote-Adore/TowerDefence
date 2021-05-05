@@ -74,14 +74,18 @@ FCharacterSavedInfo UCharacterSystem::UpgradeCharacter(int32 ID, int32 UpgradePo
 	return *TargetChangedCharacter;
 }
 
-TArray<FCharacterSavedInfo> UCharacterSystem::GetAllOwnedCharacters()
+TArray<UCharacterEntryItem*> UCharacterSystem::GetAllOwnedCharacters()
 {
-	TArray<FCharacterSavedInfo> ReturnVal;
+	TArray<UCharacterEntryItem*> Reval;
 	for(auto InCharacter: ArchiveSystem->GetUserArchive()->OwnedCharacters)
 	{
-		ReturnVal.Add(InCharacter.Value);
+		UCharacterEntryItem* EntryItem = NewObject<UCharacterEntryItem>(this);
+		EntryItem->SavedInfo = InCharacter.Value;
+		EntryItem->AdditionalInfo = GetCharacterAdditionalInfo(InCharacter.Key);
+		EntryItem->EntityParams = GetEntityParam(InCharacter.Key);
+		Reval.Add(EntryItem);	
 	}
-	return ReturnVal;
+	return Reval;
 }
 
 const FTurrentAdditionalInfo UCharacterSystem::GetCharacterAdditionalInfo(int32 ID)
@@ -102,10 +106,13 @@ const FEntityParams UCharacterSystem::GetEntityParam(int32 ID)
 void UCharacterSystem::AddNewCharacter(int32 ID)
 {
 	const FEntityParams& TargetEntityParam = GetEntityParam(ID);
+	const auto TargetRankConfig = RankConfigs.Find(ID);
 	FCharacterSavedInfo NewCharacter;
 	NewCharacter.TargetTurretId = ID;
 	NewCharacter.CurrentLevel = 1;
 	NewCharacter.MaxHP = TargetEntityParam.MaxHP;
+	NewCharacter.TotalUpgradeNextNeededPoints = (*TargetRankConfig)->InitialUpgradePoints;
+	NewCharacter.LeftUpgradePoints = 0;
 	NewCharacter.Attack = TargetEntityParam.Attack;
 	NewCharacter.Defence = TargetEntityParam.Defence;
 
