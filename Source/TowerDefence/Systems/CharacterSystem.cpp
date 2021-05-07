@@ -15,14 +15,20 @@ void UCharacterSystem::Initialize(FSubsystemCollectionBase& Collection)
 	AllEntityParamArray = UTDFunctionLibrary::GetAllTurrentParams();
 }
 
-FCharacterSavedInfo UCharacterSystem::UpgradeCharacter(int32 ID, int32 UpgradePoints)
+FCharacterSavedInfo UCharacterSystem::UpgradeCharacter(int32 ID, int32 UpgradePoints, bool JustTest /*= true */)
 {
-	UUserArchive* UserArchive = ArchiveSystem->GetUserArchive();
+	UUserArchive* UserArchive;
+	UserArchive = ArchiveSystem->GetUserArchive();
 	FCharacterSavedInfo* TargetChangedCharacter = UserArchive->OwnedCharacters.Find(ID);
 	if(TargetChangedCharacter == nullptr)
 	{
 		UE_LOG(CharacterSystem, Error, TEXT("Target character id '%d' does not exist by user! upgrade failed!"), ID);
 		return FCharacterSavedInfo();
+	}
+	// 如果单纯的只是测试，则是使用临时的数据，而不更改元数据
+	if(JustTest)
+	{
+		TargetChangedCharacter = new FCharacterSavedInfo(*TargetChangedCharacter);
 	}
 	// 获取到升级策略配置信息
 	FCharacterRankConfig** CurrentRankConfigPtr = RankConfigs.Find(ID);
@@ -45,7 +51,7 @@ FCharacterSavedInfo UCharacterSystem::UpgradeCharacter(int32 ID, int32 UpgradePo
 	}
 	
 	// 开始进行升级计算
-	while(UpgradePoints <= 0)
+	while(UpgradePoints > 0)
 	{
 		UpgradePoints -=
 			(TargetChangedCharacter->TotalUpgradeNextNeededPoints - TargetChangedCharacter->LeftUpgradePoints);
@@ -70,7 +76,10 @@ FCharacterSavedInfo UCharacterSystem::UpgradeCharacter(int32 ID, int32 UpgradePo
 		}
 	}
 	// 存下档
-	ArchiveSystem->SaveArchive();
+	if(JustTest == false)
+	{
+		ArchiveSystem->SaveArchive();
+	}
 	return *TargetChangedCharacter;
 }
 

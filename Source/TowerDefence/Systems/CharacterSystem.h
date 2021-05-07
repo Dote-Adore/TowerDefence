@@ -33,9 +33,9 @@ class TOWERDEFENCE_API UCharacterSystem:public UGameInstanceSubsystem
 	GENERATED_BODY()
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
-	// 升级角色，输入目标角色ID和升级点数，根据这个升级角色的信息
+	// 升级角色，输入目标角色ID和升级点数，根据这个升级角色的信息, 最后参数表示仅仅是测试升级后的结果，而不实际上去升级
 	UFUNCTION(BlueprintCallable)
-	FCharacterSavedInfo UpgradeCharacter(int32 ID, int32 UpgradePoints);
+	FCharacterSavedInfo UpgradeCharacter(int32 ID, int32 UpgradePoints, bool JustTest = true);
 	// 得到用户拥有的所有角色的信息
 	UFUNCTION(BlueprintCallable)
 	TArray<UCharacterEntryItem*> GetAllOwnedCharacters();
