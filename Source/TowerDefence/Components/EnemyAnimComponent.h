@@ -1,4 +1,5 @@
-﻿#include "AnimComponent.h"
+﻿#pragma once
+#include "AnimComponent.h"
 
 #include "EnemyAnimComponent.generated.h"
 

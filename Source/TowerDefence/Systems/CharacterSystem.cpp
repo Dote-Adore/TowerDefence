@@ -8,6 +8,11 @@
 DEFINE_LOG_CATEGORY(CharacterSystem)
 
 
+int32 UCharacterEntryItem::GetEntityID()
+{
+	return EntityParams.EntityID;
+}
+
 void UCharacterSystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	ArchiveSystem = GetGameInstance()->GetSubsystem<UArchiveSystem>();

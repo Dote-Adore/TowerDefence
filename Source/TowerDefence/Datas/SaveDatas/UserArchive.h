@@ -33,14 +33,7 @@ public:
 	// 付费充值的金币数量
 	UPROPERTY(BlueprintReadOnly)
 	int32 PaidCoinNum;
-	// 最大体力
-
-	// 该用户拥有的背包内容；
-	// UPROPERTY()
-	// FUserPackage Package;
-
-	
 	// 该用户拥有的所有角色信息
 	UPROPERTY(BlueprintReadOnly)
-	TMap<int32, FCharacterSavedInfo> OwnedCharacters;	
+	TMap<int32, FCharacterSavedInfo> OwnedCharacters;
 };

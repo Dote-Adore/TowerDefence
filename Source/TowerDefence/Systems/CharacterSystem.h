@@ -18,7 +18,7 @@ class UCharacterEntryItem:public UObject
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	FCharacterSavedInfo SavedInfo;
 	UPROPERTY(BlueprintReadOnly)
 	FTurrentAdditionalInfo AdditionalInfo;
@@ -26,6 +26,8 @@ public:
 	FEntityParams EntityParams;
 	UPROPERTY(BlueprintReadWrite)
 	UUserWidget* BindWidget;
+	UFUNCTION(BlueprintPure)
+	int32 GetEntityID();
 };
 UCLASS()
 class TOWERDEFENCE_API UCharacterSystem:public UGameInstanceSubsystem

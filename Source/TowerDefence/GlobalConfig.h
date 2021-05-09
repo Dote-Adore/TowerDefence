@@ -44,9 +44,18 @@ public:
     FString TargetLevelsPath;
 
     // 角色升级策略配置表
-    UPROPERTY(Config, EditAnywhere, Category=Character)
+    UPROPERTY(Config, EditAnywhere, Category=CharacterSystem)
     TSoftObjectPtr<UDataTable> CharacterRankConfigTable;
-    
+
+    // 角色升级Item
+    UPROPERTY(Config, EditAnywhere, Category=PackageSystem)
+    TSoftObjectPtr<UDataTable> DevelopmentItems;
+    // 武器Item
+    UPROPERTY(Config, EditAnywhere, Category=PackageSystem)
+    TSoftObjectPtr<UDataTable> WeaponItems;
+    // 食物 Item
+    UPROPERTY(Config, EditAnywhere, Category=PackageSystem)
+    TSoftObjectPtr<UDataTable> FoodItems;
     const FBuff* FindBuffByID(int32 ID);
     const AllLevelsMap GetAllLevels() const;
 private:
