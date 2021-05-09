@@ -36,4 +36,5 @@ public:
 	// 升级素材，物品id和拥有数量
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	TMap<int32, int32> Developments;
+	
 };

@@ -4,6 +4,7 @@
 
 class UUserArchive;
 class ULevelArchive;
+class UPackageArchive;
 // 参数：是否保存成功
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnSaveArchiveDoneDelegate, bool, bSuccess);
 UCLASS()
@@ -22,6 +23,8 @@ public:
 	UUserArchive* GetUserArchive();
 	UFUNCTION(BlueprintCallable)
 	ULevelArchive* GetLevelArchive();
+	UFUNCTION(BlueprintCallable)
+	UPackageArchive* GetPackageArchive();
 	virtual void Deinitialize() override;
 
 private:
@@ -30,7 +33,8 @@ private:
 	void LoadArchive(SavedClass*& outVal, const FString& SlotName);
 
 
-private:
 	UUserArchive* SavedUserArchive;
 	ULevelArchive* SavedLevelArchive;
+	UPackageArchive* SavedPackageArchive;
+	TArray<FString> ArchiveNames;
 };

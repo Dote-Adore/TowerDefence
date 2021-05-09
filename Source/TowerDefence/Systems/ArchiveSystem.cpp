@@ -3,12 +3,15 @@
 #include "TowerDefence/Datas/SaveDatas/UserArchive.h"
 #include "Async/Async.h"
 #include "Kismet/GameplayStatics.h"
+#include "TowerDefence/Datas/SaveDatas/PackageArchive.h"
 
 void UArchiveSystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
+	// 在这里添加存档
 	LoadArchive<UUserArchive>(SavedUserArchive, TEXT("UserArchive"));
 	LoadArchive<ULevelArchive>(SavedLevelArchive, TEXT("LevelArchive"));
+	LoadArchive<UPackageArchive>(SavedPackageArchive, TEXT("PackageArchive"));
 }
 
 void UArchiveSystem::SaveArchive()
@@ -21,8 +24,10 @@ void UArchiveSystem::SaveArchive(FOnSaveArchiveDoneDelegate SavedDelegate)
 	AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [this,SavedDelegate]()
 	{
 		bool bRet = true;
-		bRet = bRet & UGameplayStatics::SaveGameToSlot(SavedUserArchive, TEXT("UserArchive"),0);
-		bRet = bRet & UGameplayStatics::SaveGameToSlot(SavedLevelArchive, TEXT("LevelArchive"), 0);
+		for(auto ArchiveName: ArchiveNames)
+		{
+			bRet = bRet & UGameplayStatics::SaveGameToSlot(SavedUserArchive, ArchiveName,0);
+		}
 		if(SavedDelegate.IsBound())
 		{
 			AsyncTask(ENamedThreads::GameThread, [SavedDelegate,bRet]()
@@ -43,11 +48,14 @@ ULevelArchive* UArchiveSystem::GetLevelArchive()
 	return SavedLevelArchive;
 }
 
+UPackageArchive* UArchiveSystem::GetPackageArchive()
+{
+	return SavedPackageArchive;
+}
+
 void UArchiveSystem::Deinitialize()
 {
 	Super::Deinitialize();
-	// SaveArchive();
-
 }
 
 template <class SavedClass>
@@ -58,6 +66,7 @@ void UArchiveSystem::LoadArchive(SavedClass*& outVal, const FString& SlotName)
 	if(bRet)
 	{
 		UE_LOG(LogTemp, Display, TEXT("Load Archive '%s', success!"), *SlotName);
+		ArchiveNames.Add(SlotName);
 		outVal = Cast<SavedClass>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
 	}
 	else
