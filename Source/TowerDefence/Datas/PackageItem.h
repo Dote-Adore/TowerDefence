@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Engine/DataTable.h"
 #include "PackageItem.generated.h"
 
 // Item获取途径

@@ -1,5 +1,6 @@
 ﻿
 #pragma once
+#include "Engine/DataTable.h"
 #include "CharacterDatas.generated.h"
 
 // 配置每个角色的升级策略，每次升级

@@ -8,6 +8,11 @@
 			"Name": "TowerDefence",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "TDLevelEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
 		}
 	]
 }
