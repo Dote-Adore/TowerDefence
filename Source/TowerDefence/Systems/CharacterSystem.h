@@ -2,6 +2,7 @@
 #include "TowerDefence/Datas/CharacterDatas.h"
 #include "TowerDefence/Entities/Base/Entity.h"
 #include "TowerDefence/Datas/TurrentAdditional.h"
+#include "Blueprint/UserWidget.h"
 #include "CharacterSystem.generated.h"
 
 // 所有的关于角色相关的信息
