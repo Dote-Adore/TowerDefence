@@ -16,7 +16,7 @@ enum class ETileType
 	Deployable
 };
 UCLASS(BlueprintType)
-class ABaseTile:public  AActor
+class TOWERDEFENCE_API ABaseTile:public  AActor
 {
 	GENERATED_BODY()
 public:

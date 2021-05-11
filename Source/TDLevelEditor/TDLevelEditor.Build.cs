@@ -1,7 +1,6 @@
 ﻿// Copyright Epic Games, Inc. All Rights Reserved.
 
-namespace UnrealBuildTool.Rules
-{
+using UnrealBuildTool;
 	public class TDLevelEditor : ModuleRules
 	{
 		public TDLevelEditor(ReadOnlyTargetRules Target) : base(Target)
@@ -10,7 +9,6 @@ namespace UnrealBuildTool.Rules
 		
 			PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
 
-			PrivateDependencyModuleNames.AddRange(new string[] { "ToolMenus","EditorStyle","PropertyEditor","EditorWidgets", "UnrealEd","TowerDefence","Settings" });
+			PrivateDependencyModuleNames.AddRange(new string[] { "ToolMenus","EditorStyle","PropertyEditor","EditorWidgets", "UnrealEd","TowerDefence","Settings","Slate","SlateCore" });
 		}
 	}
-}

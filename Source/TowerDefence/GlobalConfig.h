@@ -7,7 +7,7 @@ class AEnemy;
 class UDataTable;
 struct FBuff;
 UCLASS(Config=Game)
-class UGlobalConfig:public UObject
+class TOWERDEFENCE_API UGlobalConfig:public UObject
 {
     typedef TMap<FName, class ULevelInfomation*> AllLevelsMap;
     GENERATED_BODY()

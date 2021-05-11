@@ -33,7 +33,7 @@ struct FEnemyGenerationInfo
 
 // 每一个关卡的Level信息，包括地图数据，每一波的怪物配置，使用的怪物ID等等
 UCLASS(BlueprintType)
-class ULevelInfomation:public UDataAsset
+class TOWERDEFENCE_API ULevelInfomation:public UDataAsset
 {
 	GENERATED_BODY()
 public:

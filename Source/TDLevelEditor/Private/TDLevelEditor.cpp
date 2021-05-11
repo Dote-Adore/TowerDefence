@@ -1,5 +1,7 @@
-﻿#include "LevelEditorModule.h"
+﻿#include "TDLevelEditor.h"
 // Copyright Epic Games, Inc. All Rights Reserved.
+#include "TDLevelEditor/Public/TDLevelEditor.h"
+
 #include "ISettingsModule.h"
 #include "ToolMenus.h"
 #include "Interfaces/IPluginManager.h"
@@ -67,6 +69,6 @@ TSharedRef<SDockTab> FTDLevelEditorModule::OnSpawnLevelCreatorTab(const FSpawnTa
     ];
     
 }
-
+IMPLEMENT_MODULE(FTDLevelEditorModule, TDLevelEditor);
 
 #undef LOCTEXT_NAMESPACE

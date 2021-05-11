@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "CoreMinimal.h"
 #include "Modules/ModuleInterface.h"
+#include "Framework/Docking/TabManager.h"
 
 class FTDLevelEditorModule:public IModuleInterface
 {
@@ -10,7 +11,7 @@ public:
 protected:
 	void RegisterMenus();
 	void OnLevelCreatorButtonClicked();
-	TSharedRef<class SDockTab> OnSpawnLevelCreatorTab(const struct FSpawnTabArgs& SpawnTabArgs);
+	TSharedRef<class SDockTab> OnSpawnLevelCreatorTab(const FSpawnTabArgs& SpawnTabArgs);
 private:
 	TSharedPtr<class FUICommandList> PluginCommands;
 	static FName LevelCreatorTab;

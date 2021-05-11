@@ -12,7 +12,7 @@
 		{
 			"Name": "TDLevelEditor",
 			"Type": "Editor",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "PostDefault"
 		}
 	]
 }
