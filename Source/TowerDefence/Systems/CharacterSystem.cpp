@@ -36,13 +36,13 @@ FCharacterSavedInfo UCharacterSystem::UpgradeCharacter(int32 ID, int32 UpgradePo
 		TargetChangedCharacter = new FCharacterSavedInfo(*TargetChangedCharacter);
 	}
 	// 获取到升级策略配置信息
-	FCharacterRankConfig** CurrentRankConfigPtr = RankConfigs.Find(ID);
+	FCharacterRankConfig* CurrentRankConfigPtr = RankConfigs.Find(ID);
 	if(CurrentRankConfigPtr == nullptr)
 	{
 		UE_LOG(CharacterSystem, Error, TEXT("Can not Get target Character '%d' Rank Config!"), ID);
 		return *TargetChangedCharacter;
 	}
-	FCharacterRankConfig* CurrentRankConfig = *CurrentRankConfigPtr;
+	FCharacterRankConfig* CurrentRankConfig = CurrentRankConfigPtr;
 	// 如果已经是最顶了，则不进行升级
 	if(TargetChangedCharacter->CurrentLevel == CurrentRankConfig->MaxLevel)
 	{
@@ -125,7 +125,7 @@ void UCharacterSystem::AddNewCharacter(int32 ID)
 	NewCharacter.TargetTurretId = ID;
 	NewCharacter.CurrentLevel = 1;
 	NewCharacter.MaxHP = TargetEntityParam.MaxHP;
-	NewCharacter.TotalUpgradeNextNeededPoints = (*TargetRankConfig)->InitialUpgradePoints;
+	NewCharacter.TotalUpgradeNextNeededPoints = TargetRankConfig->InitialUpgradePoints;
 	NewCharacter.LeftUpgradePoints = 0;
 	NewCharacter.Attack = TargetEntityParam.Attack;
 	NewCharacter.Defence = TargetEntityParam.Defence;
