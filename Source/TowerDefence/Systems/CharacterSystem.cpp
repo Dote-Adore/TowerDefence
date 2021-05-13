@@ -148,6 +148,6 @@ void UCharacterSystem::LoadAllRankConfig()
 	RankDataTable->GetAllRows<FCharacterRankConfig>(GET_MEMBER_NAME_STRING_CHECKED(FCharacterRankConfig, TurretID), RankConfigArray);
 	for(auto RankItem:RankConfigArray)
 	{
-		RankConfigs.Add(RankItem->TurretID, RankItem);
+		RankConfigs.Add(RankItem->TurretID, *RankItem);
 	}
 }

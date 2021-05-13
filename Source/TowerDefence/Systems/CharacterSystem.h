@@ -51,7 +51,8 @@ public:
 	void AddNewCharacter(int32 ID);
 private:
 	UArchiveSystem* ArchiveSystem;
-	TMap<int32, FCharacterRankConfig*> RankConfigs;
+	UPROPERTY(Transient)
+	TMap<int32, FCharacterRankConfig> RankConfigs;
 	TArray<FEntityParams> AllEntityParamArray;
 
 	

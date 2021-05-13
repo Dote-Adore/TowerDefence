@@ -12,6 +12,7 @@ void UArchiveSystem::Initialize(FSubsystemCollectionBase& Collection)
 	LoadArchive<UUserArchive>(SavedUserArchive, TEXT("UserArchive"));
 	LoadArchive<ULevelArchive>(SavedLevelArchive, TEXT("LevelArchive"));
 	LoadArchive<UPackageArchive>(SavedPackageArchive, TEXT("PackageArchive"));
+	UE_LOG(LogTemp, Display, TEXT("Initialze ArchiveSystem Success!"))
 }
 
 void UArchiveSystem::SaveArchive()
@@ -21,21 +22,15 @@ void UArchiveSystem::SaveArchive()
 
 void UArchiveSystem::SaveArchive(FOnSaveArchiveDoneDelegate SavedDelegate)
 {
-	AsyncTask(ENamedThreads::AnyHiPriThreadNormalTask, [this,SavedDelegate]()
+	bool bRet = true;
+	for(auto ArchiveName: ArchiveNames)
 	{
-		bool bRet = true;
-		for(auto ArchiveName: ArchiveNames)
-		{
-			bRet = bRet & UGameplayStatics::SaveGameToSlot(SavedUserArchive, ArchiveName,0);
-		}
-		if(SavedDelegate.IsBound())
-		{
-			AsyncTask(ENamedThreads::GameThread, [SavedDelegate,bRet]()
-			{
-				SavedDelegate.ExecuteIfBound(bRet);
-			});
-		}
-	});
+		bRet = bRet & UGameplayStatics::SaveGameToSlot(SavedUserArchive, ArchiveName,0);
+	}
+	if(SavedDelegate.IsBound())
+	{
+		SavedDelegate.ExecuteIfBound(bRet);
+	}
 }
 
 UUserArchive* UArchiveSystem::GetUserArchive()

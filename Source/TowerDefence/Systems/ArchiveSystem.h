@@ -33,8 +33,11 @@ private:
 	void LoadArchive(SavedClass*& outVal, const FString& SlotName);
 
 
+	UPROPERTY(Transient)
 	UUserArchive* SavedUserArchive;
+	UPROPERTY(Transient)
 	ULevelArchive* SavedLevelArchive;
+	UPROPERTY(Transient)
 	UPackageArchive* SavedPackageArchive;
 	TArray<FString> ArchiveNames;
 };

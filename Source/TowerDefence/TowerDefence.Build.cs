@@ -10,6 +10,6 @@ public class TowerDefence : ModuleRules
 	
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
 
-		PrivateDependencyModuleNames.AddRange(new string[] { "ToolMenus", "Slate", "SlateCore", "UMG"});
+		PrivateDependencyModuleNames.AddRange(new string[] {"Slate", "SlateCore", "UMG"});
 	}
 }

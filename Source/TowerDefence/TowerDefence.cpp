@@ -3,9 +3,11 @@
 #include "TowerDefence.h"
 
 #include "GlobalConfig.h"
+#if WITH_EDITOR
 #include "ISettingsModule.h"
 #include "ToolMenus.h"
 #include "Modules/ModuleManager.h"
+#endif
 
 IMPLEMENT_PRIMARY_GAME_MODULE(FMyGameModule, TowerDefence, "TowerDefence");
 #define LOCTEXT_NAMESPACE "FLevelEditor"

@@ -26,10 +26,8 @@ public:
 	//可部署的EntityTypes
 	UPROPERTY(EditDefaultsOnly)
 	TArray<FName> DeployableEntityTypes;
-#if WITH_EDITOR
 	UPROPERTY(EditDefaultsOnly)
 	FLinearColor DebugColor;
-#endif
 	static const float BoxSize;
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
