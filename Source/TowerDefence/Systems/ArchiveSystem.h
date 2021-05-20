@@ -1,5 +1,6 @@
 ﻿// 存档系统，专门处理存档功能
 #pragma once
+#include "GameFramework/SaveGame.h"
 #include "ArchiveSystem.generated.h"
 
 class UUserArchive;
@@ -39,5 +40,6 @@ private:
 	ULevelArchive* SavedLevelArchive;
 	UPROPERTY(Transient)
 	UPackageArchive* SavedPackageArchive;
-	TArray<FString> ArchiveNames;
+	UPROPERTY(Transient)
+	TMap<FString, USaveGame*> ArchiveNames;
 };

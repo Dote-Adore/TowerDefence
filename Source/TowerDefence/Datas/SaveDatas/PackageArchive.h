@@ -13,13 +13,6 @@ struct FWeaponItemArchive
 	int32 Level;
 };
 
-USTRUCT(BlueprintType)
-struct FFoodItemArchive
-{
-	GENERATED_BODY()
-	// 键代表FoodId,值代表拥有的数量
-	TMap<int32, int32> Foods;
-};
 
 // 存放用户的背包内容
 UCLASS()
@@ -27,6 +20,8 @@ class UPackageArchive:public USaveGame
 {
 	GENERATED_BODY()
 public:
+	void DeleteFood(int32 FoodID,int32 Num);
+	void DeleteDevelopment(int32 DevelopID, int32 Num);
 	// 武器
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	TMap<FGuid, FWeaponItemArchive> Weapons;

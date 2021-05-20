@@ -25,7 +25,7 @@ void UArchiveSystem::SaveArchive(FOnSaveArchiveDoneDelegate SavedDelegate)
 	bool bRet = true;
 	for(auto ArchiveName: ArchiveNames)
 	{
-		bRet = bRet & UGameplayStatics::SaveGameToSlot(SavedUserArchive, ArchiveName,0);
+		bRet = bRet & UGameplayStatics::SaveGameToSlot(ArchiveName.Value, ArchiveName.Key,0);
 	}
 	if(SavedDelegate.IsBound())
 	{
@@ -61,8 +61,8 @@ void UArchiveSystem::LoadArchive(SavedClass*& outVal, const FString& SlotName)
 	if(bRet)
 	{
 		UE_LOG(LogTemp, Display, TEXT("Load Archive '%s', success!"), *SlotName);
-		ArchiveNames.Add(SlotName);
 		outVal = Cast<SavedClass>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
+		ArchiveNames.Add(SlotName, outVal);
 	}
 	else
 	{
