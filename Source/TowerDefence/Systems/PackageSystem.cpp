@@ -2,6 +2,7 @@
 
 #include "ArchiveSystem.h"
 #include "TowerDefence/GlobalConfig.h"
+#include "TowerDefence/Datas/SaveDatas/PackageArchive.h"
 
 DEFINE_LOG_CATEGORY(PackageSystem)
 
@@ -48,16 +49,16 @@ FFoodItemEntry UPackageSystem::GetOneFood(int32 ID)
 
 }
 
-FCharacterDevelopmentItemEntry UPackageSystem::GetOnCharacterDevelopment(int32 ID)
+FCharacterDevelopmentItemEntry UPackageSystem::GetOneCharacterDevelopment(int32 ID)
 {
 	int32 Num = 0;
-	for(auto Development: ArchiveSystem->GetPackageArchive()->Developments)
+	auto TargetNum = ArchiveSystem->GetPackageArchive()->Developments.Find(ID);
+	if(TargetNum!=nullptr)
 	{
-		if(Development.Key != ID)
-			continue;
-		Num = Development.Value;
+		Num = *TargetNum;
 	}
 	FCharacterDevelopmentItem* Item = AllDevelopmentItemConfig.Find(ID);
+	ensureMsgf(Item, TEXT("Can not found Develop Item ID %d"), ID);
 	FCharacterDevelopmentItemEntry Res(*Item, Num);
 	return Res;
 }
@@ -71,6 +72,30 @@ void UPackageSystem::DeleteFoodItem(int32 ID, int32 Num)
 void UPackageSystem::DelteDevelopmentItem(int32 ID, int32 Num)
 {
 	ArchiveSystem->GetPackageArchive()->DeleteDevelopment(ID,Num);
+	ArchiveSystem->SaveArchive();
+}
+
+void UPackageSystem::AddFoodItem(int32 ID, int32 Num)
+{
+	FFoodItem* res = AllFoodsConfig.Find(ID);
+	if(res == nullptr)
+	{
+		UE_LOG(PackageSystem, Error, TEXT("Can not find Target food %d id in database, add failed!"), ID);
+		return;
+	}
+	ArchiveSystem->GetPackageArchive()->AddFood(ID, Num);
+	ArchiveSystem->SaveArchive();
+}
+
+void UPackageSystem::AddDevelopItem(int32 ID, int32 Num)
+{
+	FCharacterDevelopmentItem* res = AllDevelopmentItemConfig.Find(ID);
+	if(res == nullptr)
+	{
+		UE_LOG(PackageSystem, Error, TEXT("Can not find Target Development Item ID %d id in database, add failed!"), ID);
+		return;
+	}
+	ArchiveSystem->GetPackageArchive()->AddDevelopment(ID, Num);
 	ArchiveSystem->SaveArchive();
 }
 

@@ -16,6 +16,7 @@ int32 UCharacterEntryItem::GetEntityID()
 void UCharacterSystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	ArchiveSystem = GetGameInstance()->GetSubsystem<UArchiveSystem>();
+	PackageSystem = GetGameInstance()->GetSubsystem<UPackageSystem>();
 	LoadAllRankConfig();
 	AllEntityParamArray = UTDFunctionLibrary::GetAllTurrentParams();
 }
@@ -97,7 +98,8 @@ TArray<UCharacterEntryItem*> UCharacterSystem::GetAllOwnedCharacters()
 		EntryItem->SavedInfo = InCharacter.Value;
 		EntryItem->AdditionalInfo = GetCharacterAdditionalInfo(InCharacter.Key);
 		EntryItem->EntityParams = GetEntityParam(InCharacter.Key);
-		Reval.Add(EntryItem);	
+		EntryItem->EntityParams.SkeletalMesh.LoadSynchronous();
+		Reval.Add(EntryItem);
 	}
 	return Reval;
 }
@@ -132,6 +134,26 @@ void UCharacterSystem::AddNewCharacter(int32 ID)
 
 	ArchiveSystem->GetUserArchive()->OwnedCharacters.Add(ID, NewCharacter);
 	ArchiveSystem->SaveArchive();
+}
+
+TArray<FDevelopLevelItemEntry> UCharacterSystem::GetAllLevelUpDevelopItem()
+{
+	TArray<FDevelopLevelItemEntry> Res;
+	const UGlobalConfig* Config = GetDefault<UGlobalConfig>();
+	if(PackageSystem == nullptr)
+	{
+		PackageSystem = GetGameInstance()->GetSubsystem<UPackageSystem>();
+	}
+	for(auto ItemPair :Config->CharacterUpgradeDevelopItemIDAndPointMap)
+	{
+		int32 Point = ItemPair.Value;
+		FCharacterDevelopmentItemEntry TargetItemEntry = PackageSystem->GetOneCharacterDevelopment(ItemPair.Key);
+		FDevelopLevelItemEntry AResEntry;
+		AResEntry.DevelopmentItemEntry = TargetItemEntry;
+		AResEntry.Points = Point;
+		Res.Add(AResEntry);
+	}
+	return Res;
 }
 
 void UCharacterSystem::LoadAllRankConfig()

@@ -69,5 +69,6 @@ void UArchiveSystem::LoadArchive(SavedClass*& outVal, const FString& SlotName)
 		UE_LOG(LogTemp, Display, TEXT("Load Archive '%s', failed!"), *SlotName);
 
 		outVal = Cast<SavedClass>(UGameplayStatics::CreateSaveGameObject(SavedClass::StaticClass()));
+		ArchiveNames.Add(SlotName, outVal);
 	}
 }

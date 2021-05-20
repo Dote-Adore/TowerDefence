@@ -21,6 +21,8 @@ class UPackageArchive:public USaveGame
 	GENERATED_BODY()
 public:
 	void DeleteFood(int32 FoodID,int32 Num);
+	void AddFood(int32 FoodID, int32 Num);
+	void AddDevelopment(int32 DevelopID, int32 Num);
 	void DeleteDevelopment(int32 DevelopID, int32 Num);
 	// 武器
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)

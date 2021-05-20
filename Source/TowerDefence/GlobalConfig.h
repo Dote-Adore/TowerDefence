@@ -46,7 +46,10 @@ public:
     // 角色升级策略配置表
     UPROPERTY(Config, EditAnywhere, Category=CharacterSystem)
     TSoftObjectPtr<UDataTable> CharacterRankConfigTable;
-
+    // 角色升级需要用到的id和对应的每个拥有的点数
+    UPROPERTY(Config, EditAnywhere, Category=CharacterSystem)
+    TMap<int32, int32> CharacterUpgradeDevelopItemIDAndPointMap;
+    
     // 角色升级Item
     UPROPERTY(Config, EditAnywhere, Category=PackageSystem)
     TSoftObjectPtr<UDataTable> DevelopmentItems;

@@ -2,25 +2,51 @@
 
 void UPackageArchive::DeleteFood(int32 FoodID, int32 Num)
 {
-	int32* Num = Foods.Find(FoodID);
-	if(Num!=nullptr)
+	int32* PreviousNum = Foods.Find(FoodID);
+	if(PreviousNum!=nullptr)
 	{
-		(*Num) --;
+		(*PreviousNum) -= Num;
 	}
-	if((*Num)<=0)
+	if((*PreviousNum)<=0)
 	{
 		Foods.Remove(FoodID);
 	}
 }
 
+void UPackageArchive::AddFood(int32 FoodID, int32 Num)
+{
+	int32* PreviousNum = Foods.Find(FoodID);
+	if(PreviousNum== nullptr)
+	{
+		Foods.Add(FoodID, Num);
+	}
+	else
+	{
+		(*PreviousNum) +=Num;
+	}
+}
+
+void UPackageArchive::AddDevelopment(int32 DevelopID, int32 Num)
+{
+	int32* PreviousNum = Developments.Find(DevelopID);
+	if(PreviousNum== nullptr)
+	{
+		Developments.Add(DevelopID, Num);
+	}
+	else
+	{
+		(*PreviousNum) +=Num;
+	}
+}
+
 void UPackageArchive::DeleteDevelopment(int32 DevelopID, int32 Num)
 {
-	int32* Num = Developments.Find(DevelopID);
-	if(Num!=nullptr)
+	int32* PreviousNum = Developments.Find(DevelopID);
+	if(PreviousNum!=nullptr)
 	{
-		(*Num) --;
+		(*PreviousNum) -= Num;
 	}
-	if((*Num)<=0)
+	if((*PreviousNum)<=0)
 	{
 		Foods.Remove(DevelopID);
 	}

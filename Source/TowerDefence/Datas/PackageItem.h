@@ -34,7 +34,7 @@ struct FBaseItem:public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName DisplayName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSoftObjectPtr<UTexture2D> ItemImg;
+	UTexture2D* ItemImg;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString Introduction;
 	// 稀有度，一星到五星

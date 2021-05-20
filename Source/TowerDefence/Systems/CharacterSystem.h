@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "PackageSystem.h"
 #include "TowerDefence/Datas/CharacterDatas.h"
 #include "TowerDefence/Entities/Base/Entity.h"
 #include "TowerDefence/Datas/TurrentAdditional.h"
@@ -12,6 +13,18 @@ class UArchiveSystem;
 // struct FTurrentAdditionalInfo;
 // struct FEntityParams;
 
+
+USTRUCT(BlueprintType)
+struct FDevelopLevelItemEntry 
+{
+	//升级点数
+	GENERATED_BODY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int32 Points;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FCharacterDevelopmentItemEntry DevelopmentItemEntry;
+
+};
 
 // 传给UI界面需要用的object类，
 UCLASS(BlueprintType)
@@ -49,10 +62,18 @@ public:
 	// 增加一个角色
 	UFUNCTION(BlueprintCallable)
 	void AddNewCharacter(int32 ID);
+	// 获取所有升级相关的Item
+	UFUNCTION(BlueprintCallable)
+	TArray<FDevelopLevelItemEntry> GetAllLevelUpDevelopItem();
 private:
+
+	UPROPERTY(Transient)
 	UArchiveSystem* ArchiveSystem;
 	UPROPERTY(Transient)
+	UPackageSystem* PackageSystem;
+	UPROPERTY(Transient)
 	TMap<int32, FCharacterRankConfig> RankConfigs;
+	UPROPERTY(Transient)
 	TArray<FEntityParams> AllEntityParamArray;
 
 	
