@@ -64,19 +64,25 @@ public:
     virtual void BeginDestroy() override;
     FOnStopBuffDelegate OnStopBuffDelegate;
 protected:
-    virtual void Stop();
-    virtual void Start();
+
     // 重新计算buff后的攻击
     virtual void OnReCalculateOffestValue(float* CalculatedOffestValue, const FName& PropertyName);
     virtual void StartContinuously();
     // 如果类型是持续性质的影响，则这里表示其改变单次数值的间隔时间
     UPROPERTY(EditAnywhere)
     float ContinuouslyAdditionIntervals = 0.5;
-private:
-    const FBuff* MyBuff;
+    // 每一次更改value的时候就会调用这个函数，子类进行实现
+    virtual void OnChangeValue();
+    virtual void OnStop();
+
     AEntity* ParentEntity;
-    FTimerHandle StopTimerHandle;
     TMap<FName, float> ChangedValueOffest;
+    const FBuff* MyBuff;
+private:
+    void Stop();
+    void Start();
+    
+    FTimerHandle StopTimerHandle;
     // 持续性改参数的buff的定时器
     FTimerHandle ContinuouslyTimerHandle;
 };

@@ -94,6 +94,7 @@ void UBuffEntity::Start()
         {
             IntProperty->SetPropertyValue_InContainer(&CurrentEntityParams, TargetChangedValue);
         }
+        OnChangeValue();
         
     }
     if(MyBuff->duration>0)
@@ -155,6 +156,7 @@ void UBuffEntity::Stop()
     }
     // 发送消息
     OnStopBuffDelegate.ExecuteIfBound(MyBuff->BuffID);
+    OnStop();
 }
 
 void UBuffEntity::StartContinuously()
@@ -190,4 +192,13 @@ void UBuffEntity::StartContinuously()
             UE_LOG(LogTemp, Warning, TEXT("Can not Found Property %s in Base EntityParams"), *TargetChangedParmName.ToString());
         }
     }
+    OnChangeValue();
+}
+
+void UBuffEntity::OnChangeValue()
+{
+}
+
+void UBuffEntity::OnStop()
+{
 }
