@@ -1,6 +1,12 @@
 ﻿#include "DamageBuff.h"
 
+#include "TowerDefence/Actors/Visual/NumerialWidget.h"
 #include "TowerDefence/Entities/Base/Entity.h"
+
+UDamageBuff::UDamageBuff(const FObjectInitializer& ObjectInitializer)
+	:UBuffEntity(ObjectInitializer)
+{
+}
 
 void UDamageBuff::OnChangeValue()
 {
@@ -11,4 +17,13 @@ void UDamageBuff::OnChangeValue()
 			*GET_MEMBER_NAME_STRING_CHECKED(FEntityParams, CurrentHP), MyBuff->BuffID);
 		return;
 	}
+	TSoftClassPtr<ANumerialWidget> NumerialWidgetActorClass(FSoftObjectPath(
+TEXT("BlueprintGeneratedClass'/Game'")));
+	if(!NumerialWidgetActorClass.LoadSynchronous())
+	{
+		UE_LOG(LogTemp, Error, TEXT("Can not found Target NumerialWidget In DamageBuff"));
+		return;
+	}
+	ANumerialWidget* TargetWidget = ParentEntity->GetWorld()->SpawnActor<ANumerialWidget>(NumerialWidgetActorClass.LoadSynchronous());
+	
 }

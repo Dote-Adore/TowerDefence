@@ -6,6 +6,7 @@
 #include "TowerDefence/GlobalConfig.h"
 #include "Components/SplineComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 ABullet::ABullet(const FObjectInitializer& ObjectInitializer)
     :AActor(ObjectInitializer)
@@ -25,7 +26,8 @@ void AImmediateHitBullet::File(AEntity* ParentEntity, AEntity* TargetAttackEntit
     float AttackValue = ParentEntity->GetCurrentEntityParams().Attack*CurrentAttack.AttackRate;
     UGlobalConfig* GlobalConf = GetMutableDefault<UGlobalConfig>();
     const FBuff* Buff = GlobalConf->FindBuffByID(CurrentAttack.BuffID);
-    TargetAttackEntity->OnDamage(AttackValue, Buff);
+    FTransform HitTransform = TargetAttackEntity->GetActorTransform();
+    TargetAttackEntity->OnDamage(AttackValue, Buff, HitTransform);
     Destroy();
 }
 
@@ -79,7 +81,7 @@ void AFilghtHitBullet::Tick(float DeltaSeconds)
     SetActorRotation(TargetDirection.Rotation());
     if(CurrentFlightTime >=1)
     {
-        MyTargetAttackEntity->OnDamage(AttackValue, Buff);
+        MyTargetAttackEntity->OnDamage(AttackValue, Buff, this->GetActorTransform());
         Destroy();
     }
     CurrentFlightTime += Speed*DeltaSeconds/BulletPathLength;

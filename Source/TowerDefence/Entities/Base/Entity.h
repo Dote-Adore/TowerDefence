@@ -117,7 +117,7 @@ struct FEntityAnimation:public FTableRowBase
 // 攻击消息，参数是攻击下标
 DECLARE_DELEGATE_OneParam(FOnAttackDelegate, int32);
 DECLARE_DELEGATE(FOnEntityInitialized);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageDelegate, int32, DamageValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDamageDelegate, int32, DamageValue, FTransform, DamageTransform);
 DECLARE_DELEGATE(FOnIdleDelegate);
 DECLARE_DELEGATE(FOnDeathDelegate);
 UCLASS(Blueprintable)
@@ -153,12 +153,13 @@ public:
     virtual void BeginDestroy() override;
     
     virtual void OnAttack();
-    virtual void OnDamage(int32 DamageValue, const FBuff* Buff = nullptr);
+    virtual void OnDamage(int32 DamageValue, const FBuff* Buff, FTransform DamageFransform );
     virtual void OnDeath();
     bool IsDeath();
 protected:
     class UBuffComponent* BuffComponent;
     class UAnimComponent* AnimComponent;
+    class UDamageComponent* DamageComponent;
     UPROPERTY(EditDefaultsOnly)
     TSubclassOf<AEntity> TargetAttackEntityClass;
     UPROPERTY(EditDefaultsOnly)

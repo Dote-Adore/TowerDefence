@@ -9,11 +9,11 @@ class ANumerialWidget:public AActor
 public:
 	ANumerialWidget(const FObjectInitializer& ObjectInitializer);
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(BlueprintReadWrite)
 	class UWidgetComponent* UI;
 	// 存在时间
 	UPROPERTY(EditDefaultsOnly)
-	float ExsitTime;
+	float ExsitTime = 3.f;
 
 	
 	void ShowUI(FVector worldLocation, int32 ShownValue, FLinearColor TextColor);

@@ -7,6 +7,7 @@
 #include "TowerDefence/Components/AnimComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Animation/AnimInstance.h"
+#include "TowerDefence/Components/DamageComponent.h"
 
 AEntity::AEntity(const FObjectInitializer& ObjectInitializer)
     :ACharacter(ObjectInitializer)
@@ -25,6 +26,8 @@ void AEntity::InitEntity(const FEntityParams& Params, const FEntityAnimation& An
 {
     AnimComponent = NewObject<UAnimComponent>(this, GetAnimCompClass(), TEXT("AnimComp"));
     AnimComponent->RegisterComponent();
+    DamageComponent = NewObject<UDamageComponent>(this, UDamageComponent::StaticClass(), TEXT("DamageComp"));
+    DamageComponent->RegisterComponent();
     // 初始化Mesh
     USkeletalMeshComponent* MeshComp = GetMesh();
     check(MeshComp);
@@ -258,7 +261,7 @@ void AEntity::OnAttack()
         CurrentAttack.AttackTime, false);
 }
 
-void AEntity::OnDamage(int32 DamageValue,  const FBuff* Buff)
+void AEntity::OnDamage(int32 DamageValue,  const FBuff* Buff, FTransform DamageFransform)
 {
     // 如果已经没血了，就不用再收到伤害了
     if(CurrentEntityParams.CurrentHP <= 0)
@@ -278,7 +281,7 @@ void AEntity::OnDamage(int32 DamageValue,  const FBuff* Buff)
             SetMeshMaterialsColorParams("HitColor", FLinearColor(0,0,0,0));
         }, 0.3f, false);
 
-        OnDamageDelegate.Broadcast(FinalAttack);
+        OnDamageDelegate.Broadcast(FinalAttack,DamageFransform);
 
     if(CurrentEntityParams.CurrentHP <=0)
     {
