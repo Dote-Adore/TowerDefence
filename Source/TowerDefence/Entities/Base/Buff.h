@@ -53,7 +53,7 @@ struct FBuff:public FTableRowBase
 // 每个buff有自己的一套实现
 // int32 BuffID
 DECLARE_DELEGATE_OneParam(FOnStopBuffDelegate, int32)
-UCLASS(BlueprintType)
+UCLASS(Blueprintable)
 class UBuffEntity : public UObject
 {
     GENERATED_BODY()
@@ -74,8 +74,16 @@ protected:
     // 每一次更改value的时候就会调用这个函数，子类进行实现
     virtual void OnChangeValue();
     virtual void OnStop();
+    
+    UFUNCTION(BlueprintImplementableEvent)
+    void OnChangeValue_BP();
+    UFUNCTION(BlueprintImplementableEvent)
+    void OnStop_BP();
 
+    
+    UPROPERTY(BlueprintReadOnly)
     AEntity* ParentEntity;
+    UPROPERTY(BlueprintReadOnly)
     TMap<FName, float> ChangedValueOffest;
     const FBuff* MyBuff;
 private:

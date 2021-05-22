@@ -119,6 +119,7 @@ void UBuffEntity::BeginDestroy()
 
 void UBuffEntity::Stop()
 {
+    OnStop();
     UE_LOG(LogTemp, Display, TEXT("Remove Buff, ID:%d, Effect Entity: %s "), MyBuff->BuffID, *ParentEntity->GetName());
     this->MarkPendingKill();
     if(MyBuff->BuffType == EBuffType::ContinuouslyAddition)
@@ -156,7 +157,6 @@ void UBuffEntity::Stop()
     }
     // 发送消息
     OnStopBuffDelegate.ExecuteIfBound(MyBuff->BuffID);
-    OnStop();
 }
 
 void UBuffEntity::StartContinuously()
@@ -197,8 +197,10 @@ void UBuffEntity::StartContinuously()
 
 void UBuffEntity::OnChangeValue()
 {
+    OnChangeValue_BP();
 }
 
 void UBuffEntity::OnStop()
 {
+    OnStop_BP();
 }

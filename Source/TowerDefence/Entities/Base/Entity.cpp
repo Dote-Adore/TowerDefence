@@ -215,7 +215,7 @@ void AEntity::CalculateAttack(float DeltaSeconds)
     LeftHitTime -= DeltaSeconds;
 }
 
-void AEntity::SetMeshMaterialsColorParams(FName ParamName, FLinearColor Color)
+void AEntity::SetMeshMaterialsVectorParams(FName ParamName, FLinearColor Color)
 {
    TArray<UMaterialInterface*> AllMaterials = GetMesh()->GetMaterials();
     for(auto Mat: AllMaterials)
@@ -225,6 +225,34 @@ void AEntity::SetMeshMaterialsColorParams(FName ParamName, FLinearColor Color)
         {
             UE_LOG(LogTemp, Display, TEXT(" Change Target Materials '%s' Color Params"), *MID->GetName());
             MID->SetVectorParameterValue(ParamName, Color);
+        }
+    }
+}
+
+void AEntity::SetMeshMaterialsScalarParams(FName ParamName, float Value)
+{
+    TArray<UMaterialInterface*> AllMaterials = GetMesh()->GetMaterials();
+    for(auto Mat: AllMaterials)
+    {
+        UMaterialInstanceDynamic* MID =Cast<UMaterialInstanceDynamic>(Mat);
+        if(MID)
+        {
+            UE_LOG(LogTemp, Display, TEXT(" Change Target Materials '%s' Color Params"), *MID->GetName());
+            MID->SetScalarParameterValue(ParamName, Value);
+        }
+    }
+}
+
+void AEntity::SetMeshMaterialTexture(FName ParamName, UTexture2D* Tex)
+{
+    TArray<UMaterialInterface*> AllMaterials = GetMesh()->GetMaterials();
+    for(auto Mat: AllMaterials)
+    {
+        UMaterialInstanceDynamic* MID =Cast<UMaterialInstanceDynamic>(Mat);
+        if(MID)
+        {
+            UE_LOG(LogTemp, Display, TEXT(" Change Target Materials '%s' Color Params"), *MID->GetName());
+            MID->SetTextureParameterValue(ParamName, Tex);
         }
     }
 }
@@ -273,12 +301,12 @@ void AEntity::OnDamage(int32 DamageValue,  const FBuff* Buff, FTransform DamageF
         BuffComponent->AddBuff(Buff);
     
     // 如果伤害为0，表示没有收到伤害，则不需要发送Damage事件
-    SetMeshMaterialsColorParams("HitColor", FLinearColor(0.6, 0,0,0.7));
+    SetMeshMaterialsVectorParams("HitColor", FLinearColor(0.6, 0,0,0.7));
     GetWorld()->GetTimerManager().SetTimer(DamageEffectTimerHandle,
         [&]()->void
         {
             GetWorld()->GetTimerManager().ClearTimer(DamageEffectTimerHandle);
-            SetMeshMaterialsColorParams("HitColor", FLinearColor(0,0,0,0));
+            SetMeshMaterialsVectorParams("HitColor", FLinearColor(0,0,0,0));
         }, 0.3f, false);
 
         OnDamageDelegate.Broadcast(FinalAttack,DamageFransform);

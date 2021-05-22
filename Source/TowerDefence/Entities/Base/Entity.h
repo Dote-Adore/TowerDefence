@@ -175,7 +175,15 @@ private:
     void CalculateAttackEntities();
     // 计算buff到主数值中
     void CalculateAttack(float DeltaSeconds);
-    void SetMeshMaterialsColorParams(FName ParamName, FLinearColor Color);
+    // 设置材质的vector
+    UFUNCTION(BlueprintCallable)
+    void SetMeshMaterialsVectorParams(FName ParamName, FLinearColor Color);
+    // 设置材质的scale
+    UFUNCTION(BlueprintCallable)
+    void SetMeshMaterialsScalarParams(FName ParamName, float Value);
+    // 设置材质的Texture
+    UFUNCTION(BlueprintCallable)
+    void SetMeshMaterialTexture(FName ParamName, UTexture2D* Tex);
     void OnSpawnAttackBullet(int32 AttackIdx, TArray<AEntity*> TargetEntities);
     // 连招
     // 当前连招使用哪个id

@@ -12,7 +12,7 @@ struct FTurrentAdditionalInfo: public FTableRowBase
 	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	int32 EntityID;
 	UPROPERTY(EditAnywhere,BlueprintReadOnly)
-	TSoftObjectPtr<UTexture2D> Thumbnail;
+	UTexture2D* Thumbnail;
 	// 星级，2星到5星
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	ERareness StarLevel;
