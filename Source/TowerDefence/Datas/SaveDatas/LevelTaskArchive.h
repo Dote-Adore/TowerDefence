@@ -1,0 +1,34 @@
+﻿#pragma once
+// 关卡存档，存放关卡信息，包括已经通过的关卡，每个关卡通关信息等
+
+#include "GameFramework/SaveGame.h"
+#include "LevelArchive.generated.h"
+USTRUCT()
+struct FLevelPassedSave
+{
+	GENERATED_BODY()
+	// 过关星级，一星到五星
+	UPROPERTY()
+	int32 StarNum;
+	
+};
+
+
+UCLASS()
+class ULevelArchive:public USaveGame
+{
+	GENERATED_BODY()
+public:
+	// 解锁的所有关卡
+	UPROPERTY(BlueprintReadWrite)
+	TSet<int32> UnLockedLevels;
+	// 没有解锁的关卡列表
+	UPROPERTY(BlueprintReadWrite)
+	TSet<int32> LockedLevels;
+	// 已经完成的关卡列表
+	UPROPERTY(BlueprintReadWrite)
+	TSet<int32> FinishedLevels;
+	// 已经通关的其它参数
+	// UPROPERTY(BlueprintReadWrite)
+	// TMap<int32, FLevelPassedSave> PassedLevelSavedInfo;
+};
