@@ -11,7 +11,7 @@
  */
 
 // 解锁关卡的条件
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FUnlockRequirment
 {
 	GENERATED_BODY()
@@ -25,7 +25,7 @@ struct FUnlockRequirment
 };
 
 // 通关完成后的奖励
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FFinishReward
 {
 	GENERATED_BODY()
@@ -34,13 +34,16 @@ struct FFinishReward
 	TMap<int32, int32> DevelopItems;
 	// 食物,id对数量
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<int32,int32> Foods;
+	TMap<int32,int32> Foods;
 	// 付费金币奖励
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 PaidCoin;
 	// 游戏金币奖励
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 GameCoin;
+	// 通关完成后获取新的角色
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	int32 GainedNewCharacterID;
 };
 
 
@@ -55,6 +58,9 @@ struct FLevelTaskData:public FTableRowBase
 	// 在地图的位置
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FVector2D TranslationInMap;
+	//游玩改关卡消耗的体力
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	int32 UsedPhysicalStrength;
 	// 目标使用的LevelInfomation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class ULevelInfomation* TargetLevelInfo;

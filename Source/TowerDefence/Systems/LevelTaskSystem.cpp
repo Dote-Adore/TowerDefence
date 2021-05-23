@@ -1,6 +1,140 @@
 ﻿#include "LevelTaskSystem.h"
 
+#include "TowerDefence/Datas/SaveDatas/LevelTaskArchive.h"
+#include "Engine/DataTable.h"
+#include "TowerDefence/GlobalConfig.h"
+#include "ArchiveSystem.h"
+#include "PackageSystem.h"
+#include "TowerDefence/Datas/LevelTaskData.h"
+#include "TowerDefence/Datas/SaveDatas/UserArchive.h"
+
+DEFINE_LOG_CATEGORY(LevelTaskSystem)
+
+
 void ULevelTaskSystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	ArchiveSystem = GetGameInstance()->GetSubsystem<UArchiveSystem>();
+	LoadTaskConfig();
+}
+
+TArray<FLevelTaskItem> ULevelTaskSystem::GetAllLevelTasks()
+{
+	ArchiveSystem = GetGameInstance()->GetSubsystem<UArchiveSystem>();
+	TArray<FLevelTaskItem> Res;
+	bool NeedSave = false;
+	for(auto TaskItem:TaskConfig)
+	{
+		int32 ID = TaskItem.Key;
+		FLevelTaskItem TempItem;
+		TempItem.ConfigData = TaskItem.Value;
+		FEachLevelTaskSavedData* CurrentLevelTaskSavedPtr = ArchiveSystem->GetLevelArchive()->LevelTaskStates.Find(ID);
+		if(CurrentLevelTaskSavedPtr == nullptr)
+		{
+			NeedSave = true;
+			// 如果该关卡没有前置条件，则说明直接是解锁的
+			if(TaskItem.Value.UnlockRequirment.FinishedLevels.Num() == 0)
+			{
+				TempItem.TaskSavedData.TaskState = ELevelTaskState::UnLock;
+			}
+			else
+			{
+				TempItem.TaskSavedData.TaskState = ELevelTaskState::Locked;
+			}
+			FEachLevelTaskSavedData TempSavedData;
+			TempSavedData = TempItem.TaskSavedData;
+			ArchiveSystem->GetLevelArchive()->LevelTaskStates.Add(ID, TempSavedData);
+		}
+		else
+		{
+			// 如果没有解锁，则先要看一下是不是前置条件满足了,满足了就给他解锁
+			if(CurrentLevelTaskSavedPtr->TaskState == ELevelTaskState::Locked)
+			{
+				auto AllNeedFinishedLevels = TaskItem.Value.UnlockRequirment.FinishedLevels;
+				// 看一看前置条件是否都是完成的
+				for(auto LevelID:AllNeedFinishedLevels)
+				{
+					FEachLevelTaskSavedData* RequestmentLevelTaskSavedPtr = ArchiveSystem->GetLevelArchive()->LevelTaskStates.Find(LevelID);
+					//如果有一个关卡没有完成，则就lock掉他
+					if(RequestmentLevelTaskSavedPtr == nullptr || RequestmentLevelTaskSavedPtr->TaskState != ELevelTaskState::Finished)
+					{
+						CurrentLevelTaskSavedPtr->TaskState = ELevelTaskState::Locked;
+						break;
+					}
+					CurrentLevelTaskSavedPtr->TaskState = ELevelTaskState::UnLock;
+				}
+				// 需要保存
+				if(CurrentLevelTaskSavedPtr->TaskState != ELevelTaskState::Locked)
+				{
+					NeedSave = true;
+				}
+			}
+				TempItem.TaskSavedData = *CurrentLevelTaskSavedPtr;
+		}
+		Res.Add(TempItem);
+	}
+	// 需要保存，则保存
+	if(NeedSave == true)
+	{
+		ArchiveSystem->SaveArchive();
+	}
+	return Res;
+}
+
+void ULevelTaskSystem::FinishLevel(int32 LevelID)
+{
+	const FLevelTaskData* LevelTaskData =TaskConfig.Find(LevelID);
+	ensureMsgf(LevelTaskData, TEXT("Can not Find LevelTaskConfig in Target ID %d!"), LevelID);
+	// 进行结算奖励
+	FEachLevelTaskSavedData* BeforeTaskLevelSavedData = ArchiveSystem->GetLevelArchive()->LevelTaskStates.Find(LevelID);
+	ensureMsgf(BeforeTaskLevelSavedData, TEXT("Can not Find LevelTaskArchive in Target ID %d!"), LevelID);
+	// 如果之前是没有通关的，则给与第一次通关的奖励
+	if(BeforeTaskLevelSavedData->TaskState == ELevelTaskState::UnLock)
+	{
+		// 首次通关结算奖励
+		SettlementReward(LevelTaskData->FirstFinishRewards);
+		
+	}
+	// 正常的奖励结算
+	SettlementReward(LevelTaskData->NormalRewards);
+	// 更改条件为关卡通关完成
+	BeforeTaskLevelSavedData->TaskState = ELevelTaskState::Finished;
+	ArchiveSystem->SaveArchive();
+}
+
+void ULevelTaskSystem::StartTask(FLevelTaskItem TargetLevelTaskItem, TSet<int32> UsedCharacterID)
+{
+	
+}
+
+void ULevelTaskSystem::LoadTaskConfig()
+{
+	TaskConfig.Empty();
+	const UGlobalConfig* GlobalConfig = GetDefault<UGlobalConfig>();
+	UDataTable* TaskDataTable = GlobalConfig->LevelTaskDataTable.LoadSynchronous();
+	if(!TaskDataTable)
+	{
+		UE_LOG(LevelTaskSystem, Error, TEXT("Can not find LevelTaskDataTable DataTable in GlobalConfig!"));
+		return;
+	}
+	TArray<FLevelTaskData*> AllDataArray;
+	TaskDataTable->GetAllRows<FLevelTaskData>(GET_MEMBER_NAME_STRING_CHECKED(FLevelTaskData, ID), AllDataArray);
+	for(auto TaskItem:AllDataArray)
+	{
+		TaskConfig.Add(TaskItem->ID, *TaskItem);
+	}
+}
+
+void ULevelTaskSystem::SettlementReward(const FFinishReward& Reward)
+{
+	auto CurrentPackageSystem = GetGameInstance()->GetSubsystem<UPackageSystem>();
+	for(auto FoodItem: Reward.Foods)
+	{
+		CurrentPackageSystem->AddFoodItem(FoodItem.Key, FoodItem.Value);
+	}
+	for(auto DevelopItem: Reward.DevelopItems)
+	{
+		CurrentPackageSystem->AddDevelopItem(DevelopItem.Key, DevelopItem.Value);
+	}
+	ArchiveSystem->GetUserArchive()->GameCoinNum+=Reward.GameCoin;
+	ArchiveSystem->GetUserArchive()->PaidCoinNum+=Reward.PaidCoin;
 }

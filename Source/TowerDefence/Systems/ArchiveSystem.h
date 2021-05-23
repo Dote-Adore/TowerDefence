@@ -4,7 +4,7 @@
 #include "ArchiveSystem.generated.h"
 
 class UUserArchive;
-class ULevelArchive;
+class ULevelTaskArchive;
 class UPackageArchive;
 // 参数：是否保存成功
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnSaveArchiveDoneDelegate, bool, bSuccess);
@@ -23,10 +23,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	UUserArchive* GetUserArchive();
 	UFUNCTION(BlueprintCallable)
-	ULevelArchive* GetLevelArchive();
+	ULevelTaskArchive* GetLevelArchive();
 	UFUNCTION(BlueprintCallable)
 	UPackageArchive* GetPackageArchive();
 	virtual void Deinitialize() override;
+	
 
 private:
 	// 读档
@@ -37,7 +38,7 @@ private:
 	UPROPERTY(Transient)
 	UUserArchive* SavedUserArchive;
 	UPROPERTY(Transient)
-	ULevelArchive* SavedLevelArchive;
+	ULevelTaskArchive* SavedLevelTaskArchive;
 	UPROPERTY(Transient)
 	UPackageArchive* SavedPackageArchive;
 	UPROPERTY(Transient)

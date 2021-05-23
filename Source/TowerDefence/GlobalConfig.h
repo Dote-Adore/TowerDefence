@@ -42,7 +42,8 @@ public:
     // 整个游戏所有的关卡存放的位置
     UPROPERTY(Config, EditAnywhere, Category=LevelEditor)
     FString TargetLevelsPath;
-
+    UPROPERTY(Config, EditAnywhere, Category=LevelTask)
+    TSoftObjectPtr<UDataTable> LevelTaskDataTable;
     // 角色升级策略配置表
     UPROPERTY(Config, EditAnywhere, Category=CharacterSystem)
     TSoftObjectPtr<UDataTable> CharacterRankConfigTable;

@@ -1,5 +1,5 @@
 ﻿#include "ArchiveSystem.h"
-#include "TowerDefence/Datas/SaveDatas/LevelArchive.h"
+#include "TowerDefence/Datas/SaveDatas/LevelTaskArchive.h"
 #include "TowerDefence/Datas/SaveDatas/UserArchive.h"
 #include "Async/Async.h"
 #include "Kismet/GameplayStatics.h"
@@ -10,7 +10,7 @@ void UArchiveSystem::Initialize(FSubsystemCollectionBase& Collection)
 	Super::Initialize(Collection);
 	// 在这里添加存档
 	LoadArchive<UUserArchive>(SavedUserArchive, TEXT("UserArchive"));
-	LoadArchive<ULevelArchive>(SavedLevelArchive, TEXT("LevelArchive"));
+	LoadArchive<ULevelTaskArchive>(SavedLevelTaskArchive, TEXT("LevelArchive"));
 	LoadArchive<UPackageArchive>(SavedPackageArchive, TEXT("PackageArchive"));
 	UE_LOG(LogTemp, Display, TEXT("Initialze ArchiveSystem Success!"))
 }
@@ -38,9 +38,9 @@ UUserArchive* UArchiveSystem::GetUserArchive()
 	return SavedUserArchive;
 }
 
-ULevelArchive* UArchiveSystem::GetLevelArchive()
+ULevelTaskArchive* UArchiveSystem::GetLevelArchive()
 {
-	return SavedLevelArchive;
+	return SavedLevelTaskArchive;
 }
 
 UPackageArchive* UArchiveSystem::GetPackageArchive()

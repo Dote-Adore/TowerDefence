@@ -26,7 +26,9 @@ public:
 	// 当前体力
 	UPROPERTY(BlueprintReadOnly)
 	int32 PhysicalStrength;
-	const int32 MaxPhysicalStrength = 120;
+	// 体力上限
+	UPROPERTY(BlueprintReadOnly)
+	int32 MaxPhysicalStrength = 120;
 	// 游戏内金币数量
 	UPROPERTY(BlueprintReadOnly)
 	int32 GameCoinNum;
