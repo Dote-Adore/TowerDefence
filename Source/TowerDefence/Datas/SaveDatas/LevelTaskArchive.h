@@ -4,8 +4,8 @@
 #include "GameFramework/SaveGame.h"
 #include "LevelTaskArchive.generated.h"
 
-UENUM()
-enum class ELevelTaskState
+UENUM(BlueprintType)
+enum class ELevelTaskState: uint8
 {
 	Locked,
 	UnLock,
@@ -27,11 +27,8 @@ USTRUCT(BlueprintType)
 struct FEachLevelTaskSavedData
 {
 	GENERATED_BODY()
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	ELevelTaskState TaskState;
 	UPROPERTY(BlueprintReadWrite)
-	int32 Test;
-
+	ELevelTaskState TaskState;
 };
 
 UCLASS()

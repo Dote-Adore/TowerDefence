@@ -18,7 +18,6 @@ void UCharacterSystem::Initialize(FSubsystemCollectionBase& Collection)
 	ArchiveSystem = GetGameInstance()->GetSubsystem<UArchiveSystem>();
 	PackageSystem = GetGameInstance()->GetSubsystem<UPackageSystem>();
 	LoadAllRankConfig();
-	AllEntityParamArray = UTDFunctionLibrary::GetAllTurrentParams();
 }
 
 FCharacterSavedInfo UCharacterSystem::UpgradeCharacter(int32 ID, int32 UpgradePoints, bool JustTest /*= true */)
@@ -136,6 +135,7 @@ void UCharacterSystem::AddNewCharacter(int32 ID)
 	ArchiveSystem->SaveArchive();
 }
 
+
 TArray<FDevelopLevelItemEntry> UCharacterSystem::GetAllLevelUpDevelopItem()
 {
 	TArray<FDevelopLevelItemEntry> Res;
@@ -156,6 +156,13 @@ TArray<FDevelopLevelItemEntry> UCharacterSystem::GetAllLevelUpDevelopItem()
 	return Res;
 }
 
+FCharacterSavedInfo UCharacterSystem::GetCharacterSavedInfo(int32 ID)
+{
+	FCharacterSavedInfo* SavedInfo = ArchiveSystem->GetUserArchive()->OwnedCharacters.Find(ID);
+	check(SavedInfo);
+	return *SavedInfo;
+}
+
 void UCharacterSystem::LoadAllRankConfig()
 {
 	RankConfigs.Empty();
@@ -168,8 +175,11 @@ void UCharacterSystem::LoadAllRankConfig()
 	}
 	TArray<FCharacterRankConfig*> RankConfigArray;
 	RankDataTable->GetAllRows<FCharacterRankConfig>(GET_MEMBER_NAME_STRING_CHECKED(FCharacterRankConfig, TurretID), RankConfigArray);
+	TArray<FEntityAnimation*> EntityAnims;
 	for(auto RankItem:RankConfigArray)
 	{
 		RankConfigs.Add(RankItem->TurretID, *RankItem);
 	}
+	AllEntityParamArray = UTDFunctionLibrary::GetAllTurrentParams();
+
 }

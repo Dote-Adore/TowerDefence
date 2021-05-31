@@ -4,9 +4,12 @@
 #include "Engine/DataTable.h"
 #include "TowerDefence/GlobalConfig.h"
 #include "ArchiveSystem.h"
+#include "CharacterSystem.h"
 #include "PackageSystem.h"
+#include "Kismet/GameplayStatics.h"
 #include "TowerDefence/Datas/LevelTaskData.h"
 #include "TowerDefence/Datas/SaveDatas/UserArchive.h"
+#include "TowerDefence/Level/LevelInfomation.h"
 
 DEFINE_LOG_CATEGORY(LevelTaskSystem)
 
@@ -104,7 +107,23 @@ void ULevelTaskSystem::FinishLevel(int32 LevelID)
 
 void ULevelTaskSystem::StartTask(FLevelTaskItem TargetLevelTaskItem, TSet<int32> UsedCharacterID)
 {
-	
+	CurrentLevelTaskItem = TargetLevelTaskItem;
+	CurrentUsedCharacterID = UsedCharacterID;
+
+	UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), TargetLevelTaskItem.ConfigData.TargetLevelInfo->BackgroundWorld);
+}
+
+TArray<FEntityParams> ULevelTaskSystem::GetAllCanUsedCharacters()
+{
+	// 计算得到所有的用到的部署角色
+	UCharacterSystem* CharacterSys = GetGameInstance()->GetSubsystem<UCharacterSystem>();
+	check(CharacterSys);
+	TArray<FEntityParams> Res;
+	for(auto ID: CurrentUsedCharacterID)
+	{
+		Res.Add(CharacterSys->GetEntityParam(ID));
+	}
+	return Res;	
 }
 
 void ULevelTaskSystem::LoadTaskConfig()

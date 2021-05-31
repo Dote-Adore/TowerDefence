@@ -5,6 +5,7 @@
 #include "TowerDefence/GlobalConfig.h"
 #include "TowerDefence/Entities/Turrent.h"
 #include "TowerDefence/Entities/Enemy.h"
+#include "TowerDefence/Systems/CharacterSystem.h"
 
 ATurrent* UEntityCreator::CreateTurrent(int32 EntityID, FTransform EntityTransform)
 {
@@ -34,6 +35,13 @@ AEntity* UEntityCreator::CreateEntity(int32 EntityID, FTransform EntityTransform
     FEntityAnimation* TargetFoundAnims = AnimDatas->FindRow<FEntityAnimation>(FName(*FString::FromInt(EntityID)), "EntityID");
     check(TargetFoundParams);
     check(TargetFoundAnims);
+
+    // 根据等级修改参数
+    FCharacterSavedInfo SavedInfo = GetWorld()->GetGameInstance()->GetSubsystem<UCharacterSystem>()->GetCharacterSavedInfo(EntityID);
+    TargetFoundParams->Attack = SavedInfo.Attack;
+    TargetFoundParams->Defence = SavedInfo.Defence;
+    TargetFoundParams->MaxHP = SavedInfo.MaxHP;
+    
     FActorSpawnParameters SpawnParameters;
     SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
     check(GetWorld());

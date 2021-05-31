@@ -10,6 +10,7 @@
 DECLARE_LOG_CATEGORY_EXTERN(CharacterSystem, Log, All);
 
 class UArchiveSystem;
+class ATurrent;
 // struct FTurrentAdditionalInfo;
 // struct FEntityParams;
 
@@ -65,6 +66,10 @@ public:
 	// 获取所有升级相关的Item
 	UFUNCTION(BlueprintCallable)
 	TArray<FDevelopLevelItemEntry> GetAllLevelUpDevelopItem();
+
+	UFUNCTION(BlueprintCallable)
+	FCharacterSavedInfo GetCharacterSavedInfo(int32 ID);
+	
 private:
 
 	UPROPERTY(Transient)
