@@ -29,6 +29,7 @@ class TOWERDEFENCE_API ULevelTaskSystem:public UGameInstanceSubsystem
 	TArray<FLevelTaskItem> GetAllLevelTasks();
 	UFUNCTION(BlueprintCallable)
 	void FinishLevel(int32 LevelID);
+	// 开始任务
 	UFUNCTION(BlueprintCallable)
 	void StartTask(FLevelTaskItem TargetLevelTaskItem, TSet<int32> UsedCharacterID);
 private:

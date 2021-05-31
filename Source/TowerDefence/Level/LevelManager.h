@@ -32,7 +32,7 @@ public:
 	TSharedPtr<const FEnemyGenerationInfo> GetCurrentWaveInfoPtr();
 	TArray<ABaseTile*> GetAllTiles() {return AllTiles; };
 
-	void OnLevelPass();
+	void OnLevelSuccess();
 	UFUNCTION(BlueprintCallable)
 	void  OnRequestToDeploy(int32 TurrentID, FName Category, int32 Cost);
 	UFUNCTION(BlueprintCallable)

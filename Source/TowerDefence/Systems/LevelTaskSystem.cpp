@@ -28,6 +28,7 @@ TArray<FLevelTaskItem> ULevelTaskSystem::GetAllLevelTasks()
 		FLevelTaskItem TempItem;
 		TempItem.ConfigData = TaskItem.Value;
 		FEachLevelTaskSavedData* CurrentLevelTaskSavedPtr = ArchiveSystem->GetLevelArchive()->LevelTaskStates.Find(ID);
+		UE_LOG(LevelTaskSystem, Display, TEXT("ID:%d, Item.LevelName: %s"), ID, *(TaskItem.Value.LevelName).ToString());
 		if(CurrentLevelTaskSavedPtr == nullptr)
 		{
 			NeedSave = true;

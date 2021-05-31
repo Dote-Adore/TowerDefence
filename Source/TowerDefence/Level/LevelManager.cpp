@@ -116,6 +116,10 @@ TSharedPtr<const FEnemyGenerationInfo> ALevelManager::GetCurrentWaveInfoPtr()
     return MakeShared<FEnemyGenerationInfo>(TargetWave);
 }
 
+void ALevelManager::OnLevelSuccess()
+{
+}
+
 void ALevelManager::OnRequestToDeploy(int32 TurrentID, FName Category, int32 Cost)
 {
 	OnCancelDeploy();
