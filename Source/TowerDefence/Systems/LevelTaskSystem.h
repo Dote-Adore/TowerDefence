@@ -26,6 +26,7 @@ struct FLevelTaskItem
 UCLASS()
 class TOWERDEFENCE_API ULevelTaskSystem:public UGameInstanceSubsystem
 {
+public:
 	GENERATED_BODY()
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	UFUNCTION(BlueprintCallable)
@@ -41,6 +42,8 @@ class TOWERDEFENCE_API ULevelTaskSystem:public UGameInstanceSubsystem
 	// 获取所有可以用到的角色
 	UFUNCTION(BlueprintCallable)
 	TArray<FEntityParams> GetAllCanUsedCharacters();
+	FLevelTaskItem GetCurrentLevelTaskItem();
+	
 	//  ---------------
 private:
 	UPROPERTY(Transient)

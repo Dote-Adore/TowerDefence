@@ -15,6 +15,11 @@ ATurrent* UEntityCreator::CreateTurrent(int32 EntityID, FTransform EntityTransfo
     check(TurrentDataTable);
     check(AnimDataTable);
     AEntity* Res = CreateEntity(EntityID, EntityTransform, GlobalConfig->TurrentEntityClass, TurrentDataTable, AnimDataTable);
+    FCharacterSavedInfo SavedInfo = GetWorld()->GetGameInstance()->GetSubsystem<UCharacterSystem>()->GetCharacterSavedInfo(EntityID);
+    // 根据等级修改参数
+    Res->GetCurrentEntityParams().Attack = SavedInfo.Attack;
+    Res->GetCurrentEntityParams().Attack = SavedInfo.Defence;
+    Res->GetCurrentEntityParams().Attack = SavedInfo.MaxHP;
     return Cast<ATurrent>(Res);
 }
 
@@ -35,12 +40,6 @@ AEntity* UEntityCreator::CreateEntity(int32 EntityID, FTransform EntityTransform
     FEntityAnimation* TargetFoundAnims = AnimDatas->FindRow<FEntityAnimation>(FName(*FString::FromInt(EntityID)), "EntityID");
     check(TargetFoundParams);
     check(TargetFoundAnims);
-
-    // 根据等级修改参数
-    FCharacterSavedInfo SavedInfo = GetWorld()->GetGameInstance()->GetSubsystem<UCharacterSystem>()->GetCharacterSavedInfo(EntityID);
-    TargetFoundParams->Attack = SavedInfo.Attack;
-    TargetFoundParams->Defence = SavedInfo.Defence;
-    TargetFoundParams->MaxHP = SavedInfo.MaxHP;
     
     FActorSpawnParameters SpawnParameters;
     SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;

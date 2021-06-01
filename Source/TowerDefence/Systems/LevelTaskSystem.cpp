@@ -126,6 +126,11 @@ TArray<FEntityParams> ULevelTaskSystem::GetAllCanUsedCharacters()
 	return Res;	
 }
 
+FLevelTaskItem ULevelTaskSystem::GetCurrentLevelTaskItem()
+{
+	return CurrentLevelTaskItem;
+}
+
 void ULevelTaskSystem::LoadTaskConfig()
 {
 	TaskConfig.Empty();

@@ -8,6 +8,7 @@
 #include "TowerDefence/Components/EnemyMovementComponent.h"
 #include "TowerDefence/Creator/EntityCreator.h"
 #include "TowerDefence/Entities/Enemy.h"
+#include "TowerDefence/Systems/LevelTaskSystem.h"
 
 ALevelManager::ALevelManager(const FObjectInitializer& ObjectInitializer)
 	:AActor(ObjectInitializer)
@@ -26,16 +27,21 @@ void ALevelManager::BeginPlay()
 	ATDPlayerController::OnTileSelectedEvent.AddUObject(this, &ALevelManager::OnTileClickedListener);
 
 	EntityCreator = NewObject<UEntityCreator>(this);
-	TDGameInstance = Cast<UTDGameInstance>(GetGameInstance());
+		UTDGameInstance* TDGameInstance = Cast<UTDGameInstance>(GetGameInstance());
 	check(TDGameInstance);
+	
+	AEnemy::OnEnemyDeathEvent.AddUObject(this, &ALevelManager::OnEnemyDeathListener);
+	ULevelTaskSystem* LevelTaskSys = TDGameInstance->GetSubsystem<ULevelTaskSystem>();
+	CurrentLevelTaskItem = LevelTaskSys->GetCurrentLevelTaskItem();
+	TotalWaves = CurrentLevelTaskItem.ConfigData.TargetLevelInfo->Waves.Num();
+	// 初始化部署点数
+	DeployPoint = CurrentLevelTaskItem.ConfigData.TargetLevelInfo->InitDeployPoints;
+	SurplusEnemyArrivalNum = CurrentLevelTaskItem.ConfigData.TargetLevelInfo->MaxEnemyToEndNums;
+	CurrentWaveIdx = -1;
+
 	GenerateLevelMap();
 
-	AEnemy::OnEnemyDeathEvent.AddUObject(this, &ALevelManager::OnEnemyDeathListener);
-	TotalWaves = TDGameInstance->CurrentLevelInfomation->Waves.Num();
-	// 初始化部署点数
-	DeployPoint = TDGameInstance->CurrentLevelInfomation->InitDeployPoints;
-	SurplusEnemyArrivalNum = TDGameInstance->CurrentLevelInfomation->MaxEnemyToEndNums;
-	CurrentWaveIdx = -1;
+	
 	StateMachineComponent->RegisterState(
 		MakeShared<UInitWaveState>(UInitWaveState(StateMachineComponent, this)));
 	StateMachineComponent->RegisterState(
@@ -58,7 +64,7 @@ void ALevelManager::Tick(float DeltaSeconds)
 
 void ALevelManager::GenerateLevelMap()
 {
-	const FTileInfo& Tiles = TDGameInstance->CurrentLevelInfomation->TileInfo;
+	const FTileInfo& Tiles = CurrentLevelTaskItem.ConfigData.TargetLevelInfo->TileInfo;
 	for(int i = 0; i < Tiles.Height; i++)
 	{
 		for(int j = 0; j < Tiles.Witdh; j++)
@@ -112,7 +118,7 @@ void ALevelManager::OnEnemyArrivalToTheEndListener(AEnemy* TargetDeathEnemy)
 
 TSharedPtr<const FEnemyGenerationInfo> ALevelManager::GetCurrentWaveInfoPtr()
 {
-    const FEnemyGenerationInfo& TargetWave = TDGameInstance->CurrentLevelInfomation->Waves[CurrentWaveIdx];
+    const FEnemyGenerationInfo& TargetWave = CurrentLevelTaskItem.ConfigData.TargetLevelInfo->Waves[CurrentWaveIdx];
     return MakeShared<FEnemyGenerationInfo>(TargetWave);
 }
 

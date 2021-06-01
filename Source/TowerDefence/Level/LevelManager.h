@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include "TowerDefence/TDPlayerController.h"
+#include "TowerDefence/Systems/LevelTaskSystem.h"
 #include "LevelManager.generated.h"
+
 
 class ABaseTile;
 struct FEnemyGenerationInfo;
@@ -69,8 +71,8 @@ public:
 private:
 	FTimerHandle StartGameDelayTimeHandle;
 	UStateMachineComponent* StateMachineComponent;
-	UTDGameInstance* TDGameInstance;
 	TArray<ABaseTile*> AllTiles;
+	FLevelTaskItem CurrentLevelTaskItem;
 	void GenerateLevelMap();
 
 	
