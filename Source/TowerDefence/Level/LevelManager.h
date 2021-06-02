@@ -29,6 +29,8 @@ class ALevelManager:public AActor
 public:
 	
 	ALevelManager(const FObjectInitializer& ObjectInitializer);
+	virtual void Destroyed() override;
+	virtual void BeginDestroy() override;
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 	TSharedPtr<const FEnemyGenerationInfo> GetCurrentWaveInfoPtr();

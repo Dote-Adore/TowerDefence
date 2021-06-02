@@ -20,6 +20,18 @@ ALevelManager::ALevelManager(const FObjectInitializer& ObjectInitializer)
 	StateMachineComponent = CreateDefaultSubobject<UStateMachineComponent>(TEXT("WaveStateComp"));
 }
 
+void ALevelManager::Destroyed()
+{
+	// GetWorldTimerManager().ClearTimer(StartGameDelayTimeHandle);
+	Super::Destroyed();
+}
+
+void ALevelManager::BeginDestroy()
+{
+	Super::BeginDestroy();
+}
+
+
 void ALevelManager::BeginPlay()
 {
 	Super::BeginPlay();
@@ -48,11 +60,14 @@ void ALevelManager::BeginPlay()
 		MakeShared<UGenerateEnemiesState>(UGenerateEnemiesState(StateMachineComponent, this)));
 	StateMachineComponent->RegisterState(
 		MakeShared<UWaitForNextState>(UWaitForNextState(StateMachineComponent, this)));
-	GetWorldTimerManager().SetTimer(StartGameDelayTimeHandle, [&]()->void
+	auto that = this;
+	GetWorldTimerManager().SetTimer(StartGameDelayTimeHandle, [that]()->void
 	{
-		GetWorldTimerManager().ClearTimer(StartGameDelayTimeHandle);
-		OnNextWave();
-		StateMachineComponent->ChangeState("init");
+		if(!IsValid(that))
+			return;
+			that->GetWorldTimerManager().ClearTimer(that->StartGameDelayTimeHandle);
+			that->OnNextWave();
+			that->StateMachineComponent->ChangeState("init");
 	}, 2.f, false);
 
 }
