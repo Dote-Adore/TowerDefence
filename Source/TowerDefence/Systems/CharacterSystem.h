@@ -3,7 +3,6 @@
 #include "TowerDefence/Datas/CharacterDatas.h"
 #include "TowerDefence/Entities/Base/Entity.h"
 #include "TowerDefence/Datas/TurrentAdditional.h"
-#include "Blueprint/UserWidget.h"
 #include "CharacterSystem.generated.h"
 
 // 所有的关于角色相关的信息
@@ -11,6 +10,7 @@ DECLARE_LOG_CATEGORY_EXTERN(CharacterSystem, Log, All);
 
 class UArchiveSystem;
 class ATurrent;
+
 // struct FTurrentAdditionalInfo;
 // struct FEntityParams;
 
@@ -44,6 +44,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	int32 GetEntityID();
 };
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNewCharacterAdded, UCharacterEntryItem*, TargetCharacterItem);
+
 UCLASS()
 class TOWERDEFENCE_API UCharacterSystem:public UGameInstanceSubsystem
 {
@@ -69,6 +72,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	FCharacterSavedInfo GetCharacterSavedInfo(int32 ID);
+	UPROPERTY(BlueprintAssignable)
+	FOnNewCharacterAdded OnNewCharacterAdded;
 	
 private:
 

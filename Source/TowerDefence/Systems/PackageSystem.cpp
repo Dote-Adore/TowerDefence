@@ -1,5 +1,5 @@
 ﻿#include "PackageSystem.h"
-
+#include "CharacterSystem.h"
 #include "ArchiveSystem.h"
 #include "TowerDefence/GlobalConfig.h"
 #include "TowerDefence/Datas/SaveDatas/PackageArchive.h"

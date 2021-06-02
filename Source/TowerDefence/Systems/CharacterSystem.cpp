@@ -130,9 +130,16 @@ void UCharacterSystem::AddNewCharacter(int32 ID)
 	NewCharacter.LeftUpgradePoints = 0;
 	NewCharacter.Attack = TargetEntityParam.Attack;
 	NewCharacter.Defence = TargetEntityParam.Defence;
-
+	
 	ArchiveSystem->GetUserArchive()->OwnedCharacters.Add(ID, NewCharacter);
 	ArchiveSystem->SaveArchive();
+
+	
+	UCharacterEntryItem* Item = NewObject<UCharacterEntryItem>(this);
+	Item->SavedInfo = NewCharacter;
+	Item->AdditionalInfo = GetCharacterAdditionalInfo(ID);
+	Item->EntityParams = TargetEntityParam;
+	OnNewCharacterAdded.Broadcast(Item);
 }
 
 

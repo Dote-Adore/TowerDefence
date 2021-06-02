@@ -124,6 +124,10 @@ TSharedPtr<const FEnemyGenerationInfo> ALevelManager::GetCurrentWaveInfoPtr()
 
 void ALevelManager::OnLevelSuccess()
 {
+	ULevelTaskSystem* LTS = GetGameInstance()->GetSubsystem<ULevelTaskSystem>();
+	// 完成关卡
+	FFinishReward Res = LTS->FinishLevel();
+	OnLevelSuccessDelegate.Broadcast(Res);
 }
 
 void ALevelManager::OnRequestToDeploy(int32 TurrentID, FName Category, int32 Cost)

@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "TowerDefence/Datas/PackageItem.h"
-
 #include "PackageSystem.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(PackageSystem, Log, All);

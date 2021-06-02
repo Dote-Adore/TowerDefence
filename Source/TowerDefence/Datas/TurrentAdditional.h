@@ -13,6 +13,9 @@ struct FTurrentAdditionalInfo: public FTableRowBase
 	int32 EntityID;
 	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	UTexture2D* Thumbnail;
+	// 插画，在获得新角色的时候展示
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UTexture2D* Illustration;
 	// 星级，2星到5星
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	ERareness StarLevel;

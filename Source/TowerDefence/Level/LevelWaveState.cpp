@@ -156,7 +156,7 @@ void UWaitForNextState::Tick(float DeltaTime)
 	}
 	else
 	{
-		OwnerLevelManager->OnLevelSuccessDelegate.Broadcast();
+		OwnerLevelManager->OnLevelSuccess();
 		OwnerStateMachine->ChangeState("End");
 	}
 }

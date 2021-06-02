@@ -43,7 +43,7 @@ struct FFinishReward
 	int32 GameCoin;
 	// 通关完成后获取新的角色
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	int32 GainedNewCharacterID;
+	int32 GainedNewCharacterID = 0;
 };
 
 

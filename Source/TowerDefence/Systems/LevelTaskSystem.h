@@ -35,7 +35,7 @@ public:
 
 	// 战斗关卡相关------
 	UFUNCTION(BlueprintCallable)
-	void FinishLevel(int32 LevelID);
+	FFinishReward FinishLevel();
 	UFUNCTION(BlueprintCallable)
 	void StartTask(FLevelTaskItem TargetLevelTaskItem, TSet<int32> UsedCharacterID);
 
@@ -61,5 +61,5 @@ private:
 	
 	// 开始关卡
 	void LoadTaskConfig();
-	void SettlementReward(const FFinishReward& Reward);
+	void SettlementReward(const FFinishReward& Reward, FFinishReward& StatisticcalReward);
 };

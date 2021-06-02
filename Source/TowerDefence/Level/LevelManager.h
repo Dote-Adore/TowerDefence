@@ -16,7 +16,7 @@ class ATurrent;
 // 闯关失败事件
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLevelFailedDelegate);
 // 闯关成功事件
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLevelSuccessDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLevelSuccessDelegate, FFinishReward, Reward);
 // 下一波事件
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnNextWaveDeleagate);
 // 部署成功事件

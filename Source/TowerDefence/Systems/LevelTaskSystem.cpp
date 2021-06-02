@@ -84,25 +84,28 @@ TArray<FLevelTaskItem> ULevelTaskSystem::GetAllLevelTasks()
 	return Res;
 }
 
-void ULevelTaskSystem::FinishLevel(int32 LevelID)
+FFinishReward ULevelTaskSystem::FinishLevel()
 {
+	int32 LevelID = CurrentLevelTaskItem.ConfigData.ID;
 	const FLevelTaskData* LevelTaskData =TaskConfig.Find(LevelID);
 	ensureMsgf(LevelTaskData, TEXT("Can not Find LevelTaskConfig in Target ID %d!"), LevelID);
 	// 进行结算奖励
 	FEachLevelTaskSavedData* BeforeTaskLevelSavedData = ArchiveSystem->GetLevelArchive()->LevelTaskStates.Find(LevelID);
 	ensureMsgf(BeforeTaskLevelSavedData, TEXT("Can not Find LevelTaskArchive in Target ID %d!"), LevelID);
 	// 如果之前是没有通关的，则给与第一次通关的奖励
+	FFinishReward ResultReward;
 	if(BeforeTaskLevelSavedData->TaskState == ELevelTaskState::UnLock)
 	{
 		// 首次通关结算奖励
-		SettlementReward(LevelTaskData->FirstFinishRewards);
+		SettlementReward(LevelTaskData->FirstFinishRewards, ResultReward);
 		
 	}
 	// 正常的奖励结算
-	SettlementReward(LevelTaskData->NormalRewards);
+	SettlementReward(LevelTaskData->NormalRewards, ResultReward);
 	// 更改条件为关卡通关完成
 	BeforeTaskLevelSavedData->TaskState = ELevelTaskState::Finished;
 	ArchiveSystem->SaveArchive();
+	return ResultReward;
 }
 
 void ULevelTaskSystem::StartTask(FLevelTaskItem TargetLevelTaskItem, TSet<int32> UsedCharacterID)
@@ -123,7 +126,7 @@ TArray<FEntityParams> ULevelTaskSystem::GetAllCanUsedCharacters()
 	{
 		Res.Add(CharacterSys->GetEntityParam(ID));
 	}
-	return Res;	
+	return Res;
 }
 
 FLevelTaskItem ULevelTaskSystem::GetCurrentLevelTaskItem()
@@ -149,17 +152,26 @@ void ULevelTaskSystem::LoadTaskConfig()
 	}
 }
 
-void ULevelTaskSystem::SettlementReward(const FFinishReward& Reward)
+void ULevelTaskSystem::SettlementReward(const FFinishReward& Reward, FFinishReward& StatisticcalReward)
 {
 	auto CurrentPackageSystem = GetGameInstance()->GetSubsystem<UPackageSystem>();
 	for(auto FoodItem: Reward.Foods)
 	{
+		StatisticcalReward.Foods.FindOrAdd(FoodItem.Key, FoodItem.Value);
 		CurrentPackageSystem->AddFoodItem(FoodItem.Key, FoodItem.Value);
 	}
 	for(auto DevelopItem: Reward.DevelopItems)
 	{
+		StatisticcalReward.DevelopItems.FindOrAdd(DevelopItem.Key, DevelopItem.Value);
 		CurrentPackageSystem->AddDevelopItem(DevelopItem.Key, DevelopItem.Value);
 	}
 	ArchiveSystem->GetUserArchive()->GameCoinNum+=Reward.GameCoin;
 	ArchiveSystem->GetUserArchive()->PaidCoinNum+=Reward.PaidCoin;
+	if(Reward.GainedNewCharacterID!=0)
+	{
+		GetGameInstance()->GetSubsystem<UCharacterSystem>()->AddNewCharacter(Reward.GainedNewCharacterID);
+		StatisticcalReward.GainedNewCharacterID = Reward.GainedNewCharacterID;
+	}
+	StatisticcalReward.GameCoin+=Reward.GameCoin;
+	StatisticcalReward.PaidCoin+=Reward.GameCoin;
 }
