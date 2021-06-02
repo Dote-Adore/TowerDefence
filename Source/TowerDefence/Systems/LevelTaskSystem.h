@@ -42,7 +42,10 @@ public:
 	// 获取所有可以用到的角色
 	UFUNCTION(BlueprintCallable)
 	TArray<FEntityParams> GetAllCanUsedCharacters();
+	UFUNCTION(BlueprintCallable)
 	FLevelTaskItem GetCurrentLevelTaskItem();
+	UFUNCTION(BlueprintCallable)
+	void RetryCurrentLevel();
 	
 	//  ---------------
 private:

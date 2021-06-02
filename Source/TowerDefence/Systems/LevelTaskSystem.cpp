@@ -134,6 +134,11 @@ FLevelTaskItem ULevelTaskSystem::GetCurrentLevelTaskItem()
 	return CurrentLevelTaskItem;
 }
 
+void ULevelTaskSystem::RetryCurrentLevel()
+{
+	UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), CurrentLevelTaskItem.ConfigData.TargetLevelInfo->BackgroundWorld);
+}
+
 void ULevelTaskSystem::LoadTaskConfig()
 {
 	TaskConfig.Empty();

@@ -18,8 +18,8 @@ ATurrent* UEntityCreator::CreateTurrent(int32 EntityID, FTransform EntityTransfo
     FCharacterSavedInfo SavedInfo = GetWorld()->GetGameInstance()->GetSubsystem<UCharacterSystem>()->GetCharacterSavedInfo(EntityID);
     // 根据等级修改参数
     Res->GetCurrentEntityParams().Attack = SavedInfo.Attack;
-    Res->GetCurrentEntityParams().Attack = SavedInfo.Defence;
-    Res->GetCurrentEntityParams().Attack = SavedInfo.MaxHP;
+    Res->GetCurrentEntityParams().Defence = SavedInfo.Defence;
+    Res->GetCurrentEntityParams().MaxHP = SavedInfo.MaxHP;
     return Cast<ATurrent>(Res);
 }
 
