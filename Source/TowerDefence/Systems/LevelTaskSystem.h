@@ -37,7 +37,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FFinishReward FinishLevel();
 	UFUNCTION(BlueprintCallable)
-	void StartTask(FLevelTaskItem TargetLevelTaskItem, TSet<int32> UsedCharacterID);
+	bool StartTask(FLevelTaskItem TargetLevelTaskItem, TSet<int32> UsedCharacterID);
 
 	// 获取所有可以用到的角色
 	UFUNCTION(BlueprintCallable)
@@ -45,7 +45,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FLevelTaskItem GetCurrentLevelTaskItem();
 	UFUNCTION(BlueprintCallable)
-	void RetryCurrentLevel();
+	bool RetryCurrentLevel();
 	
 	//  ---------------
 private:

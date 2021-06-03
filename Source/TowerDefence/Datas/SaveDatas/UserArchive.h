@@ -23,12 +23,9 @@ class UUserArchive: public USaveGame
 {
 	GENERATED_BODY()
 public:
-	// 当前体力
-	UPROPERTY(BlueprintReadOnly)
-	int32 PhysicalStrength;
+
+	UUserArchive(const FObjectInitializer& ObjectInitializer);
 	// 体力上限
-	UPROPERTY(BlueprintReadOnly)
-	int32 MaxPhysicalStrength = 120;
 	// 游戏内金币数量
 	UPROPERTY(BlueprintReadOnly)
 	int32 GameCoinNum;
@@ -38,4 +35,19 @@ public:
 	// 该用户拥有的所有角色信息
 	UPROPERTY(BlueprintReadOnly)
 	TMap<int32, FCharacterSavedInfo> OwnedCharacters;
+	UPROPERTY(BlueprintReadOnly)
+	bool IsFirstStartGame = false;
+	// 上一次添加体力值的时间
+	UPROPERTY(BlueprintReadOnly)
+	FDateTime LastAddPhysicalPointTime;
+	UFUNCTION(BlueprintCallable)
+	int32 GetCurrentPhysicalStrength();
+	UFUNCTION(BlueprintCallable)
+	int32 GetMaxPhysicalStrength();
+	UFUNCTION(BlueprintCallable)
+	bool UsePhysicalStrength(int32 InPoints);
+protected:
+	// 当前体力
+	UPROPERTY(BlueprintReadOnly)
+	int32 PhysicalStrength;
 };

@@ -35,6 +35,7 @@ void AEntity::InitEntity(const FEntityParams& Params, const FEntityAnimation& An
    MeshComp->SetRelativeLocation(FVector(0,0, -1 * GetCapsuleComponent()->GetScaledCapsuleHalfHeight()));
     MeshComp->SetSkeletalMesh(Params.SkeletalMesh.LoadSynchronous());
     MeshComp->SetRenderCustomDepth(true);
+    MeshComp->SetCustomDepthStencilValue(255);
     // 对初始值进行初始化
     MeshComp->SetAnimInstanceClass(Anims.AnimInstance);
     SetActorTransform(TargetTransform);

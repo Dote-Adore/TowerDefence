@@ -20,6 +20,7 @@ ATurrent* UEntityCreator::CreateTurrent(int32 EntityID, FTransform EntityTransfo
     Res->GetCurrentEntityParams().Attack = SavedInfo.Attack;
     Res->GetCurrentEntityParams().Defence = SavedInfo.Defence;
     Res->GetCurrentEntityParams().MaxHP = SavedInfo.MaxHP;
+    Res->GetCurrentEntityParams().CurrentHP = SavedInfo.MaxHP;
     return Cast<ATurrent>(Res);
 }
 

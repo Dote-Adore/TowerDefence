@@ -2,6 +2,8 @@
 #include "Engine/DataTable.h"
 #include "PackageItem.generated.h"
 
+
+class UTexture2D;
 // Item获取途径
 UCLASS(BlueprintType)
 class UItemGainedMethod:public UObject

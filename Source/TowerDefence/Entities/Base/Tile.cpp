@@ -13,7 +13,8 @@ ABaseTile::ABaseTile(const FObjectInitializer& ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
-	UBillboardComponent* SpriteComponent = CreateEditorOnlyDefaultSubobject<UBillboardComponent>(TEXT("Sprite"));
+	SpriteComponent = CreateEditorOnlyDefaultSubobject<UBillboardComponent>(TEXT("Sprite"));
+	SetRootComponent(SpriteComponent);
 	SelectedPlaneComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SelectedUIComp"));
 	SelectedPlaneComponent->SetStaticMesh(LoadObject<UStaticMesh>(NULL, TEXT("StaticMesh'/Engine/BasicShapes/Plane.Plane'")));
 	struct FConstructorStatics
@@ -25,7 +26,6 @@ ABaseTile::ABaseTile(const FObjectInitializer& ObjectInitializer)
 	if (SpriteComponent)
 	{
 		SpriteComponent->Sprite = ConstructorStatics.DecalTexture.Get();
-		SpriteComponent->SetupAttachment(RootComponent);
 		SpriteComponent->SetUsingAbsoluteScale(true);
 		SpriteComponent->bIsScreenSizeScaled = true;
 		SpriteComponent->bReceivesDecals = false;
@@ -45,6 +45,7 @@ ABaseTile::ABaseTile(const FObjectInitializer& ObjectInitializer)
 void ABaseTile::BeginPlay()
 {
 	Super::BeginPlay();
+	BoxComponent->SetRelativeLocation(FVector(0,0,-BoxSize+HeightOffest));
 	BoxComponent->ShapeColor = DebugColor.ToFColor(true);
 	SlectedShowMID = SelectedPlaneComponent->CreateDynamicMaterialInstance(0,
         LoadObject<UMaterialInterface>(NULL, TEXT("MaterialInterface'/Game/Res/Materials/Tiles/M_BaseTileSelectedMat_Inst.M_BaseTileSelectedMat_Inst'")));

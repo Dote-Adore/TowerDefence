@@ -17,11 +17,11 @@ DEFINE_LOG_CATEGORY(LevelTaskSystem)
 void ULevelTaskSystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	ArchiveSystem = GetGameInstance()->GetSubsystem<UArchiveSystem>();
-	LoadTaskConfig();
 }
 
 TArray<FLevelTaskItem> ULevelTaskSystem::GetAllLevelTasks()
 {
+	LoadTaskConfig();
 	ArchiveSystem = GetGameInstance()->GetSubsystem<UArchiveSystem>();
 	TArray<FLevelTaskItem> Res;
 	bool NeedSave = false;
@@ -108,12 +108,16 @@ FFinishReward ULevelTaskSystem::FinishLevel()
 	return ResultReward;
 }
 
-void ULevelTaskSystem::StartTask(FLevelTaskItem TargetLevelTaskItem, TSet<int32> UsedCharacterID)
+bool ULevelTaskSystem::StartTask(FLevelTaskItem TargetLevelTaskItem, TSet<int32> UsedCharacterID)
 {
+	bool CanStart = ArchiveSystem->GetUserArchive()->UsePhysicalStrength(TargetLevelTaskItem.ConfigData.UsedPhysicalStrength);
+	if(CanStart == false)
+		return false;
 	CurrentLevelTaskItem = TargetLevelTaskItem;
 	CurrentUsedCharacterID = UsedCharacterID;
-
+	ArchiveSystem->SaveArchive();
 	UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), TargetLevelTaskItem.ConfigData.TargetLevelInfo->BackgroundWorld);
+	return true;
 }
 
 TArray<FEntityParams> ULevelTaskSystem::GetAllCanUsedCharacters()
@@ -134,13 +138,15 @@ FLevelTaskItem ULevelTaskSystem::GetCurrentLevelTaskItem()
 	return CurrentLevelTaskItem;
 }
 
-void ULevelTaskSystem::RetryCurrentLevel()
+bool ULevelTaskSystem::RetryCurrentLevel()
 {
-	UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), CurrentLevelTaskItem.ConfigData.TargetLevelInfo->BackgroundWorld);
+	return StartTask(CurrentLevelTaskItem, CurrentUsedCharacterID);
 }
 
 void ULevelTaskSystem::LoadTaskConfig()
 {
+	if(TaskConfig.Num()!=0)
+		return;
 	TaskConfig.Empty();
 	const UGlobalConfig* GlobalConfig = GetDefault<UGlobalConfig>();
 	UDataTable* TaskDataTable = GlobalConfig->LevelTaskDataTable.LoadSynchronous();

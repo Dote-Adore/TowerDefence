@@ -1,7 +1,10 @@
 ﻿#pragma once
+#include "GameFramework/Actor.h"
 #include "Tile.generated.h"
 
 class UBoxComponent;
+class UBillboardComponent;
+class UStaticMeshComponent;
 class AEntity;
 class ABaseTile;
 UENUM()
@@ -45,8 +48,10 @@ protected:
 	UBoxComponent* BoxComponent;
 	UPROPERTY(EditDefaultsOnly)
 	UStaticMeshComponent* SelectedPlaneComponent;
+	UPROPERTY(EditDefaultsOnly)
+	UBillboardComponent* SpriteComponent;
 	UPROPERTY(EditAnywhere)
-	float HeightOffest = 0.f;
+	float HeightOffest;
 
 	UMaterialInstanceDynamic* SlectedShowMID;
 };

@@ -60,6 +60,13 @@ public:
     // 食物 Item
     UPROPERTY(Config, EditAnywhere, Category=PackageSystem)
     TSoftObjectPtr<UDataTable> FoodItems;
+    
+    UPROPERTY(Config,EditAnywhere,Category=UserSystem)
+    // 体力恢复时间
+    int32 PhysicalStrengthRecoverySeconds = 60;
+    // 最大体力
+    UPROPERTY(Config,EditAnywhere,Category=UserSystem)
+    int32 MaxPhysicalStrength = 120;
     const FBuff* FindBuffByID(int32 ID);
     const AllLevelsMap GetAllLevels() const;
 private:

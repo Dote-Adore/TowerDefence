@@ -65,6 +65,8 @@ private:
 	void LoadAllPackageItemConfig();
 	UPROPERTY(Transient)
 	UArchiveSystem* ArchiveSystem;
+	UPROPERTY(Transient)
 	TMap<int32, FFoodItem> AllFoodsConfig;
+	UPROPERTY(Transient)
 	TMap<int32, FCharacterDevelopmentItem> AllDevelopmentItemConfig;
 };
