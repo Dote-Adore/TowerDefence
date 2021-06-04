@@ -57,6 +57,7 @@ void ABaseTile::BeginPlay()
 void ABaseTile::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+	BoxComponent->SetRelativeLocation(FVector(0,0,-BoxSize+HeightOffest));
 	// SlectedShowMID->SetVectorParameterValue("Color", DebugColor);
 }
 

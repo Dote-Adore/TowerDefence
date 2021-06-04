@@ -9,10 +9,7 @@ void UArchiveSystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 	// 在这里添加存档
-	LoadArchive<UUserArchive>(SavedUserArchive, TEXT("UserArchive"));
-	LoadArchive<ULevelTaskArchive>(SavedLevelTaskArchive, TEXT("LevelArchive"));
-	LoadArchive<UPackageArchive>(SavedPackageArchive, TEXT("PackageArchive"));
-	UE_LOG(LogTemp, Display, TEXT("Initialze ArchiveSystem Success!"))
+	LoadArchive();
 }
 
 void UArchiveSystem::SaveArchive()
@@ -53,8 +50,25 @@ void UArchiveSystem::Deinitialize()
 	Super::Deinitialize();
 }
 
+void UArchiveSystem::ClearArchive()
+{
+	for(auto ArchiveName: ArchiveNames)
+	{
+		UGameplayStatics::DeleteGameInSlot(ArchiveName.Key, 0);
+	}
+	LoadArchive();
+}
+
+void UArchiveSystem::LoadArchive()
+{
+	_LoadArchive<UUserArchive>(SavedUserArchive, TEXT("UserArchive"));
+	_LoadArchive<ULevelTaskArchive>(SavedLevelTaskArchive, TEXT("LevelArchive"));
+	_LoadArchive<UPackageArchive>(SavedPackageArchive, TEXT("PackageArchive"));
+	UE_LOG(LogTemp, Display, TEXT("Initialze ArchiveSystem Success!"))
+}
+
 template <class SavedClass>
-void UArchiveSystem::LoadArchive(SavedClass*& outVal, const FString& SlotName)
+void UArchiveSystem::_LoadArchive(SavedClass*& outVal, const FString& SlotName)
 {
 	bool bRet = UGameplayStatics::DoesSaveGameExist(SlotName, 0);
 	

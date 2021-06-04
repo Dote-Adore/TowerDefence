@@ -27,13 +27,15 @@ public:
 	UFUNCTION(BlueprintCallable)
 	UPackageArchive* GetPackageArchive();
 	virtual void Deinitialize() override;
+	UFUNCTION(BlueprintCallable)
+	void ClearArchive();
 	
 
 private:
 	// 读档
 	template<class SavedClass>
-	void LoadArchive(SavedClass*& outVal, const FString& SlotName);
-
+	void _LoadArchive(SavedClass*& outVal, const FString& SlotName);
+	void LoadArchive();
 
 	UPROPERTY(Transient)
 	UUserArchive* SavedUserArchive;
