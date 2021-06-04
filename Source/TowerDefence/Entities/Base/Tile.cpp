@@ -13,7 +13,7 @@ ABaseTile::ABaseTile(const FObjectInitializer& ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
-	SpriteComponent = CreateEditorOnlyDefaultSubobject<UBillboardComponent>(TEXT("Sprite"));
+	SpriteComponent = CreateDefaultSubobject<UBillboardComponent>(TEXT("Sprite"));
 	SetRootComponent(SpriteComponent);
 	SelectedPlaneComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SelectedUIComp"));
 	SelectedPlaneComponent->SetStaticMesh(LoadObject<UStaticMesh>(NULL, TEXT("StaticMesh'/Engine/BasicShapes/Plane.Plane'")));
